@@ -4,23 +4,33 @@ import Hero from "@/components/Hero";
 import Problem from "@/components/Problem";
 import FeaturesAccordion from "@/components/FeaturesAccordion";
 import Pricing from "@/components/Pricing";
-import FAQ from "@/components/FAQ";
-import CTA from "@/components/CTA";
+import Questions from "@/components/Questions";
+import BigCTA from "@/components/BigCTA";
 import Footer from "@/components/Footer";
+import HeroSection from "@/components/HeroSection";
+import SocialProof from "@/components/SocialProof";
+import WithWithout from '@/components/WithWithout';
+import Benefits from '@/components/Benefits';
+import HowItWorks from '@/components/HowItWorks';
 
 export default function Home() {
   return (
     <>
-      <Suspense>
+      {/* <Suspense>
         <Header />
-      </Suspense>
+      </Suspense> */}
       <main>
-        <Hero />
-        <Problem />
-        <FeaturesAccordion />
+        <HeroSection/>
+        <SocialProof/>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <hr className="my-12 border-t border-gray-200" />
+        </div>
+        <WithWithout />
+        <Benefits />
+        <HowItWorks />
         <Pricing />
-        <FAQ />
-        <CTA />
+        <Questions />
+        <BigCTA />
       </main>
       <Footer />
     </>
