@@ -57,51 +57,33 @@ const PrivacyPolicy = () => {
           className="leading-relaxed whitespace-pre-wrap"
           style={{ fontFamily: "sans-serif" }}
         >
-          {`Last Updated: 2023-08-25
+          {`Última actualización: 11 de octubre de 2024
 
-Thank you for visiting ShipFast ("we," "us," or "our"). This Privacy Policy outlines how we collect, use, and protect your personal and non-personal information when you use our website located at https://shipfa.st (the "Website").
+En MenúAhora ("nosotros" o "nuestro"), accesible desde https://menuahora.com, estamos comprometidos con la protección de tu privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos y protegemos tu información. Al utilizar nuestro sitio web, aceptas los términos descritos a continuación.
 
-By accessing or using the Website, you agree to the terms of this Privacy Policy. If you do not agree with the practices described in this policy, please do not use the Website.
+1. Información que Recopilamos
+Recopilamos dos tipos de datos:
 
-1. Information We Collect
+Información Personal: Incluye tu nombre, correo electrónico e información de pago para procesar pedidos.
+Información No Personal: Recopilamos cookies web para mejorar tu experiencia de navegación.
+2. Propósito de la Recopilación de Datos
+Recopilamos tus datos para procesar y gestionar pedidos de manera eficiente y mejorar nuestros servicios.
 
-1.1 Personal Data
+3. Compartición de Datos
+No compartimos tu información personal ni no personal con terceros. Toda la información se mantiene estrictamente confidencial.
 
-We collect the following personal information from you:
+4. Privacidad de los Niños
+Nuestros servicios no están dirigidos a niños y no recopilamos intencionadamente datos de menores.
 
-Name: We collect your name to personalize your experience and communicate with you effectively.
-Email: We collect your email address to send you important information regarding your orders, updates, and communication.
-Payment Information: We collect payment details to process your orders securely. However, we do not store your payment information on our servers. Payments are processed by trusted third-party payment processors.
+5. Cookies
+Utilizamos cookies para mejorar la funcionalidad del sitio web y la experiencia del usuario. Al usar el sitio, consientes el uso de cookies según lo descrito en esta Política de Privacidad.
 
-1.2 Non-Personal Data
+6. Actualizaciones a la Política de Privacidad
+Podemos actualizar esta Política de Privacidad periódicamente. Si se realizan cambios significativos, notificaremos a los usuarios por correo electrónico. Revisa esta Política de Privacidad regularmente para estar informado sobre cómo protegemos tus datos.
 
-We may use web cookies and similar technologies to collect non-personal information such as your IP address, browser type, device information, and browsing patterns. This information helps us to enhance your browsing experience, analyze trends, and improve our services.
-
-2. Purpose of Data Collection
-
-We collect and use your personal data for the sole purpose of order processing. This includes processing your orders, sending order confirmations, providing customer support, and keeping you updated about the status of your orders.
-
-3. Data Sharing
-
-We do not share your personal data with any third parties except as required for order processing (e.g., sharing your information with payment processors). We do not sell, trade, or rent your personal information to others.
-
-4. Children's Privacy
-
-ShipFast is not intended for children under the age of 13. We do not knowingly collect personal information from children. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us at the email address provided below.
-
-5. Updates to the Privacy Policy
-
-We may update this Privacy Policy from time to time to reflect changes in our practices or for other operational, legal, or regulatory reasons. Any updates will be posted on this page, and we may notify you via email about significant changes.
-
-6. Contact Information
-
-If you have any questions, concerns, or requests related to this Privacy Policy, you can contact us at:
-
-Email: marc@shipfa.st
-
-For all other inquiries, please visit our Contact Us page on the Website.
-
-By using ShipFast, you consent to the terms of this Privacy Policy.`}
+7. Información de Contacto
+Si tienes alguna pregunta o inquietud sobre nuestra Política de Privacidad, por favor contáctanos en:
+Correo electrónico: soyurielurbina@gmail.com`}
         </pre>
       </div>
     </main>

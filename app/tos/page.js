@@ -57,39 +57,40 @@ const TOS = () => {
           className="leading-relaxed whitespace-pre-wrap"
           style={{ fontFamily: "sans-serif" }}
         >
-          {`Last Updated: September 26, 2023
+          {`Última actualización: 11 de octubre de 2024
 
-Welcome to ShipFast!
+Bienvenido a MenúAhora ("nosotros" o "nuestro"). Al acceder o usar nuestro sitio web, https://menuahora.com ("Sitio Web"), aceptas cumplir con estos Términos y Servicios ("Términos"). Por favor, léelos cuidadosamente.
 
-These Terms of Service ("Terms") govern your use of the ShipFast website at https://shipfa.st ("Website") and the services provided by ShipFast. By using our Website and services, you agree to these Terms.
+1. Descripción del Servicio
+MenúAhora ofrece herramientas para crear y personalizar menús digitales, así como la descarga de código para crear aplicaciones. Al comprar un paquete, los usuarios adquieren la propiedad del código, pero no pueden revenderlo ni transferir estos derechos a terceros.
 
-1. Description of ShipFast
+2. Propiedad y Licencia
+Los usuarios que compren un paquete tienen derecho a usar y modificar el código descargado para sus propios fines.
+El código proporcionado es para uso personal o comercial, y está prohibida la reventa, redistribución o sublicencia del código.
+MenúAhora retiene todos los demás derechos no expresamente otorgados en estos Términos.
+3. Política de Reembolso
+Ofrecemos un reembolso completo dentro de los 7 días posteriores a la fecha de compra si no estás satisfecho. Para solicitar un reembolso, por favor contáctanos en soyurielurbina@gmail.com.
 
-ShipFast is a platform that offers a JavaScript code boilerplate to assist entrepreneurs in launching their startups more efficiently.
+4. Recopilación de Datos de los Usuarios
+Recopilamos la siguiente información personal:
 
-2. Ownership and Usage Rights
+Nombre
+Correo electrónico
+Información de pago
+Para más detalles sobre cómo manejamos tus datos, consulta nuestra Política de Privacidad.
 
-When you purchase a package from ShipFast, you gain the right to download and use the code provided for creating applications. You own the code you create but do not have the right to resell it. We offer a full refund within 7 days of purchase, as specified in our refund policy.
+5. Recopilación de Datos No Personales
+También recopilamos datos no personales a través de cookies web para mejorar nuestros servicios y la experiencia del usuario. Al usar el Sitio Web, aceptas el uso de cookies de acuerdo con nuestra Política de Privacidad.
 
-3. User Data and Privacy
+6. Cambios en los Términos
+Podemos actualizar estos Términos de vez en cuando. Si realizamos cambios, notificaremos a los usuarios por correo electrónico. El uso continuo de nuestro Sitio Web después de cualquier cambio constituye tu aceptación de los Términos actualizados.
 
-We collect and store user data, including name, email, and payment information, as necessary to provide our services. For details on how we handle your data, please refer to our Privacy Policy at https://shipfa.st/privacy-policy.
+7. Ley Aplicable
+Estos Términos se rigen y se interpretan de acuerdo con las leyes de México. Cualquier disputa que surja o esté relacionada con estos Términos se resolverá conforme a la legislación mexicana.
 
-4. Non-Personal Data Collection
-
-We use web cookies to collect non-personal data for the purpose of improving our services and user experience.
-
-5. Governing Law
-
-These Terms are governed by the laws of France.
-
-6. Updates to the Terms
-
-We may update these Terms from time to time. Users will be notified of any changes via email.
-
-For any questions or concerns regarding these Terms of Service, please contact us at marc@shipfa.st.
-
-Thank you for using ShipFast!`}
+8. Información de Contacto
+Para cualquier pregunta o inquietud sobre estos Términos, por favor contáctanos en:
+Correo electrónico: soyurielurbina@gmail.com`}
         </pre>
       </div>
     </main>
