@@ -8,7 +8,7 @@ const WithWithout = () => {
         <div className="mx-auto max-w-2xl lg:text-center">
           <h2 className="text-base font-semibold leading-7 text-indigo-600">Comparativa</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Deja atrás los problemas<br className="hidden sm:inline" /> de un menú tradicional
+            Deja atrás los problemas<br className="hidden sm:inline" /> de un menú tradicional 👋
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
             Descubre cómo MenúAhora simplifica tu proceso de gestión de menús y ahorra tiempo y dinero.
@@ -16,11 +16,11 @@ const WithWithout = () => {
         </div>
         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
           <dl className="grid grid-cols-1 gap-x-8 gap-y-16 lg:grid-cols-2">
-            <div className="flex flex-col rounded-2xl bg-red-50 p-8">
-              <dt className="text-base font-semibold leading-7 text-gray-900">
+            <div className="flex flex-col rounded-2xl bg-gradient-to-br from-red-100 to-red-50 p-8 shadow-lg border border-red-200 transition-all hover:shadow-xl">
+              <dt className="text-xl font-bold leading-7 text-red-800 mb-4">
                 Menú tradicional
               </dt>
-              <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-600">
+              <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-700">
                 <ul className="flex-auto space-y-4">
                   {[
                     "Actualizar el menú puede tardar días",
@@ -39,11 +39,11 @@ const WithWithout = () => {
                 </ul>
               </dd>
             </div>
-            <div className="flex flex-col rounded-2xl bg-green-50 p-8">
-              <dt className="text-base font-semibold leading-7 text-gray-900">
+            <div className="flex flex-col rounded-2xl bg-gradient-to-br from-green-100 to-green-50 p-8 shadow-lg border border-green-200 transition-all hover:shadow-xl">
+              <dt className="text-xl font-bold leading-7 text-green-800 mb-4">
                 MenúAhora
               </dt>
-              <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-600">
+              <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-700">
                 <ul className="flex-auto space-y-4">
                   {[
                     "Edita productos en segundos",

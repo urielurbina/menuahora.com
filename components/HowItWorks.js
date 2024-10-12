@@ -31,12 +31,20 @@ const steps = [
   },
 ]
 
+const images = [
+  { src: "/images/menu-digital-1.jpg", alt: "Ejemplo de menú digital", className: "col-span-2 row-span-2" },
+  { src: "/images/restaurante-2.jpg", alt: "Interior de restaurante", className: "col-span-1 row-span-1" },
+  { src: "/images/chef-3.jpg", alt: "Chef preparando platillo", className: "col-span-1 row-span-2" },
+  { src: "/images/cliente-4.jpg", alt: "Cliente usando menú digital", className: "col-span-1 row-span-1" },
+  { src: "/images/plato-5.jpg", alt: "Plato gourmet", className: "col-span-3 row-span-1" }, // Quitamos hidden lg:block
+]
+
 export default function HowItWorks() {
   return (
-    <div className="bg-gradient-to-b from-indigo-50 to-white py-24 sm:py-32">
+    <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-base font-semibold leading-7 text-indigo-600">Proceso Simplificado</h2>
+        <div className="mx-auto max-w-2xl lg:text-center">
+          <h2 className="text-base font-semibold leading-7 text-indigo-600">How it works</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Cómo Funciona
           </p>
@@ -45,15 +53,19 @@ export default function HowItWorks() {
           </p>
         </div>
         <div className="mt-16 sm:mt-24">
-          <div className="lg:flex lg:items-center lg:space-x-16">
+          <div className="lg:flex lg:items-start lg:space-x-16">
             <div className="lg:w-1/2 mb-12 lg:mb-0">
-              <div className="relative w-full pt-[75%]"> {/* 4:3 aspect ratio */}
-                <Image
-                  src="https://images.unsplash.com/photo-1499951360447-b19be8fe80f5"
-                  alt="Proceso de creación de menú digital"
-                  fill
-                  className="rounded-lg shadow-lg object-cover"
-                />
+              <div className="grid grid-cols-3 grid-rows-4 gap-4 aspect-[3/5]"> {/* Cambiamos a aspect-[3/5] para todos los tamaños */}
+                {images.map((image, index) => (
+                  <div key={index} className={`relative ${image.className}`}>
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      className="rounded-lg shadow-md object-cover"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
             <ul role="list" className="lg:w-1/2 space-y-12">

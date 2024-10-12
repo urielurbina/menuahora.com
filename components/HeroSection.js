@@ -106,7 +106,7 @@ export default function Example() {
         </Dialog>
       </header>
 
-      <div className="relative isolate pt-14">
+      <div className="relative isolate pt-10">
         <svg
           aria-hidden="true"
           className="absolute inset-0 -z-10 h-full w-full stroke-gray-200 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]"
@@ -131,28 +131,37 @@ export default function Example() {
           </svg>
           <rect fill="url(#83fd4e5a-9d52-42fc-97b6-718e5d7ee527)" width="100%" height="100%" strokeWidth={0} />
         </svg>
-        <div className="mx-auto max-w-7xl px-6 py-24 sm:py-32 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-40">
-          <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto">
-            <div className="flex justify-center lg:justify-start">
-              <TestimonialsAvatars priority={true} />
-            </div>
-            <h1 className="mt-10 max-w-lg text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl text-center lg:text-left mx-auto lg:mx-0">
-              Tu menú digital personalizado
+        <div className="mx-auto max-w-7xl px-6 py-8 sm:py-12 sm:pb-32 lg:flex lg:items-center lg:gap-x-10 lg:px-8 lg:py-16">
+          <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto sm:mt-24 lg:mt-0">
+            <h1 className="max-w-lg text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl text-center lg:text-left mx-auto lg:mx-0">
+              Tu menú digital{' '}
+              <span className="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md mt-2">
+                personalizado
+              </span>
             </h1>
-            <p className="mt-6 text-lg leading-8 text-gray-600 text-center lg:text-left">
+            <p className="mt-4 text-lg leading-8 text-gray-600 text-center lg:text-left">
               Elige los detalles, sube tus productos y recibe tu menú en 24-72 horas. Fácil de compartir y actualizar
               cuando lo necesites.
             </p>
-            <div className="mt-10 flex items-center justify-center lg:justify-start gap-x-6">
+            <div className="mt-8 flex items-center justify-center lg:justify-start gap-x-6">
               <a
                 href="#"
                 className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
               >
                 Empieza ya
               </a>
+              <a
+                href="#"
+                className="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-indigo-600 shadow-sm ring-1 ring-inset ring-indigo-300 hover:bg-indigo-50"
+              >
+                Ver Demos
+              </a>
+            </div>
+            <div className="mt-8 flex justify-center lg:justify-start">
+              <TestimonialsAvatars priority={true} />
             </div>
           </div>
-          <div className="mt-16 sm:mt-24 lg:mt-0 lg:flex-shrink-0 lg:flex-grow">
+          <div className="mt-12 sm:mt-16 lg:mt-0 lg:flex-shrink-0 lg:flex-grow">
             <svg role="img" viewBox="0 0 366 729" className="mx-auto w-[22.875rem] max-w-full drop-shadow-xl">
               <title>App screenshot</title>
               <defs>

@@ -1,8 +1,8 @@
 import {
   QrCodeIcon,
-  LinkIcon,
-  MagnifyingGlassIcon,
-  PaintBrushIcon,
+  CurrencyDollarIcon,
+  ChartBarIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline'
 
 const benefits = [
@@ -14,17 +14,17 @@ const benefits = [
   {
     name: 'Link Personalizado',
     description: 'Crea un enlace único y memorable para tu menú, facilitando que tus clientes lo encuentren rápidamente.',
-    icon: LinkIcon,
+    icon: CurrencyDollarIcon,
   },
   {
     name: 'SEO Optimizado',
     description: 'Mejora la visibilidad de tu menú en buscadores con palabras clave relevantes.',
-    icon: MagnifyingGlassIcon,
+    icon: ChartBarIcon,
   },
   {
     name: 'Diseño Profesional',
     description: 'Un diseñador experto se encarga de crear tu menú, adaptándolo a la identidad de tu marca.',
-    icon: PaintBrushIcon,
+    icon: UserGroupIcon,
   },
 ]
 
@@ -35,7 +35,10 @@ export default function Benefits() {
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-base font-semibold leading-7 text-indigo-600">Beneficios Clave</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Sistema Intuitivo de<br className="hidden sm:inline" /> Administración de Menús
+            Sistema Intuitivo de<br className="hidden sm:inline" />
+            <span className="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md mt-2">
+              Administración de Menús
+            </span>
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
             Con nuestro sistema, gestionar tu menú es fácil y rápido. Actualiza productos, precios y detalles en tiempo real.
@@ -56,11 +59,11 @@ export default function Benefits() {
       <div className="mx-auto mt-16 max-w-7xl px-6 sm:mt-20 md:mt-24 lg:px-8">
         <dl className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-4">
           {benefits.map((benefit) => (
-            <div key={benefit.name} className="relative pl-16">
+            <div key={benefit.name} className="flex flex-col items-center text-center sm:items-start sm:text-left">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 mb-6">
+                <benefit.icon className="h-6 w-6 text-white" aria-hidden="true" />
+              </div>
               <dt className="text-base font-semibold leading-7 text-gray-900">
-                <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-600">
-                  <benefit.icon className="h-6 w-6 text-white" aria-hidden="true" />
-                </div>
                 {benefit.name}
               </dt>
               <dd className="mt-2 text-base leading-7 text-gray-600">{benefit.description}</dd>
