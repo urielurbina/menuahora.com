@@ -6,28 +6,28 @@ const WithWithout = () => {
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:text-center">
-          <h2 className="text-base font-semibold leading-7 text-indigo-600">Comparison</h2>
+          <h2 className="text-base font-semibold leading-7 text-indigo-600">Comparativa</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Tired of managing Stripe invoices?
+            Deja atrás los problemas<br className="hidden sm:inline" /> de un menú tradicional
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            See how ZenVoice simplifies your invoice management process and saves you time and money.
+            Descubre cómo MenúAhora simplifica tu proceso de gestión de menús y ahorra tiempo y dinero.
           </p>
         </div>
         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
           <dl className="grid grid-cols-1 gap-x-8 gap-y-16 lg:grid-cols-2">
             <div className="flex flex-col rounded-2xl bg-red-50 p-8">
               <dt className="text-base font-semibold leading-7 text-gray-900">
-                Stripe invoices without ZenVoice
+                Menú tradicional
               </dt>
               <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-600">
                 <ul className="flex-auto space-y-4">
                   {[
-                    "Manually create invoices",
-                    "Or pay up to $2 per invoice",
-                    "Waste hours in customer support",
-                    "Can't update details once sent (VAT, Tax ID)",
-                    "Can't make invoices for previous purchases",
+                    "Actualizar el menú puede tardar días",
+                    "Cada modificación requiere reimpresión",
+                    "No se distribuye fácilmente en redes",
+                    "No refleja cambios en tiempo real",
+                    "Necesitas contactar al diseñador",
                   ].map((item, index) => (
                     <li key={index} className="flex items-start">
                       <svg className="h-6 w-5 flex-none text-red-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -41,16 +41,16 @@ const WithWithout = () => {
             </div>
             <div className="flex flex-col rounded-2xl bg-green-50 p-8">
               <dt className="text-base font-semibold leading-7 text-gray-900">
-                Stripe invoices + ZenVoice
+                MenúAhora
               </dt>
               <dd className="mt-6 flex flex-auto flex-col text-base leading-7 text-gray-600">
                 <ul className="flex-auto space-y-4">
                   {[
-                    "Self-serve invoices",
-                    "One-time payment for unlimited invoices",
-                    "No more customer support",
-                    "Editable invoices to stay compliant",
-                    "Invoices for any payment, even past ones",
+                    "Edita productos en segundos",
+                    "Olvídate de las impresiones",
+                    "Fácil acceso desde cualquier dispositivo",
+                    "Refleja cambios en tiempo real",
+                    "Gestiona tu menú sin intermediarios",
                   ].map((item, index) => (
                     <li key={index} className="flex items-start">
                       <svg className="h-6 w-5 flex-none text-green-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
