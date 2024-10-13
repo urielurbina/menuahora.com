@@ -3,16 +3,21 @@ import { authOptions } from "@/libs/next-auth";
 import connectMongo from "@/libs/mongoose";
 import User from "@/models/User";
 import ButtonAccount from "@/components/ButtonAccount";
+import InitialSetup from "@/components/InitialSetup";
 
 export const dynamic = "force-dynamic";
 
 // This is a private page: It's protected by the layout.js component which ensures the user is authenticated.
-// It's a server compoment which means you can fetch data (like the user profile) before the page is rendered.
+// It's a server component which means you can fetch data (like the user profile) before the page is rendered.
 // See https://shipfa.st/docs/tutorials/private-page
 export default async function Dashboard() {
   await connectMongo();
   const session = await getServerSession(authOptions);
   const user = await User.findById(session.user.id);
+
+  if (!user.username) {
+    return <InitialSetup userId={user.id} />;
+  }
 
   return (
     <main className="min-h-screen p-8 pb-24">
@@ -27,4 +32,3 @@ export default async function Dashboard() {
     </main>
   );
 }
-
