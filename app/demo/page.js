@@ -116,24 +116,26 @@ export default function Menu() {
 
         {/* Columns 2-4: Categories and Products */}
         <div className="lg:w-3/4 lg:ml-[25%]">
-          <div  className="bg-white">
+          <div className="bg-white">
             {/* Categories */}
             <div className={`px-6 py-4 ${isScrolled ? 'lg:fixed lg:top-0 lg:right-0 lg:left-[25%] lg:bg-white lg:z-10' : ''}`}>
               <h2 className="text-2xl font-bold mb-4">Categorías</h2>
-              <div className="flex space-x-2 overflow-x-auto">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setActiveCategory(category)}
-                    className={`px-4 py-2 rounded-full text-sm ${
-                      activeCategory === category
-                        ? 'bg-black text-white'
-                        : 'bg-gray-100 text-black'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
+              <div className="flex overflow-x-auto pb-2 -mx-6 px-6 scrollbar-hide">
+                <div className="flex space-x-2 flex-nowrap">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setActiveCategory(category)}
+                      className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
+                        activeCategory === category
+                          ? 'bg-black text-white'
+                          : 'bg-gray-100 text-black'
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
