@@ -1,0 +1,9 @@
+touch app/icon.png
+
+mkdir -p app/blog/_assets/images/authors
+touch app/blog/_assets/images/authors/marc.png
+
+mkdir -p public/blog/introducing-supabase
+touch public/blog/introducing-supabase/header.png
+
+

@@ -2,29 +2,37 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Menu() {
   const [activeCategory, setActiveCategory] = useState('Todo')
   const [isScrolled, setIsScrolled] = useState(false)
+  const [selectedProduct, setSelectedProduct] = useState(null)
   const categories = ['Todo', 'Tacos', 'Tortas', 'Quesadillas', 'Ensaladas', 'Bebidas', 'Postres']
   const products = [
-    { name: 'Orden de 4 tacos al Pastor', price: 249.99, category: 'Tacos' },
-    { name: 'Orden de 4 tacos de Bistec', price: 249.99, category: 'Tacos' },
-    { name: 'Nombre del producto', price: 249.99, category: 'Categoria' },
-    { name: 'Nombre del producto', price: 249.99, category: 'Categoria' },
-    { name: 'Orden de 4 tacos al Pastor', price: 249.99, category: 'Tacos' },
-    { name: 'Orden de 4 tacos de Bistec', price: 249.99, category: 'Tacos' },
-    { name: 'Nombre del producto', price: 249.99, category: 'Categoria' },
-    { name: 'Nombre del producto', price: 249.99, category: 'Categoria' },
-    { name: 'Orden de 4 tacos al Pastor', price: 249.99, category: 'Tacos' },
-    { name: 'Orden de 4 tacos de Bistec', price: 249.99, category: 'Tacos' },
-    { name: 'Nombre del producto', price: 249.99, category: 'Categoria' },
-    { name: 'Nombre del producto', price: 249.99, category: 'Categoria' },
-    { name: 'Orden de 4 tacos al Pastor', price: 249.99, category: 'Tacos' },
-    { name: 'Orden de 4 tacos de Bistec', price: 249.99, category: 'Tacos' },
-    { name: 'Nombre del producto', price: 249.99, category: 'Categoria' },
-    { name: 'Nombre del producto', price: 249.99, category: 'Categoria' },
+    { 
+      id: 1,
+      name: 'Orden de 4 tacos al Pastor', 
+      price: 249.99, 
+      category: 'Tacos',
+      description: 'Deliciosos tacos al pastor con piña, cebolla y cilantro.',
+      extras: ['Salsa verde', 'Salsa roja', 'Limones']
+    },
+    { 
+      id: 2,
+      name: 'Orden de 4 tacos de Bistec', 
+      price: 249.99, 
+      category: 'Tacos',
+      description: 'Sabrosos tacos de bistec con cebolla y cilantro.',
+      extras: ['Salsa verde', 'Salsa roja', 'Limones']
+    },
+    { id: 3, name: 'Torta de Jamón', price: 89.99, category: 'Tortas' },
+    { id: 4, name: 'Quesadilla de Queso', price: 59.99, category: 'Quesadillas' },
+    { id: 5, name: 'Ensalada César', price: 129.99, category: 'Ensaladas' },
+    { id: 6, name: 'Refresco', price: 25.00, category: 'Bebidas' },
+    { id: 7, name: 'Flan Napolitano', price: 45.00, category: 'Postres' },
+    { id: 8, name: 'Agua de Horchata', price: 30.00, category: 'Bebidas' },
   ]
 
   useEffect(() => {
@@ -34,6 +42,10 @@ export default function Menu() {
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
+
+  const toggleProductDetails = useCallback((product) => {
+    setSelectedProduct(prevProduct => prevProduct?.id === product.id ? null : product)
   }, [])
 
   return (
@@ -111,6 +123,7 @@ export default function Menu() {
             <button className="w-full bg-white text-black hover:bg-gray-100 h-12 text-lg rounded-md border border-black">
               Pedir en Rappi
             </button>
+          
           </div>
         </div>
 
@@ -118,24 +131,25 @@ export default function Menu() {
         <div className="lg:w-3/4 lg:ml-[25%]">
           <div className="bg-white">
             {/* Categories */}
-            <div className={`px-6 py-4 ${isScrolled ? 'lg:fixed lg:top-0 lg:right-0 lg:left-[25%] lg:bg-white lg:z-10' : ''}`}>
+            <div 
+              className={`px-6 py-4 ${isScrolled ? 'lg:fixed lg:top-0 lg:right-0 lg:left-[25%] lg:bg-white lg:z-20' : ''}`}
+              style={{pointerEvents: 'auto'}} // Asegurarse de que los eventos de clic funcionen aquí
+            >
               <h2 className="text-2xl font-bold mb-4">Categorías</h2>
-              <div className="flex overflow-x-auto pb-2 -mx-6 px-6 scrollbar-hide">
-                <div className="flex space-x-2 flex-nowrap">
-                  {categories.map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => setActiveCategory(category)}
-                      className={`px-4 py-2 rounded-full text-sm whitespace-nowrap ${
-                        activeCategory === category
-                          ? 'bg-black text-white'
-                          : 'bg-gray-100 text-black'
-                      }`}
-                    >
-                      {category}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex space-x-2 overflow-x-auto">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setActiveCategory(category)}
+                    className={`px-4 py-2 rounded-full text-sm ${
+                      activeCategory === category
+                        ? 'bg-black text-white'
+                        : 'bg-gray-100 text-black'
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -143,14 +157,22 @@ export default function Menu() {
 
             {/* Products */}
             <div className={`px-6 py-4 ${isScrolled ? 'lg:mt-[100px]' : ''}`}>
-              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {products.map((product, index) => (
-                  <div key={index} className="bg-whiterounded-lg overflow-hidden">
-                    <div className="aspect-square bg-gray-200" />
-                    <div className="pt-3">
-                      <span className="text-xs bg-gray-200 px-2 py-1 rounded-full">{product.category}</span>
-                      <h3 className="font-semibold text-md mt-2">{product.name}</h3>
-                      <span className="font-bold text-sm mt-1">${product.price.toFixed(2)}</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {products.map((product) => (
+                  <div 
+                    key={product.id}
+                    className="bg-white rounded-lg overflow-hidden shadow-md cursor-pointer"
+                    onClick={() => toggleProductDetails(product)}
+                  >
+                    <div className="p-3">
+                      <div className="aspect-square bg-gray-200" />
+                      <span className="text-xs bg-gray-200 px-2 py-1 rounded-full mt-2 inline-block">
+                        {product.category}
+                      </span>
+                      <h3 className="font-semibold text-sm mt-2">{product.name}</h3>
+                      <span className="font-bold text-sm mt-1 block">
+                        ${product.price.toFixed(2)}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -159,6 +181,50 @@ export default function Menu() {
           </div>
         </div>
       </div>
+
+      {/* Modal para detalles del producto */}
+      <AnimatePresence>
+        {selectedProduct && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+            onClick={() => setSelectedProduct(null)}
+          >
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              className="bg-white rounded-lg p-6 max-w-md w-full"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-2xl font-bold mb-4">{selectedProduct.name}</h2>
+              <p className="text-gray-600 mb-2">{selectedProduct.category}</p>
+              <p className="font-bold text-lg mb-4">${selectedProduct.price.toFixed(2)}</p>
+              {selectedProduct.description && (
+                <p className="text-gray-700 mb-4">{selectedProduct.description}</p>
+              )}
+              {selectedProduct.extras && selectedProduct.extras.length > 0 && (
+                <div>
+                  <h4 className="font-semibold mb-2">Extras:</h4>
+                  <ul className="list-disc list-inside text-sm">
+                    {selectedProduct.extras.map((extra, index) => (
+                      <li key={index}>{extra}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <button
+                className="mt-6 bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+                onClick={() => setSelectedProduct(null)}
+              >
+                Cerrar
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
