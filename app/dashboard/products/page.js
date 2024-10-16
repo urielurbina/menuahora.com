@@ -8,6 +8,7 @@ const ProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
+  const [excelLink, setExcelLink] = useState('');
 
   // Función para cargar los productos (simulada)
   useEffect(() => {
@@ -51,9 +52,44 @@ const ProductsPage = () => {
     closePopup();
   };
 
+  const handleExcelLinkChange = (e) => {
+    setExcelLink(e.target.value);
+  };
+
+  const handleImportExcel = async () => {
+    // Aquí deberías implementar la lógica para importar productos desde el Excel
+    console.log('Importando productos desde:', excelLink);
+    // Ejemplo de implementación:
+    // const response = await fetch('/api/import-products', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ excelLink })
+    // });
+    // if (response.ok) {
+    //   const importedProducts = await response.json();
+    //   setProducts([...products, ...importedProducts]);
+    //   setExcelLink('');
+    // }
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Productos</h1>
+      <div className="mb-4 flex items-center space-x-2">
+        <input
+          type="url"
+          value={excelLink}
+          onChange={handleExcelLinkChange}
+          placeholder="https://ejemplo.com/productos.xlsx"
+          className="flex-grow border rounded px-2 py-1"
+        />
+        <button
+          onClick={handleImportExcel}
+          className="bg-green-500 text-white px-4 py-2 rounded"
+        >
+          Importar Excel
+        </button>
+      </div>
       <button
         onClick={() => openPopup()}
         className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
@@ -98,7 +134,8 @@ const ProductPopup = ({ product, onSave, onDelete, onClose }) => {
     extras: [],
     image: null,
     category: '',
-    available: true
+    available: true,
+    excelLink: '' // Nuevo campo para el enlace de Excel
   });
 
   const handleChange = (e) => {
@@ -201,6 +238,18 @@ const ProductPopup = ({ product, onSave, onDelete, onClose }) => {
               />
               Disponible
             </label>
+          </div>
+          {/* Nuevo campo para el enlace de Excel */}
+          <div className="mb-4">
+            <label className="block mb-2">Enlace de Excel (para importación masiva)</label>
+            <input
+              type="url"
+              name="excelLink"
+              value={formData.excelLink}
+              onChange={handleChange}
+              className="w-full border rounded px-2 py-1"
+              placeholder="https://ejemplo.com/mi-archivo-excel.xlsx"
+            />
           </div>
           <div className="flex justify-between">
             <button
