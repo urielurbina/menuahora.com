@@ -16,7 +16,6 @@ export default function VisualIdentity() {
   const [primaryColor, setPrimaryColor] = useState('#000000');
   const [secondaryColor, setSecondaryColor] = useState('#ffffff');
   const [tertiaryColor, setTertiaryColor] = useState('#cccccc');
-  const [brandManual, setBrandManual] = useState(null);
 
   const handleFontChange = (e) => {
     setSelectedFont(e.target.value);
@@ -26,17 +25,10 @@ export default function VisualIdentity() {
     setColor(e.target.value);
   };
 
-  const handleBrandManualChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setBrandManual(file);
-    }
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     // Aquí iría la lógica para guardar la identidad visual
-    console.log({ selectedFont, primaryColor, secondaryColor, tertiaryColor, brandManual });
+    console.log({ selectedFont, primaryColor, secondaryColor, tertiaryColor });
   };
 
   return (
@@ -103,22 +95,7 @@ export default function VisualIdentity() {
           />
         </div>
 
-        <div>
-          <label htmlFor="brandManual" className="block text-sm font-medium text-gray-700">
-            Manual de marca (opcional)
-          </label>
-          <input
-            type="file"
-            id="brandManual"
-            onChange={handleBrandManualChange}
-            className="mt-1 block w-full text-sm text-gray-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-full file:border-0
-            file:text-sm file:font-semibold
-            file:bg-indigo-50 file:text-indigo-700
-            hover:file:bg-indigo-100"
-          />
-        </div>
+        
 
         <motion.button
           whileHover={{ scale: 1.05 }}

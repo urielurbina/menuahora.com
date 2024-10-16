@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export default function Menu() {
@@ -36,18 +36,53 @@ export default function Menu() {
     { id: 7, name: 'Agua de Horchata', price: 30.00, category: 'Bebidas', image: '/images/jamaica.jpg' },
   ]
 
+  const [showScrollTop, setShowScrollTop] = useState(false)
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 0)
+      setShowScrollTop(window.scrollY > 300) // Mostrar el botón después de 300px de scroll
     }
 
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
+
   const toggleProductDetails = useCallback((product) => {
-    setSelectedProduct(prevProduct => prevProduct?.id === product.id ? null : product)
+    setSelectedProduct(prevProduct => {
+      if (prevProduct?.id === product.id) {
+        document.body.style.overflow = 'auto'; // Habilitar scroll
+        return null;
+      } else {
+        document.body.style.overflow = 'hidden'; // Deshabilitar scroll
+        return product;
+      }
+    })
   }, [])
+
+  useEffect(() => {
+    return () => {
+      // Limpieza: asegurarse de que el scroll se habilite cuando el componente se desmonte
+      document.body.style.overflow = 'auto';
+    }
+  }, [])
+
+  const businessInfoRef = useRef(null)
+
+  const scrollToBusinessInfo = () => {
+    if (businessInfoRef.current) {
+      const yOffset = -20; // Ajusta este valor si necesitas un poco de espacio en la parte superior
+      const y = businessInfoRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({top: y, behavior: 'smooth'});
+    }
+  }
 
   return (
     <div className="w-full mx-auto">
@@ -150,7 +185,7 @@ export default function Menu() {
         </div>
 
         {/* Columns 2-4: Categories and Products */}
-        <div className="lg:w-3/4 lg:ml-[25%]">
+        <div ref={businessInfoRef}  className="lg:w-3/4 lg:ml-[25%]">
           <div className="bg-gray-100">
             {/* Categories */}
             <div 
@@ -187,7 +222,7 @@ export default function Menu() {
                     onClick={() => toggleProductDetails(product)}
                   >
                     <div className="p-3">
-                      <div className="aspect-[3/4] relative overflow-hidden rounded-sm">
+                      <div className="aspect-square md:aspect-[3/4] relative overflow-hidden rounded-sm">
                         <Image
                           src={product.image}
                           alt={product.name}
@@ -211,6 +246,23 @@ export default function Menu() {
         </div>
       </div>
 
+      {/* Botón Volver Arriba */}
+      <AnimatePresence>
+        {showScrollTop && (
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            onClick={scrollToBusinessInfo}
+            className="fixed bottom-4 right-4 bg-black text-white p-3 rounded-full shadow-lg z-50"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            </svg>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
       {/* Modal para detalles del producto */}
       <AnimatePresence>
         {selectedProduct && (
@@ -219,16 +271,31 @@ export default function Menu() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-            onClick={() => setSelectedProduct(null)}
+            onClick={() => {
+              setSelectedProduct(null);
+              document.body.style.overflow = 'auto'; // Habilitar scroll al cerrar
+            }}
           >
             <motion.div
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: 50, opacity: 0 }}
-              className="bg-white rounded-lg p-6 max-w-md w-full"
+              className="bg-white rounded-lg p-6 max-w-md w-full relative"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-2xl font-bold mb-4">{selectedProduct.name}</h2>
+              {/* Eliminamos el botón de cerrar (X) de la parte superior */}
+
+              {/* Imagen del producto */}
+              <div className="aspect-[3/2] w-full mb-4 relative overflow-hidden rounded-lg">
+                <Image
+                  src={selectedProduct.image}
+                  alt={selectedProduct.name}
+                  layout="fill"
+                  objectFit="cover"
+                />
+              </div>
+
+              <h2 className="text-2xl font-bold mb-2">{selectedProduct.name}</h2>
               <p className="text-gray-600 mb-2">{selectedProduct.category}</p>
               <p className="font-bold text-lg mb-4">${selectedProduct.price.toFixed(2)}</p>
               {selectedProduct.description && (
@@ -244,9 +311,14 @@ export default function Menu() {
                   </ul>
                 </div>
               )}
+
+              {/* Nuevo botón de cerrar en la esquina inferior derecha */}
               <button
-                className="mt-6 bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
-                onClick={() => setSelectedProduct(null)}
+                className="absolute bottom-4 right-4 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800"
+                onClick={() => {
+                  setSelectedProduct(null);
+                  document.body.style.overflow = 'auto'; // Habilitar scroll al cerrar
+                }}
               >
                 Cerrar
               </button>
