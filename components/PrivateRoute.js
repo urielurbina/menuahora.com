@@ -20,8 +20,7 @@ export default function PrivateRoute({ children }) {
         .then(res => res.json())
         .then(data => {
           if (!data.hasAccess) {
-            // Redirigir a la página principal con la sección de precios
-            router.push('/#pricing')
+            router.push('/pantallaplanes') // Redirigir a la página de precios si no tiene acceso
           } else {
             setIsLoading(false)
           }

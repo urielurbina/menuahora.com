@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 const PantallaPlanes = () => {
   return (
@@ -10,9 +11,11 @@ const PantallaPlanes = () => {
         <p className="text-gray-600 mb-8">
           Actualmente no cuentas con un plan activo. Explora nuestros planes disponibles para encontrar el que mejor se adapte a tus necesidades.
         </p>
-        <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300">
-          Ver planes
-        </button>
+        <Link href="/#pricing">
+          <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded transition duration-300">
+            Ver planes
+          </button>
+        </Link>
       </div>
     </div>
   );
