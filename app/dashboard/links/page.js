@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -14,7 +14,15 @@ import {
   faShoppingCart, 
   faUser, 
   faHome,
-  faChevronDown
+  faChevronDown,
+  faTrash,
+  faBars,
+  faCar,
+  faUtensils,
+  faGlobe,
+  faStar,
+  faPlus,
+  faTimes
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faInstagram,
@@ -37,238 +45,207 @@ library.add(
   faFacebook,
   faTiktok,
   faWhatsapp,
-  faChevronDown
+  faChevronDown,
+  faTrash,
+  faBars,
+  faCar,
+  faUtensils,
+  faGlobe,
+  faStar,
+  faPlus,
+  faTimes
 )
 
 export default function Links() {
-  const [extraLinks, setExtraLinks] = useState([])
-  const [primaryIcon, setPrimaryIcon] = useState('')
-  const [secondaryIcon, setSecondaryIcon] = useState('')
+  const [links, setLinks] = useState([])
+  const [isIconModalOpen, setIsIconModalOpen] = useState(false)
+  const [currentEditingLink, setCurrentEditingLink] = useState(null)
 
-  const addExtraLink = () => {
-    setExtraLinks([...extraLinks, { title: '', url: '' }])
+  useEffect(() => {
+    // Inicializar los enlaces por defecto
+    setLinks([
+      { id: '1', title: 'WhatsApp', url: '', icon: 'whatsapp', isActive: true },
+      { id: '2', title: 'Uber', url: '', icon: 'car', isActive: true },
+      { id: '3', title: 'Rappi', url: '', icon: 'utensils', isActive: true },
+      { id: '4', title: 'Sitio Web', url: '', icon: 'globe', isActive: true },
+    ])
+  }, [])
+
+  const addLink = () => {
+    setLinks([...links, { id: Date.now().toString(), title: '', url: '', icon: '', isActive: true }])
   }
 
-  const renderIconPreview = (icon) => {
-    if (!icon) return null
-    return <FontAwesomeIcon icon={icon} className="w-5 h-5 text-gray-500" />
+  const updateLink = (id, field, value) => {
+    setLinks(links.map(link => 
+      link.id === id ? { ...link, [field]: value } : link
+    ))
   }
 
-  const IconSelector = ({ value, onChange }) => {
-    const [isOpen, setIsOpen] = useState(false)
-    
+  const removeLink = (id) => {
+    setLinks(links.filter(link => link.id !== id))
+  }
+
+  const toggleLinkActive = (id) => {
+    setLinks(links.map(link => 
+      link.id === id ? { ...link, isActive: !link.isActive } : link
+    ))
+  }
+
+  const openIconModal = (linkId) => {
+    setCurrentEditingLink(linkId)
+    setIsIconModalOpen(true)
+  }
+
+  const closeIconModal = () => {
+    setIsIconModalOpen(false)
+    setCurrentEditingLink(null)
+  }
+
+  const IconModal = () => {
     const icons = [
-      { value: '', label: 'Selecciona un icono (opcional)', icon: null },
-      { value: 'link', label: 'Enlace', icon: ['fas', 'link'] },
-      { value: 'phone', label: 'Teléfono', icon: ['fas', 'phone'] },
-      { value: 'envelope', label: 'Correo', icon: ['fas', 'envelope'] },
-      { value: 'map-marker-alt', label: 'Ubicación', icon: ['fas', 'map-marker-alt'] },
-      { value: 'calendar', label: 'Calendario', icon: ['fas', 'calendar'] },
-      { value: 'shopping-cart', label: 'Carrito de Compras', icon: ['fas', 'shopping-cart'] },
-      { value: 'user', label: 'Usuario', icon: ['fas', 'user'] },
-      { value: 'home', label: 'Inicio', icon: ['fas', 'home'] },
-      { value: 'instagram', label: 'Instagram', icon: ['fab', 'instagram'] },
-      { value: 'facebook', label: 'Facebook', icon: ['fab', 'facebook'] },
-      { value: 'tiktok', label: 'TikTok', icon: ['fab', 'tiktok'] },
-      { value: 'whatsapp', label: 'WhatsApp', icon: ['fab', 'whatsapp'] },
+      { value: 'link', icon: ['fas', 'link'] },
+      { value: 'phone', icon: ['fas', 'phone'] },
+      { value: 'envelope', icon: ['fas', 'envelope'] },
+      { value: 'map-marker-alt', icon: ['fas', 'map-marker-alt'] },
+      { value: 'calendar', icon: ['fas', 'calendar'] },
+      { value: 'shopping-cart', icon: ['fas', 'shopping-cart'] },
+      { value: 'user', icon: ['fas', 'user'] },
+      { value: 'home', icon: ['fas', 'home'] },
+      { value: 'instagram', icon: ['fab', 'instagram'] },
+      { value: 'facebook', icon: ['fab', 'facebook'] },
+      { value: 'tiktok', icon: ['fab', 'tiktok'] },
+      { value: 'whatsapp', icon: ['fab', 'whatsapp'] },
+      { value: 'car', icon: ['fas', 'car'] },
+      { value: 'utensils', icon: ['fas', 'utensils'] },
+      { value: 'globe', icon: ['fas', 'globe'] },
     ]
 
-    const selectedIcon = icons.find(icon => icon.value === value) || icons[0]
-
     return (
-      <div className="relative w-full">
-        <button
-          type="button"
-          className="w-full flex items-center justify-between rounded-md border border-gray-300 bg-white px-4 py-2 text-left text-sm leading-5 font-medium text-gray-700 hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:bg-gray-50 active:text-gray-800"
-          onClick={() => setIsOpen(!isOpen)}
-        >
-          <span className="flex items-center">
-            {selectedIcon.icon && <FontAwesomeIcon icon={selectedIcon.icon} className="mr-2 w-5" />}
-            {selectedIcon.label}
-          </span>
-          <FontAwesomeIcon icon={['fas', 'chevron-down']} />
-        </button>
-        {isOpen && (
-          <div className="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg">
-            <ul className="max-h-60 rounded-md py-1 text-base leading-6 shadow-xs overflow-auto focus:outline-none sm:text-sm sm:leading-5">
-              {icons.map((icon) => (
-                <li
-                  key={icon.value}
-                  className="text-gray-900 cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 hover:text-white"
-                  onClick={() => {
-                    onChange(icon.value)
-                    setIsOpen(false)
-                  }}
-                >
-                  <div className="flex items-center">
-                    {icon.icon ? (
-                      <FontAwesomeIcon icon={icon.icon} className="mr-2 w-5 h-5" />
-                    ) : (
-                      <span className="mr-2 w-5 h-5"></span>
-                    )}
-                    <span>{icon.label}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white p-6 rounded-lg max-w-md w-full">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-semibold">Selecciona un icono</h3>
+            <button onClick={closeIconModal} className="text-gray-500 hover:text-gray-700">
+              <FontAwesomeIcon icon="times" />
+            </button>
           </div>
-        )}
+          <div className="grid grid-cols-4 gap-4">
+            {icons.map((icon) => (
+              <button
+                key={icon.value}
+                className="p-2 hover:bg-gray-100 rounded flex items-center justify-center"
+                onClick={() => {
+                  updateLink(currentEditingLink, 'icon', icon.value)
+                  closeIconModal()
+                }}
+              >
+                <FontAwesomeIcon icon={icon.icon} className="w-6 h-6" />
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     )
   }
 
-  return (
-    <div className="space-y-12 sm:space-y-16">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+  const Switch = ({ isOn, onToggle }) => {
+    return (
+      <button
+        onClick={onToggle}
+        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
+          isOn ? 'bg-indigo-600' : 'bg-gray-200'
+        }`}
       >
+        <span className="sr-only">Activar enlace</span>
+        <span
+          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+            isOn ? 'translate-x-5' : 'translate-x-0'
+          }`}
+        />
+      </button>
+    );
+  };
+
+  return (
+    <div className="space-y-12">
+      <div className="border-b border-gray-900/10 pb-12">
         <h2 className="text-base font-semibold leading-7 text-gray-900">Gestiona tus Enlaces</h2>
         <p className="mt-1 text-sm leading-6 text-gray-600">
-          Personaliza tu perfil añadiendo tus redes sociales e información de contacto.
+          Añade y personaliza los enlaces que aparecerán en tu perfil.
         </p>
 
-        <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:pb-0">
-          {[
-            { name: 'Instagram', placeholder: 'Ingresa tu nombre de usuario de Instagram', icon: 'instagram' },
-            { name: 'Facebook', placeholder: 'Ingresa la URL de tu perfil de Facebook', icon: 'facebook' },
-            { name: 'TikTok', placeholder: 'Ingresa tu nombre de usuario de TikTok', icon: 'tiktok' },
-          ].map((field) => (
-            <div key={field.name} className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
-              <label htmlFor={field.name.toLowerCase()} className="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5">
-                {field.name}
-              </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex rounded-md shadow-sm ring-1 ring-inset ring-gray-300 focus-within:ring-2 focus-within:ring-inset focus-within:ring-indigo-600 sm:max-w-md">
-                  <span className="flex select-none items-center pl-3 text-gray-500 sm:text-sm">
-                    <FontAwesomeIcon icon={field.icon} className="w-5 h-5" />
-                  </span>
-                  <input
-                    type="text"
-                    name={field.name.toLowerCase()}
-                    id={field.name.toLowerCase()}
-                    placeholder={field.placeholder}
-                    className="block flex-1 border-0 bg-transparent py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-      >
-        <h2 className="text-base font-semibold leading-7 text-gray-900">Botones de Acción</h2>
-        <p className="mt-1 text-sm leading-6 text-gray-600">
-          Configura tus botones de acción principal y secundario.
-        </p>
-
-        <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:pb-0">
-          {[
-            { type: 'Principal', state: primaryIcon, setState: setPrimaryIcon },
-            { type: 'Secundario', state: secondaryIcon, setState: setSecondaryIcon }
-          ].map((button) => (
-            <div key={button.type} className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
-              <label className="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5">
-                Botón {button.type}
-              </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Texto del Botón"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                  />
-                  <div className="flex items-center space-x-2">
-                    <div className="w-full">
-                      <IconSelector
-                        value={button.state}
-                        onChange={(value) => button.setState(value)}
-                      />
-                    </div>
+        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+          {links.map((link, index) => (
+            <div key={link.id} className="col-span-full">
+              <div className="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-4 mb-4">
+                {index === 0 && (
+                  <div className="text-sm text-indigo-600 font-semibold mb-2">
+                    <FontAwesomeIcon icon="star" className="mr-1" /> Este es tu link destacado
                   </div>
-                  <input
-                    type="text"
-                    placeholder="URL del Botón"
-                    className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                )}
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex-grow mr-4">
+                    <input
+                      type="text"
+                      value={link.title}
+                      onChange={(e) => updateLink(link.id, 'title', e.target.value)}
+                      placeholder="Título del enlace"
+                      className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                  <Switch
+                    isOn={link.isActive}
+                    onToggle={() => toggleLinkActive(link.id)}
                   />
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.5 }}
-      >
-        <h2 className="text-base font-semibold leading-7 text-gray-900">Enlaces Adicionales</h2>
-        <p className="mt-1 text-sm leading-6 text-gray-600">
-          Añade enlaces adicionales a tu perfil.
-        </p>
-
-        <div className="mt-10 space-y-8 border-b border-gray-900/10 pb-12 sm:space-y-0 sm:divide-y sm:divide-gray-900/10 sm:border-t sm:pb-0">
-          {extraLinks.map((link, index) => (
-            <div key={index} className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
-              <label className="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5">
-                Enlace Adicional {index + 1}
-              </label>
-              <div className="mt-2 sm:col-span-2 sm:mt-0">
-                <div className="flex space-x-2">
+                <div className="flex items-center mb-2">
                   <input
                     type="text"
-                    placeholder="Título del Enlace"
-                    className="block w-1/3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    value={link.title}
-                    onChange={(e) => {
-                      const newLinks = [...extraLinks]
-                      newLinks[index].title = e.target.value
-                      setExtraLinks(newLinks)
-                    }}
-                  />
-                  <input
-                    type="text"
-                    placeholder="URL del Enlace"
-                    className="block w-2/3 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                     value={link.url}
-                    onChange={(e) => {
-                      const newLinks = [...extraLinks]
-                      newLinks[index].url = e.target.value
-                      setExtraLinks(newLinks)
-                    }}
+                    onChange={(e) => updateLink(link.id, 'url', e.target.value)}
+                    placeholder="URL del enlace"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mr-2"
                   />
+                  <button
+                    onClick={() => openIconModal(link.id)}
+                    className="flex-shrink-0 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 whitespace-nowrap"
+                  >
+                    <FontAwesomeIcon icon={link.icon || 'plus'} className="mr-2" />
+                    {link.icon ? 'Cambiar icono' : 'Seleccionar icono'}
+                  </button>
                 </div>
+                <button
+                  onClick={() => removeLink(link.id)}
+                  className="text-sm text-red-600 hover:text-red-500"
+                >
+                  <FontAwesomeIcon icon="trash" /> Eliminar
+                </button>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="mt-6 flex items-center justify-end gap-x-6">
+        <div className="mt-6">
           <motion.button
-            type="button"
-            onClick={addExtraLink}
+            onClick={addLink}
             className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Añadir Enlace Adicional
+            <FontAwesomeIcon icon="plus" className="mr-2" />
+            Añadir enlace
           </motion.button>
         </div>
-      </motion.div>
+      </div>
+
+      {isIconModalOpen && <IconModal />}
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
         <Link
           href="/dashboard"
-          className="text-sm font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
+          className="text-sm font-semibold leading-6 text-gray-900"
         >
-          Volver al Panel
+          Cancelar
         </Link>
         <motion.button
           type="submit"

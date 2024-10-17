@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { PhotoIcon } from '@heroicons/react/24/solid'
 
 const ProductsPage = () => {
   const [products, setProducts] = useState([]);
@@ -75,43 +76,55 @@ const ProductsPage = () => {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Productos</h1>
-      <div className="mb-4 flex items-center space-x-2">
-        <input
-          type="url"
-          value={excelLink}
-          onChange={handleExcelLinkChange}
-          placeholder="https://ejemplo.com/productos.xlsx"
-          className="flex-grow border rounded px-2 py-1"
-        />
-        <button
-          onClick={handleImportExcel}
-          className="bg-green-500 text-white px-4 py-2 rounded"
-        >
-          Importar Excel
-        </button>
-      </div>
-      <button
-        onClick={() => openPopup()}
-        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
-      >
-        Agregar Producto
-      </button>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {products.map(product => (
-          <motion.div
-            key={product.id}
-            className="border p-4 rounded cursor-pointer"
-            whileHover={{ scale: 1.05 }}
-            onClick={() => openPopup(product)}
+      
+      {/* Sección de importación de Excel */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-2">Importar productos desde Excel</h2>
+        <div className="flex items-center space-x-2">
+          <input
+            type="url"
+            value={excelLink}
+            onChange={handleExcelLinkChange}
+            placeholder="https://ejemplo.com/productos.xlsx"
+            className="flex-grow rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          />
+          <button
+            onClick={handleImportExcel}
+            className="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
           >
-            <h2 className="text-xl font-semibold">{product.name}</h2>
-            <p className="text-gray-600">{product.subtitle}</p>
-            <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
-            <p className={product.available ? "text-green-500" : "text-red-500"}>
-              {product.available ? "Disponible" : "Agotado"}
-            </p>
-          </motion.div>
-        ))}
+            Importar Excel
+          </button>
+        </div>
+      </div>
+
+      {/* Divisor */}
+      <hr className="my-8 border-gray-200" />
+
+      {/* Sección de gestión de productos */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">Gestión de productos</h2>
+        <button
+          onClick={() => openPopup()}
+          className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-4"
+        >
+          Agregar Producto
+        </button>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {products.map(product => (
+            <motion.div
+              key={product.id}
+              className="border p-4 rounded cursor-pointer"
+              whileHover={{ scale: 1.05 }}
+              onClick={() => openPopup(product)}
+            >
+              <h2 className="text-xl font-semibold">{product.name}</h2>
+              <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
+              <p className={product.available ? "text-green-500" : "text-red-500"}>
+                {product.available ? "Disponible" : "Agotado"}
+              </p>
+            </motion.div>
+          ))}
+        </div>
       </div>
       {isPopupOpen && (
         <ProductPopup
@@ -128,15 +141,17 @@ const ProductsPage = () => {
 const ProductPopup = ({ product, onSave, onDelete, onClose }) => {
   const [formData, setFormData] = useState(product || {
     name: '',
-    subtitle: '',
     description: '',
-    price: '',
+    price: '$0.00',
     extras: [],
     image: null,
     category: '',
     available: true,
-    excelLink: '' // Nuevo campo para el enlace de Excel
   });
+
+  const [dragActive, setDragActive] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [newExtra, setNewExtra] = useState({ name: '', price: '$0.00' });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -146,11 +161,43 @@ const ProductPopup = ({ product, onSave, onDelete, onClose }) => {
     }));
   };
 
-  const handleImageUpload = (e) => {
-    // Aquí deberías implementar la lógica para subir la imagen
-    const file = e.target.files[0];
-    // Por ahora, solo guardamos el nombre del archivo
-    setFormData(prev => ({ ...prev, image: file.name }));
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFiles(e.dataTransfer.files);
+    }
+  };
+
+  const handleFiles = (files) => {
+    if (files && files[0]) {
+      const file = files[0];
+      const validTypes = ['image/jpeg', 'image/png'];
+      if (validTypes.includes(file.type)) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviewImage(reader.result);
+          setFormData(prevData => ({
+            ...prevData,
+            image: reader.result
+          }));
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('Por favor, sube solo archivos JPG o PNG.');
+      }
+    }
   };
 
   const handleSubmit = (e) => {
@@ -158,111 +205,278 @@ const ProductPopup = ({ product, onSave, onDelete, onClose }) => {
     onSave(formData);
   };
 
+  const handleExtraChange = (e) => {
+    const { name, value } = e.target;
+    setNewExtra(prev => ({ ...prev, [name]: value }));
+  };
+
+  const addExtra = () => {
+    if (newExtra.name && newExtra.price) {
+      setFormData(prev => ({
+        ...prev,
+        extras: [...prev.extras, { ...newExtra, id: Date.now() }]
+      }));
+      setNewExtra({ name: '', price: '$0.00' });
+    }
+  };
+
+  const removeExtra = (id) => {
+    setFormData(prev => ({
+      ...prev,
+      extras: prev.extras.filter(extra => extra.id !== id)
+    }));
+  };
+
+  const formatPrice = (value) => {
+    // Elimina cualquier carácter que no sea número o punto
+    const numericValue = value.replace(/[^\d.]/g, '');
+    // Asegura que solo haya un punto decimal
+    const parts = numericValue.split('.');
+    if (parts.length > 2) {
+      parts[1] = parts.slice(1).join('');
+    }
+    // Limita a dos decimales
+    if (parts[1]) {
+      parts[1] = parts[1].slice(0, 2);
+    }
+    // Agrega el símbolo $ al principio y asegura que siempre haya dos decimales
+    return `$${parseFloat(parts.join('.')).toFixed(2)}`;
+  };
+
+  const handlePriceChange = (e) => {
+    const formattedPrice = formatPrice(e.target.value);
+    setFormData(prev => ({ ...prev, price: formattedPrice }));
+  };
+
+  const handleExtraPriceChange = (e) => {
+    const formattedPrice = formatPrice(e.target.value);
+    setNewExtra(prev => ({ ...prev, price: formattedPrice }));
+  };
+
+  const handleOutsideClick = (e) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
+      onClick={handleOutsideClick}
+    >
       <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <h2 className="text-2xl font-bold mb-4">
-          {product ? 'Editar Producto' : 'Agregar Producto'}
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block mb-2">Nombre</label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
-              required
-            />
+        <form onSubmit={handleSubmit} className="space-y-12">
+          <div className="border-b border-gray-900/10 pb-12">
+            <h2 className="text-base font-semibold leading-7 text-gray-900">
+              {product ? 'Editar Producto' : 'Agregar Producto'}
+            </h2>
+            <p className="mt-1 text-sm leading-6 text-gray-600">
+              Esta información será mostrada públicamente, así que ten cuidado con lo que compartes.
+            </p>
+
+            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+              <div className="sm:col-span-4">
+                <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">
+                  Nombre del producto
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    required
+                    placeholder="Ej: Pizza Margherita, Corte de cabello"
+                  />
+                </div>
+              </div>
+
+              <div className="col-span-full">
+                <label htmlFor="description" className="block text-sm font-medium leading-6 text-gray-900">
+                  Descripción
+                </label>
+                <div className="mt-2">
+                  <textarea
+                    id="description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows={3}
+                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="Ej: Deliciosa pizza con tomate, mozzarella y albahaca fresca / Servicio de corte y peinado profesional"
+                  />
+                </div>
+                <p className="mt-3 text-sm leading-6 text-gray-600">Escribe una breve descripción del producto o servicio.</p>
+              </div>
+
+              <div className="col-span-full">
+                <label htmlFor="image" className="block text-sm font-medium leading-6 text-gray-900">
+                  Imagen del producto
+                </label>
+                <div 
+                  className={`mt-2 flex justify-center rounded-lg border border-dashed ${dragActive ? 'border-indigo-600' : 'border-gray-900/25'} px-6 py-10`}
+                  onDragEnter={handleDrag}
+                  onDragLeave={handleDrag}
+                  onDragOver={handleDrag}
+                  onDrop={handleDrop}
+                >
+                  <div className="text-center">
+                    {previewImage ? (
+                      <img src={previewImage} alt="Product Preview" className="mx-auto h-32 w-32 object-cover" />
+                    ) : (
+                      <PhotoIcon className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
+                    )}
+                    <div className="mt-4 flex text-sm leading-6 text-gray-600">
+                      <label
+                        htmlFor="file-upload"
+                        className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                      >
+                        <span>Sube un archivo</span>
+                        <input 
+                          id="file-upload" 
+                          name="file-upload" 
+                          type="file" 
+                          className="sr-only" 
+                          onChange={(e) => handleFiles(e.target.files)}
+                          accept=".jpg,.jpeg,.png"
+                        />
+                      </label>
+                      <p className="pl-1">o arrastra y suelta</p>
+                    </div>
+                    <p className="text-xs leading-5 text-gray-600">PNG, JPG hasta 10MB</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="block mb-2">Subtítulo</label>
-            <input
-              type="text"
-              name="subtitle"
-              value={formData.subtitle}
-              onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
-            />
+
+          <div className="border-b border-gray-900/10 pb-12">
+            <h2 className="text-base font-semibold leading-7 text-gray-900">Detalles del producto</h2>
+            <p className="mt-1 text-sm leading-6 text-gray-600">Proporciona información adicional sobre el producto.</p>
+
+            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+              <div className="sm:col-span-3">
+                <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900">
+                  Precio
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    id="price"
+                    name="price"
+                    value={formData.price}
+                    onChange={handlePriceChange}
+                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="sm:col-span-3">
+                <label htmlFor="category" className="block text-sm font-medium leading-6 text-gray-900">
+                  Categoría
+                </label>
+                <div className="mt-2">
+                  <input
+                    type="text"
+                    id="category"
+                    name="category"
+                    value={formData.category}
+                    onChange={handleChange}
+                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    placeholder="Ej: Pizzas, Servicios de belleza"
+                  />
+                </div>
+              </div>
+
+              <div className="sm:col-span-3">
+                <div className="flex items-center h-6">
+                  <input
+                    id="available"
+                    name="available"
+                    type="checkbox"
+                    checked={formData.available}
+                    onChange={handleChange}
+                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                  />
+                  <label htmlFor="available" className="ml-3 block text-sm font-medium leading-6 text-gray-900">
+                    Disponible
+                  </label>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="block mb-2">Descripción</label>
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
-              rows="3"
-            ></textarea>
+
+          <div className="border-b border-gray-900/10 pb-12">
+            <h2 className="text-base font-semibold leading-7 text-gray-900">Extras del producto</h2>
+            <p className="mt-1 text-sm leading-6 text-gray-600">Agrega opciones o características adicionales para este producto.</p>
+
+            <div className="mt-10 space-y-4">
+              {formData.extras && formData.extras.length > 0 ? (
+                formData.extras.map((extra) => (
+                  <div key={extra.id} className="flex items-center space-x-2">
+                    <span className="text-sm font-medium">{extra.name}: ${extra.price}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeExtra(extra.id)}
+                      className="text-red-600 hover:text-red-800"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No hay extras agregados aún.</p>
+              )}
+              <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+                <div className="sm:col-span-3">
+                  <label htmlFor="extraName" className="block text-sm font-medium leading-6 text-gray-900">Nombre del extra</label>
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      id="extraName"
+                      name="name"
+                      value={newExtra.name}
+                      onChange={handleExtraChange}
+                      className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      placeholder="Ej: Queso extra, Tratamiento capilar"
+                    />
+                  </div>
+                </div>
+                <div className="sm:col-span-2">
+                  <label htmlFor="extraPrice" className="block text-sm font-medium leading-6 text-gray-900">Precio</label>
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      id="extraPrice"
+                      name="price"
+                      value={newExtra.price}
+                      onChange={handleExtraPriceChange}
+                      className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    />
+                  </div>
+                </div>
+                <div className="sm:col-span-1 flex items-end">
+                  <button
+                    type="button"
+                    onClick={addExtra}
+                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  >
+                    Agregar
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="block mb-2">Precio</label>
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
-              step="0.01"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">Imagen</label>
-            <input
-              type="file"
-              onChange={handleImageUpload}
-              className="w-full border rounded px-2 py-1"
-              accept="image/*"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block mb-2">Categoría</label>
-            <input
-              type="text"
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                name="available"
-                checked={formData.available}
-                onChange={handleChange}
-                className="mr-2"
-              />
-              Disponible
-            </label>
-          </div>
-          {/* Nuevo campo para el enlace de Excel */}
-          <div className="mb-4">
-            <label className="block mb-2">Enlace de Excel (para importación masiva)</label>
-            <input
-              type="url"
-              name="excelLink"
-              value={formData.excelLink}
-              onChange={handleChange}
-              className="w-full border rounded px-2 py-1"
-              placeholder="https://ejemplo.com/mi-archivo-excel.xlsx"
-            />
-          </div>
-          <div className="flex justify-between">
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Guardar
-            </button>
+
+          <div className="mt-6 flex items-center justify-end gap-x-6">
             {product && (
               <button
                 type="button"
                 onClick={() => onDelete(product.id)}
-                className="bg-red-500 text-white px-4 py-2 rounded"
+                className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
               >
                 Eliminar
               </button>
@@ -270,9 +484,15 @@ const ProductPopup = ({ product, onSave, onDelete, onClose }) => {
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-300 px-4 py-2 rounded"
+              className="text-sm font-semibold leading-6 text-gray-900"
             >
               Cancelar
+            </button>
+            <button
+              type="submit"
+              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Guardar
             </button>
           </div>
         </form>
