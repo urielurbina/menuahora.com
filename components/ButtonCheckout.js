@@ -1,58 +1,63 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import apiClient from "@/libs/api";
 import config from "@/config";
+import { useRouter } from 'next/navigation';
 
-// Este componente se utiliza para crear sesiones de pago de Stripe
-// Llama a la ruta /api/stripe/create-checkout con el priceId, successUrl y cancelUrl
-// Por defecto, no obliga a los usuarios a estar autenticados. Pero si lo están, prellenará los datos de Checkout con su correo electrónico y/o tarjeta de crédito.
-// También se puede cambiar el modo a "subscription" si se quiere crear una suscripción en lugar de un pago único
 const ButtonCheckout = ({ priceId, mode = "subscription" }) => {
-  // Estado para manejar el estado de carga del botón
   const [isLoading, setIsLoading] = useState(false);
-  // Hook de next-auth para obtener la sesión del usuario
   const { data: session, status } = useSession();
+  const router = useRouter();
 
-  const handlePayment = async () => {
+  useEffect(() => {
+    if (status === "authenticated") {
+      const savedPriceId = localStorage.getItem('selectedPriceId');
+      const savedMode = localStorage.getItem('selectedMode');
+      if (savedPriceId && savedMode) {
+        handlePayment(savedPriceId, savedMode);
+        localStorage.removeItem('selectedPriceId');
+        localStorage.removeItem('selectedMode');
+      }
+    }
+  }, [status]);
+
+  const handlePayment = async (selectedPriceId = priceId, selectedMode = mode) => {
     setIsLoading(true);
 
-    // Si el usuario no está autenticado, inicia el proceso de inicio de sesión
     if (status === "unauthenticated") {
-      signIn();
-      setIsLoading(false);
+      localStorage.setItem('selectedPriceId', selectedPriceId);
+      localStorage.setItem('selectedMode', selectedMode);
+      signIn(undefined, { callbackUrl: window.location.href });
       return;
     }
 
     try {
-      // Llama a la API para crear una sesión de pago de Stripe
       const res = await apiClient.post("/stripe/create-checkout", {
-        priceId,
-        mode,
-        successUrl: `${window.location.origin}/bienvenida`, // Cambiado aquí
+        priceId: selectedPriceId,
+        mode: selectedMode,
+        successUrl: `${window.location.origin}/bienvenida`,
         cancelUrl: window.location.href,
       });
 
-      // Redirige al usuario a la página de pago de Stripe
       window.location.href = res.url;
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (
     <button
       className="btn btn-primary btn-block group"
       onClick={() => handlePayment()}
+      disabled={isLoading}
     >
       {isLoading ? (
-        // Muestra un spinner de carga cuando isLoading es true
         <span className="loading loading-spinner loading-xs"></span>
       ) : (
-        // Muestra un icono SVG cuando no está cargando
         <svg
           className="w-5 h-5 fill-primary-content group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-200"
           viewBox="0 0 375 509"
