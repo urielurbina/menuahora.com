@@ -28,7 +28,9 @@ export default function Home() {
         <WithWithout />
         <Benefits />
         <HowItWorks />
-        <Pricing />
+        <section id="pricing">
+          <Pricing />
+        </section>
         <Questions />
         <BigCTA />
       </main>

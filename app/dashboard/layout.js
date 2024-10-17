@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import ButtonAccount from "@/components/ButtonAccount";
+import PrivateRoute from '@/components/PrivateRoute';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -16,69 +17,71 @@ export default function ResponsiveLayout({ children }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <div className="h-screen flex overflow-hidden bg-gray-100">
-      {/* Sidebar para desktop */}
-      <div className="hidden md:flex md:flex-shrink-0">
-        <div className="flex flex-col w-64">
-          <SidebarContent />
-        </div>
-      </div>
-
-      {/* Sidebar móvil */}
-      <div className="md:hidden">
-        <div className={`fixed inset-0 flex z-40 ${isMobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
-          <div
-            className={`fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity ease-linear duration-300 ${
-              isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
-            }`}
-            onClick={() => setIsMobileMenuOpen(false)}
-          ></div>
-
-          <div
-            className={`relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white transition ease-in-out duration-300 transform ${
-              isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-            }`}
-          >
-            {isMobileMenuOpen && (
-              <div className="absolute top-0 right-0 -mr-12 pt-2">
-                <button
-                  className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <span className="sr-only">Close sidebar</span>
-                  <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            )}
+    <PrivateRoute>
+      <div className="h-screen flex overflow-hidden bg-gray-100">
+        {/* Sidebar para desktop */}
+        <div className="hidden md:flex md:flex-shrink-0">
+          <div className="flex flex-col w-64">
             <SidebarContent />
           </div>
         </div>
-      </div>
 
-      <div className="flex flex-col w-full flex-1 overflow-hidden">
-        {/* Botón de menú para móvil */}
-        <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3">
-          <button
-            className="h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-            onClick={() => setIsMobileMenuOpen(true)}
-          >
-            <span className="sr-only">Open sidebar</span>
-            <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-        </div>
-        <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
-          <div className="py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-              {children}
+        {/* Sidebar móvil */}
+        <div className="md:hidden">
+          <div className={`fixed inset-0 flex z-40 ${isMobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+            <div
+              className={`fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity ease-linear duration-300 ${
+                isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
+              }`}
+              onClick={() => setIsMobileMenuOpen(false)}
+            ></div>
+
+            <div
+              className={`relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white transition ease-in-out duration-300 transform ${
+                isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+              }`}
+            >
+              {isMobileMenuOpen && (
+                <div className="absolute top-0 right-0 -mr-12 pt-2">
+                  <button
+                    className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="sr-only">Close sidebar</span>
+                    <svg className="h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+              <SidebarContent />
             </div>
           </div>
-        </main>
+        </div>
+
+        <div className="flex flex-col w-full flex-1 overflow-hidden">
+          {/* Botón de menú para móvil */}
+          <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3">
+            <button
+              className="h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+              onClick={() => setIsMobileMenuOpen(true)}
+            >
+              <span className="sr-only">Open sidebar</span>
+              <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+          <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
+            <div className="py-6">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                {children}
+              </div>
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </PrivateRoute>
   );
 }
 
