@@ -5,32 +5,36 @@ import { useSession, signIn } from "next-auth/react";
 import apiClient from "@/libs/api";
 import config from "@/config";
 
-// This component is used to create Stripe Checkout Sessions
-// It calls the /api/stripe/create-checkout route with the priceId, successUrl and cancelUrl
-// By default, it doesn't force users to be authenticated. But if they are, it will prefill the Checkout data with their email and/or credit card. You can change that in the API route
-// You can also change the mode to "subscription" if you want to create a subscription instead of a one-time payment
+// Este componente se utiliza para crear sesiones de pago de Stripe
+// Llama a la ruta /api/stripe/create-checkout con el priceId, successUrl y cancelUrl
+// Por defecto, no obliga a los usuarios a estar autenticados. Pero si lo están, prellenará los datos de Checkout con su correo electrónico y/o tarjeta de crédito.
+// También se puede cambiar el modo a "subscription" si se quiere crear una suscripción en lugar de un pago único
 const ButtonCheckout = ({ priceId, mode = "subscription" }) => {
+  // Estado para manejar el estado de carga del botón
   const [isLoading, setIsLoading] = useState(false);
+  // Hook de next-auth para obtener la sesión del usuario
   const { data: session, status } = useSession();
 
   const handlePayment = async () => {
     setIsLoading(true);
 
+    // Si el usuario no está autenticado, inicia el proceso de inicio de sesión
     if (status === "unauthenticated") {
-      // Si no hay sesión, iniciar el proceso de inicio de sesión
       signIn();
       setIsLoading(false);
       return;
     }
 
     try {
+      // Llama a la API para crear una sesión de pago de Stripe
       const res = await apiClient.post("/stripe/create-checkout", {
         priceId,
         mode,
-        successUrl: window.location.href,
+        successUrl: `${window.location.origin}/bienvenida`, // Cambiado aquí
         cancelUrl: window.location.href,
       });
 
+      // Redirige al usuario a la página de pago de Stripe
       window.location.href = res.url;
     } catch (e) {
       console.error(e);
@@ -45,8 +49,10 @@ const ButtonCheckout = ({ priceId, mode = "subscription" }) => {
       onClick={() => handlePayment()}
     >
       {isLoading ? (
+        // Muestra un spinner de carga cuando isLoading es true
         <span className="loading loading-spinner loading-xs"></span>
       ) : (
+        // Muestra un icono SVG cuando no está cargando
         <svg
           className="w-5 h-5 fill-primary-content group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-200"
           viewBox="0 0 375 509"
