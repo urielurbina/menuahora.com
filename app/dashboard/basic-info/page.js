@@ -342,7 +342,7 @@ export default function BasicInfo() {
 
           <div className="sm:col-span-3">
             <label htmlFor="whatsappLink" className="block text-sm font-medium leading-6 text-gray-900">
-              Enlace de WhatsApp <span className="text-gray-500">(opcional)</span>
+              Enlace de WhatsApp
             </label>
             <div className="mt-2">
               <input
