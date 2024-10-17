@@ -36,7 +36,7 @@ const ColorPicker = ({ id, label, value, onChange }) => (
   </div>
 );
 
-export default function VisualIdentity() {
+export default function Apariencia() {
   const [titleFont, setTitleFont] = useState(fonts[0].value);
   const [bodyFont, setBodyFont] = useState(fonts[0].value);
   const [buttonFont, setButtonFont] = useState(fonts[0].value);

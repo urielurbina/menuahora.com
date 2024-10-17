@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import Select from 'react-select';
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 
-export default function BasicInfo() {
+export default function InformacionBasica() {
   const { data: session } = useSession();
   const [formData, setFormData] = useState({
     businessName: '',

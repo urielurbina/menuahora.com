@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PhotoIcon } from '@heroicons/react/24/solid'
 
-const ProductsPage = () => {
+const Productos = () => {
   const [products, setProducts] = useState([]);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState(null);
@@ -167,7 +167,7 @@ const ProductsPage = () => {
           {products.map(product => (
             <motion.div
               key={product.id}
-              className="border p-4 rounded cursor-pointer"
+              className="border p-4 rounded cursor-pointer bg-white shadow-sm" // Añadido bg-white y shadow-sm
               whileHover={{ scale: 1.05 }}
               onClick={() => openPopup(product)}
             >
@@ -555,4 +555,4 @@ const ProductPopup = ({ product, onSave, onDelete, onClose }) => {
   );
 };
 
-export default ProductsPage;
+export default Productos;

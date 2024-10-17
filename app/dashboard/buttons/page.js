@@ -56,7 +56,7 @@ library.add(
   faTimes
 )
 
-export default function Links() {
+export default function Buttons() {
   const [links, setLinks] = useState([])
   const [isIconModalOpen, setIsIconModalOpen] = useState(false)
   const [currentEditingLink, setCurrentEditingLink] = useState(null)
