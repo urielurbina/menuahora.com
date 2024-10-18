@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { PhotoIcon } from '@heroicons/react/24/solid'
+import { PhotoIcon, XCircleIcon } from '@heroicons/react/24/solid'
 
 const Productos = () => {
   const [products, setProducts] = useState([]);
@@ -11,6 +11,10 @@ const Productos = () => {
   const [currentProduct, setCurrentProduct] = useState(null);
   const [excelLink, setExcelLink] = useState('');
   const [menuTitle, setMenuTitle] = useState('');
+  const [mainTitle, setMainTitle] = useState('');
+  const [mobileColumns, setMobileColumns] = useState('1'); // Nuevo estado para las columnas en móvil
+  const [categories, setCategories] = useState(['Pizzas', 'Bebidas']); // Estado inicial con algunas categorías de ejemplo
+  const [newCategory, setNewCategory] = useState('');
 
   // Función para cargar los productos (simulada)
   useEffect(() => {
@@ -102,6 +106,22 @@ const Productos = () => {
     }
   };
 
+  const handleMobileColumnsChange = (e) => {
+    setMobileColumns(e.target.value);
+  };
+
+  const handleAddCategory = (e) => {
+    e.preventDefault();
+    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
+      setCategories([...categories, newCategory.trim()]);
+      setNewCategory('');
+    }
+  };
+
+  const handleRemoveCategory = (categoryToRemove) => {
+    setCategories(categories.filter(category => category !== categoryToRemove));
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Productos</h1>
@@ -157,6 +177,68 @@ const Productos = () => {
           </div>
         </div>
 
+        {/* Dropdown para columnas en móvil */}
+        <div className="mb-4">
+          <label htmlFor="mobileColumns" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
+            Columnas en móvil
+          </label>
+          <select
+            id="mobileColumns"
+            name="mobileColumns"
+            value={mobileColumns}
+            onChange={handleMobileColumnsChange}
+            className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          >
+            <option value="1">1 columna</option>
+            <option value="2">2 columnas</option>
+          </select>
+        </div>
+
+        {/* Campo para agregar categorías */}
+        <div className="mb-4">
+          <label htmlFor="categories" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
+            Categorías
+          </label>
+          <div className="flex flex-wrap gap-2 mb-2">
+            {categories.map((category, index) => (
+              <div 
+                key={index} 
+                className="bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 relative group"
+              >
+                {category}
+                <button
+                  onClick={() => handleRemoveCategory(category)}
+                  className="absolute right-0 top-0 -mt-1 -mr-1 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                >
+                  <XCircleIcon className="h-5 w-5" />
+                </button>
+              </div>
+            ))}
+          </div>
+          <form onSubmit={handleAddCategory} className="flex gap-2">
+            <input
+              type="text"
+              id="newCategory"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="Nueva categoría"
+              className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+            <button
+              type="submit"
+              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Agregar
+            </button>
+          </form>
+        </div>
+
+        {/* Nuevo divisor */}
+        <hr className="my-6 border-gray-200" />
+
+        {/* Nuevo título para la sección de inventario */}
+        <h2 className="text-xl font-semibold mb-4">Inventario del Menú</h2>
+
         <button
           onClick={() => openPopup()}
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-4"
@@ -193,14 +275,30 @@ const Productos = () => {
 };
 
 const ProductPopup = ({ product, onSave, onDelete, onClose }) => {
-  const [formData, setFormData] = useState(product || {
-    name: '',
-    description: '',
-    price: '$0.00',
-    extras: [],
-    image: null,
-    category: '',
-    available: true,
+  const [formData, setFormData] = useState(() => {
+    const defaultShowInCard = {
+      name: true,
+      description: false,
+      price: true,
+      category: false,
+      image: true,
+    };
+    
+    return {
+      name: '',
+      description: '',
+      price: '$0.00',
+      extras: [],
+      image: null,
+      category: '',
+      available: true,
+      detailedView: false,
+      showInCard: {
+        ...defaultShowInCard,
+        ...(product?.showInCard || {}),
+      },
+      ...(product || {}),
+    };
   });
 
   const [dragActive, setDragActive] = useState(false);
@@ -311,6 +409,23 @@ const ProductPopup = ({ product, onSave, onDelete, onClose }) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
+  };
+
+  const handleToggleChange = (field) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: !prev[field]
+    }));
+  };
+
+  const handleShowInCardToggle = (field) => {
+    setFormData(prev => ({
+      ...prev,
+      showInCard: {
+        ...prev.showInCard,
+        [field]: !prev.showInCard[field]
+      }
+    }));
   };
 
   return (
@@ -521,6 +636,55 @@ const ProductPopup = ({ product, onSave, onDelete, onClose }) => {
                     Agregar
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-b border-gray-900/10 pb-12">
+            <h2 className="text-base font-semibold leading-7 text-gray-900">Configuración de visualización</h2>
+            <p className="mt-1 text-sm leading-6 text-gray-600">Configura cómo se mostrará el producto en la lista y en la vista detallada.</p>
+
+            <div className="mt-10 space-y-6">
+              <div className="flex items-center justify-between">
+                <span className="flex-grow flex flex-col">
+                  <span className="text-sm font-medium leading-6 text-gray-900">Vista detallada</span>
+                  <span className="text-sm text-gray-500">Activar para mostrar todos los detalles del producto al hacer clic</span>
+                </span>
+                <button
+                  type="button"
+                  className={`${
+                    formData.detailedView ? 'bg-indigo-600' : 'bg-gray-200'
+                  } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2`}
+                  onClick={() => handleToggleChange('detailedView')}
+                >
+                  <span
+                    className={`${
+                      formData.detailedView ? 'translate-x-5' : 'translate-x-0'
+                    } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                  />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-sm font-medium text-gray-900">Mostrar en la tarjeta:</p>
+                {Object.keys(formData.showInCard).map((field) => (
+                  <div key={field} className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500 capitalize">{field}</span>
+                    <button
+                      type="button"
+                      className={`${
+                        formData.showInCard[field] ? 'bg-indigo-600' : 'bg-gray-200'
+                      } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2`}
+                      onClick={() => handleShowInCardToggle(field)}
+                    >
+                      <span
+                        className={`${
+                          formData.showInCard[field] ? 'translate-x-5' : 'translate-x-0'
+                        } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
+                      />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
