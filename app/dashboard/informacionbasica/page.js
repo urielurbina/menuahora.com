@@ -21,23 +21,24 @@ export default function InformacionBasica() {
     slogan: '',
     logoUrl: '',
     coverPhotoUrl: '',
-    phoneNumber: '',
-    whatsappLink: '',
-    facebookLink: '',
-    address: '', // New field for address
-    hasSchedule: false, // New field to make schedule optional
-    schedule: {
-      lunes: { open: '09:00', close: '18:00', isClosed: false },
-      martes: { open: '09:00', close: '18:00', isClosed: false },
-      miércoles: { open: '09:00', close: '18:00', isClosed: false },
-      jueves: { open: '09:00', close: '18:00', isClosed: false },
-      viernes: { open: '09:00', close: '18:00', isClosed: false },
-      sábado: { open: '10:00', close: '14:00', isClosed: false },
-      domingo: { open: '10:00', close: '14:00', isClosed: true },
+    contact: {
+      phoneNumber: '',
+      whatsappLink: '',
+      facebookLink: '',
+      address: '',
     },
-    hasAddress: false,
-    hasWhatsapp: false,
-    hasFacebook: false,
+    schedule: {
+      enabled: false,
+      days: {
+        lunes: { open: '09:00', close: '18:00', isClosed: false },
+        martes: { open: '09:00', close: '18:00', isClosed: false },
+        miércoles: { open: '09:00', close: '18:00', isClosed: false },
+        jueves: { open: '09:00', close: '18:00', isClosed: false },
+        viernes: { open: '09:00', close: '18:00', isClosed: false },
+        sábado: { open: '10:00', close: '14:00', isClosed: false },
+        domingo: { open: '10:00', close: '14:00', isClosed: true },
+      },
+    },
   });
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -69,10 +70,16 @@ export default function InformacionBasica() {
     if (type === 'file') {
       handleFiles(files, name === 'logoFile' ? 'logo' : 'cover');
     } else {
-      setFormData(prevData => ({
-        ...prevData,
-        [name]: value
-      }));
+      setFormData(prevData => {
+        const newData = { ...prevData };
+        if (name.includes('.')) {
+          const [section, field] = name.split('.');
+          newData[section] = { ...newData[section], [field]: value };
+        } else {
+          newData[name] = value;
+        }
+        return newData;
+      });
     }
   }, []);
 
@@ -136,11 +143,36 @@ export default function InformacionBasica() {
     setIsLoading(true);
     setMessage('');
 
-    if (!session) {
+    if (!session || !session.user) {
       setMessage('No estás autenticado');
       setIsLoading(false);
       return;
     }
+
+    // Obtener el userId de la sesión
+    const userId = session.user.id;
+
+    // Preparar los datos para enviar
+    const dataToSend = {
+      userId, // Incluir el userId del usuario autenticado
+      'basic-info': {
+        businessName: formData.businessName,
+        description: formData.description,
+        slogan: formData.slogan,
+        logoUrl: previewImage.logo || formData.logoUrl,
+        coverPhotoUrl: previewImage.cover || formData.coverPhotoUrl,
+        contact: {
+          phoneNumber: formData.contact.phoneNumber,
+          whatsappLink: formData.contact.whatsappLink,
+          facebookLink: formData.contact.facebookLink,
+          address: formData.contact.address,
+        },
+        schedule: formData.schedule.enabled ? {
+          enabled: true,
+          days: formData.schedule.days
+        } : { enabled: false },
+      }
+    };
 
     try {
       const response = await fetch('/api/save-basic-info', {
@@ -148,18 +180,29 @@ export default function InformacionBasica() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dataToSend),
       });
+
+      if (!response.ok) {
+        throw new Error('Error en la respuesta del servidor');
+      }
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (data.success) {
         setMessage('Información guardada exitosamente');
+        // Actualizamos el formData con las nuevas URLs de las imágenes
+        setFormData(prevData => ({
+          ...prevData,
+          logoUrl: dataToSend['basic-info'].logoUrl,
+          coverPhotoUrl: dataToSend['basic-info'].coverPhotoUrl,
+        }));
       } else {
-        setMessage(data.error || 'Ocurrió un error al guardar la información');
+        throw new Error(data.error || 'Ocurrió un error al guardar la información');
       }
     } catch (error) {
-      setMessage('Ocurrió un error al guardar la información');
+      console.error('Error al guardar la información:', error);
+      setMessage(error.message || 'Ocurrió un error al guardar la información');
     } finally {
       setIsLoading(false);
     }
@@ -168,7 +211,10 @@ export default function InformacionBasica() {
   const handleScheduleToggle = (e) => {
     setFormData(prevData => ({
       ...prevData,
-      hasSchedule: e.target.checked
+      schedule: {
+        ...prevData.schedule,
+        enabled: e.target.checked
+      }
     }));
   };
 
@@ -177,9 +223,12 @@ export default function InformacionBasica() {
       ...prevData,
       schedule: {
         ...prevData.schedule,
-        [day]: {
-          ...prevData.schedule[day],
-          [field]: value
+        days: {
+          ...prevData.schedule.days,
+          [day]: {
+            ...prevData.schedule.days[day],
+            [field]: value
+          }
         }
       }
     }));
@@ -241,6 +290,23 @@ export default function InformacionBasica() {
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 placeholder="Tu negocio"
+              />
+            </div>
+          </div>
+
+          <div className="sm:col-span-4">
+            <label htmlFor="slogan" className="block text-sm font-medium leading-6 text-gray-900">
+              Slogan
+            </label>
+            <div className="mt-2">
+              <input
+                type="text"
+                id="slogan"
+                name="slogan"
+                value={formData.slogan}
+                onChange={handleChange}
+                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                placeholder="Tu slogan aquí"
               />
             </div>
           </div>
@@ -350,15 +416,15 @@ export default function InformacionBasica() {
 
         <div className="mt-10 space-y-10">
           <div className="sm:col-span-3">
-            <label htmlFor="address" className="block text-sm font-medium leading-6 text-gray-900">
+            <label htmlFor="contact.address" className="block text-sm font-medium leading-6 text-gray-900">
               Dirección <span className="text-gray-500">(opcional)</span>
             </label>
             <div className="mt-2">
               <input
                 type="text"
-                id="address"
-                name="address"
-                value={formData.address}
+                id="contact.address"
+                name="contact.address"
+                value={formData.contact.address}
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 placeholder="Ingresa la dirección de tu negocio"
@@ -367,15 +433,15 @@ export default function InformacionBasica() {
           </div>
 
           <div className="sm:col-span-3">
-            <label htmlFor="whatsappLink" className="block text-sm font-medium leading-6 text-gray-900">
+            <label htmlFor="contact.whatsappLink" className="block text-sm font-medium leading-6 text-gray-900">
               Enlace de WhatsApp
             </label>
             <div className="mt-2">
               <input
                 type="url"
-                id="whatsappLink"
-                name="whatsappLink"
-                value={formData.whatsappLink}
+                id="contact.whatsappLink"
+                name="contact.whatsappLink"
+                value={formData.contact.whatsappLink}
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 placeholder="https://wa.me/1234567890"
@@ -384,15 +450,15 @@ export default function InformacionBasica() {
           </div>
 
           <div className="sm:col-span-3">
-            <label htmlFor="facebookLink" className="block text-sm font-medium leading-6 text-gray-900">
+            <label htmlFor="contact.facebookLink" className="block text-sm font-medium leading-6 text-gray-900">
               Enlace de Facebook <span className="text-gray-500">(opcional)</span>
             </label>
             <div className="mt-2">
               <input
                 type="url"
-                id="facebookLink"
-                name="facebookLink"
-                value={formData.facebookLink}
+                id="contact.facebookLink"
+                name="contact.facebookLink"
+                value={formData.contact.facebookLink}
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                 placeholder="https://www.facebook.com/tu-pagina"
@@ -407,22 +473,22 @@ export default function InformacionBasica() {
         <div className="flex items-center mb-4">
           <input
             type="checkbox"
-            id="hasSchedule"
-            checked={formData.hasSchedule}
+            id="schedule.enabled"
+            checked={formData.schedule.enabled}
             onChange={handleScheduleToggle}
             className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
           />
-          <label htmlFor="hasSchedule" className="ml-2 block text-sm font-medium leading-6 text-gray-900">
+          <label htmlFor="schedule.enabled" className="ml-2 block text-sm font-medium leading-6 text-gray-900">
             ¿Deseas agregar un horario de atención?
           </label>
         </div>
         
-        {formData.hasSchedule && (
+        {formData.schedule.enabled && (
           <div className="mt-10 space-y-10">
             <fieldset>
               <legend className="text-sm font-semibold leading-6 text-gray-900">Horario de atención</legend>
               <div className="mt-6 space-y-6">
-                {Object.entries(formData.schedule).map(([day, hours]) => (
+                {Object.entries(formData.schedule.days).map(([day, hours]) => (
                   <div key={day} className="flex items-center gap-x-3">
                     <input
                       type="checkbox"
