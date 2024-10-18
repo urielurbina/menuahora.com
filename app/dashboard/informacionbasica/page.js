@@ -4,6 +4,14 @@ import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import Select from 'react-select';
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
+import { Cloudinary } from "@cloudinary/url-gen";
+
+// Inicializa Cloudinary
+const cld = new Cloudinary({
+  cloud: {
+    cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+  }
+});
 
 export default function InformacionBasica() {
   const { data: session } = useSession();
@@ -68,20 +76,38 @@ export default function InformacionBasica() {
     }
   }, []);
 
-  const handleFiles = useCallback((files, type) => {
+  const handleFiles = useCallback(async (files, type) => {
     if (files && files[0]) {
       const file = files[0];
       const validTypes = ['image/jpeg', 'image/png'];
       if (validTypes.includes(file.type)) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreviewImage(prev => ({ ...prev, [type]: reader.result }));
+        try {
+          const formData = new FormData();
+          formData.append('file', file);
+          formData.append('type', type); // Añadimos el tipo de imagen (logo o cover)
+
+          const response = await fetch('/api/upload-image', {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(`Error al subir la imagen: ${data.error}`);
+          }
+
+          const imageUrl = data.url;
+          
+          setPreviewImage(prev => ({ ...prev, [type]: imageUrl }));
           setFormData(prevData => ({
             ...prevData,
-            [`${type}Url`]: reader.result
+            [`${type}Url`]: imageUrl
           }));
-        };
-        reader.readAsDataURL(file);
+        } catch (error) {
+          console.error('Error detallado:', error);
+          alert(error.message);
+        }
       } else {
         alert('Por favor, sube solo archivos JPG o PNG.');
       }
@@ -266,7 +292,7 @@ export default function InformacionBasica() {
                       name="logoFile" 
                       type="file" 
                       className="sr-only" 
-                      onChange={handleChange}
+                      onChange={(e) => handleFiles(e.target.files, 'logo')}
                       accept=".jpg,.jpeg,.png"
                     />
                   </label>
@@ -305,7 +331,7 @@ export default function InformacionBasica() {
                       name="coverFile" 
                       type="file" 
                       className="sr-only" 
-                      onChange={handleChange}
+                      onChange={(e) => handleFiles(e.target.files, 'cover')}
                       accept=".jpg,.jpeg,.png"
                     />
                   </label>
