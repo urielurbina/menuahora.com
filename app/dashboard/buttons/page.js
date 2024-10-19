@@ -1,60 +1,10 @@
 'use client'
 
+import React from 'react'
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { 
-  faLink, 
-  faPhone, 
-  faEnvelope, 
-  faMapMarkerAlt, 
-  faCalendar, 
-  faShoppingCart, 
-  faUser, 
-  faHome,
-  faChevronDown,
-  faTrash,
-  faBars,
-  faCar,
-  faUtensils,
-  faGlobe,
-  faStar,
-  faPlus,
-  faTimes
-} from '@fortawesome/free-solid-svg-icons'
-import {
-  faInstagram,
-  faFacebook,
-  faTiktok,
-  faWhatsapp
-} from '@fortawesome/free-brands-svg-icons'
-
-// Añade los iconos a la biblioteca
-library.add(
-  faLink, 
-  faPhone, 
-  faEnvelope, 
-  faMapMarkerAlt, 
-  faCalendar, 
-  faShoppingCart, 
-  faUser, 
-  faHome,
-  faInstagram,
-  faFacebook,
-  faTiktok,
-  faWhatsapp,
-  faChevronDown,
-  faTrash,
-  faBars,
-  faCar,
-  faUtensils,
-  faGlobe,
-  faStar,
-  faPlus,
-  faTimes
-)
+import * as FaIcons from 'react-icons/fa'
 
 export default function Buttons() {
   const { data: session, status } = useSession()
@@ -116,21 +66,21 @@ export default function Buttons() {
 
   const IconModal = () => {
     const icons = [
-      { value: 'link', icon: ['fas', 'link'] },
-      { value: 'phone', icon: ['fas', 'phone'] },
-      { value: 'envelope', icon: ['fas', 'envelope'] },
-      { value: 'map-marker-alt', icon: ['fas', 'map-marker-alt'] },
-      { value: 'calendar', icon: ['fas', 'calendar'] },
-      { value: 'shopping-cart', icon: ['fas', 'shopping-cart'] },
-      { value: 'user', icon: ['fas', 'user'] },
-      { value: 'home', icon: ['fas', 'home'] },
-      { value: 'instagram', icon: ['fab', 'instagram'] },
-      { value: 'facebook', icon: ['fab', 'facebook'] },
-      { value: 'tiktok', icon: ['fab', 'tiktok'] },
-      { value: 'whatsapp', icon: ['fab', 'whatsapp'] },
-      { value: 'car', icon: ['fas', 'car'] },
-      { value: 'utensils', icon: ['fas', 'utensils'] },
-      { value: 'globe', icon: ['fas', 'globe'] },
+      { value: 'link', icon: FaIcons.FaLink },
+      { value: 'phone', icon: FaIcons.FaPhone },
+      { value: 'envelope', icon: FaIcons.FaEnvelope },
+      { value: 'map-marker-alt', icon: FaIcons.FaMapMarkerAlt },
+      { value: 'calendar', icon: FaIcons.FaCalendar },
+      { value: 'shopping-cart', icon: FaIcons.FaShoppingCart },
+      { value: 'user', icon: FaIcons.FaUser },
+      { value: 'home', icon: FaIcons.FaHome },
+      { value: 'instagram', icon: FaIcons.FaInstagram },
+      { value: 'facebook', icon: FaIcons.FaFacebook },
+      { value: 'tiktok', icon: FaIcons.FaTiktok },
+      { value: 'whatsapp', icon: FaIcons.FaWhatsapp },
+      { value: 'car', icon: FaIcons.FaCar },
+      { value: 'utensils', icon: FaIcons.FaUtensils },
+      { value: 'globe', icon: FaIcons.FaGlobe },
     ]
 
     return (
@@ -139,7 +89,7 @@ export default function Buttons() {
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Selecciona un icono</h3>
             <button onClick={closeIconModal} className="text-gray-500 hover:text-gray-700">
-              <FontAwesomeIcon icon="times" />
+              <FaIcons.FaTimes />
             </button>
           </div>
           <div className="grid grid-cols-4 gap-4">
@@ -152,7 +102,7 @@ export default function Buttons() {
                   closeIconModal()
                 }}
               >
-                <FontAwesomeIcon icon={icon.icon} className="w-6 h-6" />
+                <icon.icon className="w-6 h-6" />
               </button>
             ))}
           </div>
@@ -166,7 +116,7 @@ export default function Buttons() {
       <button
         onClick={onToggle}
         className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
-          isOn ? 'bg-indigo-600' : 'bg-gray-200'
+            isOn ? 'bg-indigo-600' : 'bg-gray-200'
         }`}
       >
         <span className="sr-only">Activar enlace</span>
@@ -178,6 +128,11 @@ export default function Buttons() {
       </button>
     );
   };
+
+  const getIconComponent = (iconName) => {
+    const pascalCase = iconName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('')
+    return FaIcons[`Fa${pascalCase}`] || FaIcons.FaPlus
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -232,7 +187,7 @@ export default function Buttons() {
               <div className="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-4 mb-4">
                 {index === 0 && (
                   <div className="text-sm text-indigo-600 font-semibold mb-2">
-                    <FontAwesomeIcon icon="star" className="mr-1" /> Este es tu link destacado
+                    <FaIcons.FaStar className="inline mr-1" /> Este es tu link destacado
                   </div>
                 )}
                 <div className="flex items-center justify-between mb-2">
@@ -262,7 +217,7 @@ export default function Buttons() {
                     onClick={() => openIconModal(link.id)}
                     className="flex-shrink-0 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 whitespace-nowrap"
                   >
-                    <FontAwesomeIcon icon={link.icon || 'plus'} className="mr-2" />
+                    {React.createElement(getIconComponent(link.icon), { className: "inline mr-2" })}
                     {link.icon ? 'Cambiar icono' : 'Seleccionar icono'}
                   </button>
                 </div>
@@ -270,7 +225,7 @@ export default function Buttons() {
                   onClick={() => removeLink(link.id)}
                   className="text-sm text-red-600 hover:text-red-500"
                 >
-                  <FontAwesomeIcon icon="trash" /> Eliminar
+                  <FaIcons.FaTrash className="inline mr-1" /> Eliminar
                 </button>
               </div>
             </div>
@@ -284,7 +239,7 @@ export default function Buttons() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <FontAwesomeIcon icon="plus" className="mr-2" />
+            <FaIcons.FaPlus className="inline mr-2" />
             Añadir enlace
           </motion.button>
         </div>

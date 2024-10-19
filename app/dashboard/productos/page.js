@@ -1,722 +1,350 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { PhotoIcon, XCircleIcon } from '@heroicons/react/24/solid'
+import { useState } from "react"
+import { Plus, X, Edit2, ChevronDown, ChevronUp } from "lucide-react"
 
-const Productos = () => {
-  const [products, setProducts] = useState([]);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [currentProduct, setCurrentProduct] = useState(null);
-  const [excelLink, setExcelLink] = useState('');
-  const [menuTitle, setMenuTitle] = useState('');
-  const [mainTitle, setMainTitle] = useState('');
-  const [mobileColumns, setMobileColumns] = useState('1'); // Nuevo estado para las columnas en móvil
-  const [categories, setCategories] = useState(['Pizzas', 'Bebidas']); // Estado inicial con algunas categorías de ejemplo
-  const [newCategory, setNewCategory] = useState('');
+export default function ProductDashboard() {
+  const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
+  const [isAddingProduct, setIsAddingProduct] = useState(false)
+  const [editingProduct, setEditingProduct] = useState(null)
+  const [newProduct, setNewProduct] = useState({
+    nombre: "",
+    descripcion: "",
+    imagen: "",
+    precio: 0,
+    categoria: "",
+    availability: true,
+    extras: [],
+  })
+  const [newCategory, setNewCategory] = useState("")
+  const [newExtra, setNewExtra] = useState({ name: "", price: 0 })
+  const [cardInfoSettings, setCardInfoSettings] = useState({
+    nombre: true,
+    descripcion: true,
+    precio: true,
+    categoria: true,
+    imagen: true,
+    detailedView: true,  // Cambiado de 'enabled' a 'detailedView'
+  })
+  const [expandedProduct, setExpandedProduct] = useState(null)
 
-  // Función para cargar los productos (simulada)
-  useEffect(() => {
-    // Aquí deberías hacer una llamada a tu API para obtener los productos
-    const fetchProducts = async () => {
-      // Simulación de productos
-      const mockProducts = [
-        { id: 1, name: 'Producto 1', subtitle: 'Subtítulo 1', price: 10.99, available: true },
-        { id: 2, name: 'Producto 2', subtitle: 'Subtítulo 2', price: 15.99, available: false },
-      ];
-      setProducts(mockProducts);
-    };
-    fetchProducts();
-  }, []);
-
-  const openPopup = (product = null) => {
-    setCurrentProduct(product);
-    setIsPopupOpen(true);
-  };
-
-  const closePopup = () => {
-    setCurrentProduct(null);
-    setIsPopupOpen(false);
-  };
-
-  const saveProduct = (productData) => {
-    // Aquí deberías implementar la lógica para guardar el producto en tu backend
-    if (productData.id) {
-      // Actualizar producto existente
-      setProducts(products.map(p => p.id === productData.id ? productData : p));
+  const handleAddProduct = () => {
+    if (editingProduct) {
+      setProducts(products.map(p => p.id === editingProduct.id ? { ...editingProduct, ...newProduct } : p))
     } else {
-      // Agregar nuevo producto
-      setProducts([...products, { ...productData, id: Date.now() }]);
+      setProducts([...products, { ...newProduct, id: Date.now() }])
     }
-    closePopup();
-  };
+    resetNewProduct()
+    setIsAddingProduct(false)
+    setEditingProduct(null)
+  }
 
-  const deleteProduct = (productId) => {
-    // Aquí deberías implementar la lógica para eliminar el producto en tu backend
-    setProducts(products.filter(p => p.id !== productId));
-    closePopup();
-  };
+  const resetNewProduct = () => {
+    setNewProduct({
+      nombre: "",
+      descripcion: "",
+      imagen: "",
+      precio: 0,
+      categoria: "",
+      availability: true,
+      extras: [],
+    })
+  }
 
-  const handleExcelLinkChange = (e) => {
-    setExcelLink(e.target.value);
-  };
-
-  const handleImportExcel = async () => {
-    // Aquí deberías implementar la lógica para importar productos desde el Excel
-    console.log('Importando productos desde:', excelLink);
-    // Ejemplo de implementación:
-    // const response = await fetch('/api/import-products', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({ excelLink })
-    // });
-    // if (response.ok) {
-    //   const importedProducts = await response.json();
-    //   setProducts([...products, ...importedProducts]);
-    //   setExcelLink('');
-    // }
-  };
-
-  const handleMenuTitleChange = (e) => {
-    setMenuTitle(e.target.value);
-  };
-
-  const handleSaveMenuTitle = async () => {
-    // Aquí deberías implementar la lógica para guardar el título del menú en tu backend
-    try {
-      // Ejemplo de llamada a API (deberás ajustar esto según tu implementación real)
-      // const response = await fetch('/api/save-menu-title', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ title: menuTitle })
-      // });
-      // if (response.ok) {
-      //   // Título guardado exitosamente
-      //   console.log('Título del menú guardado:', menuTitle);
-      // } else {
-      //   throw new Error('Error al guardar el título del menú');
-      // }
-      
-      // Por ahora, solo mostraremos un mensaje en la consola
-      console.log('Título del menú guardado:', menuTitle);
-    } catch (error) {
-      console.error('Error al guardar el título del menú:', error);
-      // Aquí podrías mostrar un mensaje de error al usuario
+  const handleAddCategory = () => {
+    if (newCategory) {
+      setCategories([...categories, { id: Date.now(), name: newCategory }])
+      setNewCategory("")
     }
-  };
+  }
 
-  const handleMobileColumnsChange = (e) => {
-    setMobileColumns(e.target.value);
-  };
+  const handleDeleteCategory = (id) => {
+    setCategories(categories.filter(category => category.id !== id))
+  }
 
-  const handleAddCategory = (e) => {
-    e.preventDefault();
-    if (newCategory.trim() && !categories.includes(newCategory.trim())) {
-      setCategories([...categories, newCategory.trim()]);
-      setNewCategory('');
+  const handleAddExtra = () => {
+    if (newExtra.name && newExtra.price) {
+      setNewProduct({
+        ...newProduct,
+        extras: [...newProduct.extras, { ...newExtra, id: Date.now() }],
+      })
+      setNewExtra({ name: "", price: 0 })
     }
-  };
+  }
 
-  const handleRemoveCategory = (categoryToRemove) => {
-    setCategories(categories.filter(category => category !== categoryToRemove));
-  };
+  const handleDeleteExtra = (id) => {
+    setNewProduct({
+      ...newProduct,
+      extras: newProduct.extras.filter(extra => extra.id !== id),
+    })
+  }
+
+  const handleEditProduct = (product) => {
+    setEditingProduct(product)
+    setNewProduct(product)
+    setIsAddingProduct(true)
+  }
+
+  const handleDeleteProduct = (id) => {
+    setProducts(products.filter(p => p.id !== id))
+  }
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Productos</h1>
-      
-      {/* Sección de importación de Excel */}
-      <div className="mb-8">
-        <h2 className="text-xl font-semibold mb-2">Importar productos desde Excel</h2>
-        <div className="flex items-center space-x-2">
+    <div className="container mx-auto p-4 space-y-8">
+      <h1 className="text-3xl font-bold text-gray-800">Administrador de Productos</h1>
+
+      <div className="bg-white shadow-md rounded-lg p-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-700">Categorías</h2>
+        <div className="flex items-center gap-2 mb-4">
           <input
-            type="url"
-            value={excelLink}
-            onChange={handleExcelLinkChange}
-            placeholder="https://ejemplo.com/productos.xlsx"
-            className="flex-grow rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            type="text"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            placeholder="Nueva categoría"
+            className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
-            onClick={handleImportExcel}
-            className="rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600"
+            onClick={handleAddCategory}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
           >
-            Importar Excel
+            Agregar
           </button>
         </div>
-      </div>
-
-      {/* Divisor */}
-      <hr className="my-8 border-gray-200" />
-
-      {/* Sección de gestión de productos */}
-      <div>
-        <h2 className="text-xl font-semibold mb-4">Gestión de productos</h2>
-        
-        {/* Campo de título del menú con botón de guardado */}
-        <div className="mb-4">
-          <label htmlFor="menuTitle" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-            Título del menú
-          </label>
-          <div className="flex items-center space-x-2">
-            <input
-              type="text"
-              id="menuTitle"
-              name="menuTitle"
-              value={menuTitle}
-              onChange={handleMenuTitleChange}
-              placeholder="Menú"
-              className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-            <button
-              onClick={handleSaveMenuTitle}
-              className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Guardar
-            </button>
-          </div>
-        </div>
-
-        {/* Dropdown para columnas en móvil */}
-        <div className="mb-4">
-          <label htmlFor="mobileColumns" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-            Columnas en móvil
-          </label>
-          <select
-            id="mobileColumns"
-            name="mobileColumns"
-            value={mobileColumns}
-            onChange={handleMobileColumnsChange}
-            className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          >
-            <option value="1">1 columna</option>
-            <option value="2">2 columnas</option>
-          </select>
-        </div>
-
-        {/* Campo para agregar categorías */}
-        <div className="mb-4">
-          <label htmlFor="categories" className="block text-sm font-medium leading-6 text-gray-900 mb-1">
-            Categorías
-          </label>
-          <div className="flex flex-wrap gap-2 mb-2">
-            {categories.map((category, index) => (
-              <div 
-                key={index} 
-                className="bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 relative group"
+        <div className="flex flex-wrap gap-2">
+          {categories.map((category) => (
+            <span key={category.id} className="px-3 py-1 bg-gray-200 text-gray-700 rounded-full flex items-center">
+              {category.name}
+              <button
+                onClick={() => handleDeleteCategory(category.id)}
+                className="ml-2 text-gray-500 hover:text-red-500 focus:outline-none"
               >
-                {category}
-                <button
-                  onClick={() => handleRemoveCategory(category)}
-                  className="absolute right-0 top-0 -mt-1 -mr-1 text-red-500 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-                >
-                  <XCircleIcon className="h-5 w-5" />
-                </button>
-              </div>
-            ))}
-          </div>
-          <form onSubmit={handleAddCategory} className="flex gap-2">
-            <input
-              type="text"
-              id="newCategory"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              placeholder="Nueva categoría"
-              className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-            />
-            <button
-              type="submit"
-              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Agregar
-            </button>
-          </form>
-        </div>
-
-        {/* Nuevo divisor */}
-        <hr className="my-6 border-gray-200" />
-
-        {/* Nuevo título para la sección de inventario */}
-        <h2 className="text-xl font-semibold mb-4">Inventario del Menú</h2>
-
-        <button
-          onClick={() => openPopup()}
-          className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 mb-4"
-        >
-          Agregar Producto
-        </button>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {products.map(product => (
-            <motion.div
-              key={product.id}
-              className="border p-4 rounded cursor-pointer bg-white shadow-sm" // Añadido bg-white y shadow-sm
-              whileHover={{ scale: 1.05 }}
-              onClick={() => openPopup(product)}
-            >
-              <h2 className="text-xl font-semibold">{product.name}</h2>
-              <p className="text-lg font-bold">${product.price.toFixed(2)}</p>
-              <p className={product.available ? "text-green-500" : "text-red-500"}>
-                {product.available ? "Disponible" : "Agotado"}
-              </p>
-            </motion.div>
+                <X className="h-4 w-4" />
+              </button>
+            </span>
           ))}
         </div>
       </div>
-      {isPopupOpen && (
-        <ProductPopup
-          product={currentProduct}
-          onSave={saveProduct}
-          onDelete={deleteProduct}
-          onClose={closePopup}
-        />
-      )}
-    </div>
-  );
-};
 
-const ProductPopup = ({ product, onSave, onDelete, onClose }) => {
-  const [formData, setFormData] = useState(() => {
-    const defaultShowInCard = {
-      name: true,
-      description: false,
-      price: true,
-      category: false,
-      image: true,
-    };
-    
-    return {
-      name: '',
-      description: '',
-      price: '$0.00',
-      extras: [],
-      image: null,
-      category: '',
-      available: true,
-      detailedView: false,
-      showInCard: {
-        ...defaultShowInCard,
-        ...(product?.showInCard || {}),
-      },
-      ...(product || {}),
-    };
-  });
-
-  const [dragActive, setDragActive] = useState(false);
-  const [previewImage, setPreviewImage] = useState(null);
-  const [newExtra, setNewExtra] = useState({ name: '', price: '$0.00' });
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-  };
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFiles(e.dataTransfer.files);
-    }
-  };
-
-  const handleFiles = (files) => {
-    if (files && files[0]) {
-      const file = files[0];
-      const validTypes = ['image/jpeg', 'image/png'];
-      if (validTypes.includes(file.type)) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setPreviewImage(reader.result);
-          setFormData(prevData => ({
-            ...prevData,
-            image: reader.result
-          }));
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert('Por favor, sube solo archivos JPG o PNG.');
-      }
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onSave(formData);
-  };
-
-  const handleExtraChange = (e) => {
-    const { name, value } = e.target;
-    setNewExtra(prev => ({ ...prev, [name]: value }));
-  };
-
-  const addExtra = () => {
-    if (newExtra.name && newExtra.price) {
-      setFormData(prev => ({
-        ...prev,
-        extras: [...prev.extras, { ...newExtra, id: Date.now() }]
-      }));
-      setNewExtra({ name: '', price: '$0.00' });
-    }
-  };
-
-  const removeExtra = (id) => {
-    setFormData(prev => ({
-      ...prev,
-      extras: prev.extras.filter(extra => extra.id !== id)
-    }));
-  };
-
-  const formatPrice = (value) => {
-    // Elimina cualquier carácter que no sea número o punto
-    const numericValue = value.replace(/[^\d.]/g, '');
-    // Asegura que solo haya un punto decimal
-    const parts = numericValue.split('.');
-    if (parts.length > 2) {
-      parts[1] = parts.slice(1).join('');
-    }
-    // Limita a dos decimales
-    if (parts[1]) {
-      parts[1] = parts[1].slice(0, 2);
-    }
-    // Agrega el símbolo $ al principio y asegura que siempre haya dos decimales
-    return `$${parseFloat(parts.join('.')).toFixed(2)}`;
-  };
-
-  const handlePriceChange = (e) => {
-    const formattedPrice = formatPrice(e.target.value);
-    setFormData(prev => ({ ...prev, price: formattedPrice }));
-  };
-
-  const handleExtraPriceChange = (e) => {
-    const formattedPrice = formatPrice(e.target.value);
-    setNewExtra(prev => ({ ...prev, price: formattedPrice }));
-  };
-
-  const handleOutsideClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  const handleToggleChange = (field) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: !prev[field]
-    }));
-  };
-
-  const handleShowInCardToggle = (field) => {
-    setFormData(prev => ({
-      ...prev,
-      showInCard: {
-        ...prev.showInCard,
-        [field]: !prev.showInCard[field]
-      }
-    }));
-  };
-
-  return (
-    <div 
-      className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center"
-      onClick={handleOutsideClick}
-    >
-      <div className="bg-white p-6 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <form onSubmit={handleSubmit} className="space-y-12">
-          <div className="border-b border-gray-900/10 pb-12">
-            <h2 className="text-base font-semibold leading-7 text-gray-900">
-              {product ? 'Editar Producto' : 'Agregar Producto'}
-            </h2>
-            <p className="mt-1 text-sm leading-6 text-gray-600">
-              Esta información será mostrada públicamente, así que ten cuidado con lo que compartes.
-            </p>
-
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-4">
-                <label htmlFor="name" className="block text-sm font-medium leading-6 text-gray-900">
-                  Nombre del producto
-                </label>
-                <div className="mt-2">
+      <div className="bg-white shadow-md rounded-lg p-6">
+        <h2 className="text-xl font-semibold mb-4 text-gray-700">Información en Tarjeta</h2>
+        <div className="space-y-2">
+          {Object.entries(cardInfoSettings)
+            .filter(([key]) => key !== 'detailedView')
+            .map(([key, value]) => (
+              <div key={key} className="flex items-center justify-between">
+                <span className="text-gray-700 capitalize">{key}</span>
+                <label className="relative inline-flex items-center cursor-pointer">
                   <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    required
-                    placeholder="Ej: Pizza Margherita, Corte de cabello"
-                  />
-                </div>
-              </div>
-
-              <div className="col-span-full">
-                <label htmlFor="description" className="block text-sm font-medium leading-6 text-gray-900">
-                  Descripción
-                </label>
-                <div className="mt-2">
-                  <textarea
-                    id="description"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    rows={3}
-                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="Ej: Deliciosa pizza con tomate, mozzarella y albahaca fresca / Servicio de corte y peinado profesional"
-                  />
-                </div>
-                <p className="mt-3 text-sm leading-6 text-gray-600">Escribe una breve descripción del producto o servicio.</p>
-              </div>
-
-              <div className="col-span-full">
-                <label htmlFor="image" className="block text-sm font-medium leading-6 text-gray-900">
-                  Imagen del producto
-                </label>
-                <div 
-                  className={`mt-2 flex justify-center rounded-lg border border-dashed ${dragActive ? 'border-indigo-600' : 'border-gray-900/25'} px-6 py-10`}
-                  onDragEnter={handleDrag}
-                  onDragLeave={handleDrag}
-                  onDragOver={handleDrag}
-                  onDrop={handleDrop}
-                >
-                  <div className="text-center">
-                    {previewImage ? (
-                      <img src={previewImage} alt="Product Preview" className="mx-auto h-32 w-32 object-cover" />
-                    ) : (
-                      <PhotoIcon className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
-                    )}
-                    <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                      <label
-                        htmlFor="file-upload"
-                        className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
-                      >
-                        <span>Sube un archivo</span>
-                        <input 
-                          id="file-upload" 
-                          name="file-upload" 
-                          type="file" 
-                          className="sr-only" 
-                          onChange={(e) => handleFiles(e.target.files)}
-                          accept=".jpg,.jpeg,.png"
-                        />
-                      </label>
-                      <p className="pl-1">o arrastra y suelta</p>
-                    </div>
-                    <p className="text-xs leading-5 text-gray-600">PNG, JPG hasta 10MB</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-b border-gray-900/10 pb-12">
-            <h2 className="text-base font-semibold leading-7 text-gray-900">Detalles del producto</h2>
-            <p className="mt-1 text-sm leading-6 text-gray-600">Proporciona información adicional sobre el producto.</p>
-
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-              <div className="sm:col-span-3">
-                <label htmlFor="price" className="block text-sm font-medium leading-6 text-gray-900">
-                  Precio
-                </label>
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    id="price"
-                    name="price"
-                    value={formData.price}
-                    onChange={handlePriceChange}
-                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-3">
-                <label htmlFor="category" className="block text-sm font-medium leading-6 text-gray-900">
-                  Categoría
-                </label>
-                <div className="mt-2">
-                  <input
-                    type="text"
-                    id="category"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    placeholder="Ej: Pizzas, Servicios de belleza"
-                  />
-                </div>
-              </div>
-
-              <div className="sm:col-span-3">
-                <div className="flex items-center h-6">
-                  <input
-                    id="available"
-                    name="available"
                     type="checkbox"
-                    checked={formData.available}
-                    onChange={handleChange}
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                    className="sr-only peer"
+                    checked={value}
+                    onChange={(e) => setCardInfoSettings({ ...cardInfoSettings, [key]: e.target.checked })}
                   />
-                  <label htmlFor="available" className="ml-3 block text-sm font-medium leading-6 text-gray-900">
-                    Disponible
-                  </label>
-                </div>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
               </div>
-            </div>
+            ))}
+          <div className="my-4 border-t border-gray-200"></div>
+          <div className="flex items-center justify-between">
+            <span className="text-gray-700 font-semibold">Vista detallada</span>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={cardInfoSettings.detailedView}
+                onChange={(e) => setCardInfoSettings({ ...cardInfoSettings, detailedView: e.target.checked })}
+              />
+              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
           </div>
+        </div>
+      </div>
 
-          <div className="border-b border-gray-900/10 pb-12">
-            <h2 className="text-base font-semibold leading-7 text-gray-900">Extras del producto</h2>
-            <p className="mt-1 text-sm leading-6 text-gray-600">Agrega opciones o características adicionales para este producto.</p>
+      <button
+        onClick={() => setIsAddingProduct(true)}
+        className="mb-6 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center"
+      >
+        <Plus className="mr-2" /> Agregar Producto
+      </button>
 
-            <div className="mt-10 space-y-4">
-              {formData.extras && formData.extras.length > 0 ? (
-                formData.extras.map((extra) => (
-                  <div key={extra.id} className="flex items-center space-x-2">
-                    <span className="text-sm font-medium">{extra.name}: ${extra.price}</span>
+      {isAddingProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">{editingProduct ? "Editar" : "Agregar"} Producto</h2>
+            <div className="space-y-4">
+              <input
+                type="text"
+                value={newProduct.nombre}
+                onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
+                placeholder="Nombre del producto"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <textarea
+                value={newProduct.descripcion}
+                onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
+                placeholder="Descripción"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="text"
+                value={newProduct.imagen}
+                onChange={(e) => setNewProduct({ ...newProduct, imagen: e.target.value })}
+                placeholder="URL de la imagen"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <input
+                type="number"
+                value={newProduct.precio}
+                onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) })}
+                placeholder="Precio"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <select
+                value={newProduct.categoria}
+                onChange={(e) => setNewProduct({ ...newProduct, categoria: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Seleccionar categoría</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.name}>{category.name}</option>
+                ))}
+              </select>
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700">Disponible</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={newProduct.availability}
+                    onChange={(e) => setNewProduct({ ...newProduct, availability: e.target.checked })}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+              <div>
+                <h3 className="font-semibold mb-2 text-gray-700">Extras</h3>
+                {newProduct.extras.map((extra) => (
+                  <div key={extra.id} className="flex items-center justify-between mb-2">
+                    <span>{extra.name}: ${extra.price}</span>
                     <button
-                      type="button"
-                      onClick={() => removeExtra(extra.id)}
-                      className="text-red-600 hover:text-red-800"
+                      onClick={() => handleDeleteExtra(extra.id)}
+                      className="text-red-500 hover:text-red-700 focus:outline-none"
                     >
-                      Eliminar
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
-                ))
-              ) : (
-                <p className="text-sm text-gray-500">No hay extras agregados aún.</p>
-              )}
-              <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                <div className="sm:col-span-3">
-                  <label htmlFor="extraName" className="block text-sm font-medium leading-6 text-gray-900">Nombre del extra</label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      id="extraName"
-                      name="name"
-                      value={newExtra.name}
-                      onChange={handleExtraChange}
-                      className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      placeholder="Ej: Queso extra, Tratamiento capilar"
-                    />
-                  </div>
-                </div>
-                <div className="sm:col-span-2">
-                  <label htmlFor="extraPrice" className="block text-sm font-medium leading-6 text-gray-900">Precio</label>
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      id="extraPrice"
-                      name="price"
-                      value={newExtra.price}
-                      onChange={handleExtraPriceChange}
-                      className="block w-full rounded-md border-0 px-3 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                </div>
-                <div className="sm:col-span-1 flex items-end">
+                ))}
+                <div className="flex gap-2 mt-2">
+                  <input
+                    type="text"
+                    value={newExtra.name}
+                    onChange={(e) => setNewExtra({ ...newExtra, name: e.target.value })}
+                    placeholder="Nombre del extra"
+                    className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <input
+                    type="number"
+                    value={newExtra.price}
+                    onChange={(e) => setNewExtra({ ...newExtra, price: parseFloat(e.target.value) })}
+                    placeholder="Precio"
+                    className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
                   <button
-                    type="button"
-                    onClick={addExtra}
-                    className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    onClick={handleAddExtra}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
                     Agregar
                   </button>
                 </div>
               </div>
             </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <button
+                onClick={() => {
+                  setIsAddingProduct(false)
+                  resetNewProduct()
+                  setEditingProduct(null)
+                }}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleAddProduct}
+                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              >
+                {editingProduct ? "Guardar" : "Agregar"}
+              </button>
+            </div>
           </div>
+        </div>
+      )}
 
-          <div className="border-b border-gray-900/10 pb-12">
-            <h2 className="text-base font-semibold leading-7 text-gray-900">Configuración de visualización</h2>
-            <p className="mt-1 text-sm leading-6 text-gray-600">Configura cómo se mostrará el producto en la lista y en la vista detallada.</p>
-
-            <div className="mt-10 space-y-6">
-              <div className="flex items-center justify-between">
-                <span className="flex-grow flex flex-col">
-                  <span className="text-sm font-medium leading-6 text-gray-900">Vista detallada</span>
-                  <span className="text-sm text-gray-500">Activar para mostrar todos los detalles del producto al hacer clic</span>
-                </span>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {products.map((product) => (
+          <div key={product.id} className="bg-white shadow-md rounded-lg overflow-hidden">
+            {cardInfoSettings.enabled && cardInfoSettings.imagen && (
+              <img src={product.imagen} alt={product.nombre} className="w-full h-48 object-cover" />
+            )}
+            <div className="p-4">
+              <div className="flex justify-between items-start mb-2">
+                {cardInfoSettings.enabled && cardInfoSettings.nombre && (
+                  <h3 className="font-bold text-xl text-gray-800">{product.nombre}</h3>
+                )}
                 <button
-                  type="button"
-                  className={`${
-                    formData.detailedView ? 'bg-indigo-600' : 'bg-gray-200'
-                  } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2`}
-                  onClick={() => handleToggleChange('detailedView')}
+                  onClick={() => setExpandedProduct(expandedProduct === product.id ? null : product.id)}
+                  className="text-gray-500 hover:text-gray-700 focus:outline-none"
                 >
-                  <span
-                    className={`${
-                      formData.detailedView ? 'translate-x-5' : 'translate-x-0'
-                    } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
-                  />
+                  {expandedProduct === product.id ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
                 </button>
               </div>
-
-              <div className="space-y-4">
-                <p className="text-sm font-medium text-gray-900">Mostrar en la tarjeta:</p>
-                {Object.keys(formData.showInCard).map((field) => (
-                  <div key={field} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500 capitalize">{field}</span>
-                    <button
-                      type="button"
-                      className={`${
-                        formData.showInCard[field] ? 'bg-indigo-600' : 'bg-gray-200'
-                      } relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2`}
-                      onClick={() => handleShowInCardToggle(field)}
-                    >
-                      <span
-                        className={`${
-                          formData.showInCard[field] ? 'translate-x-5' : 'translate-x-0'
-                        } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
-                      />
-                    </button>
-                  </div>
-                ))}
+              {(expandedProduct === product.id || cardInfoSettings.enabled) && (
+                <>
+                  {cardInfoSettings.descripcion && (
+                    <p className="text-gray-600 text-sm mb-2">{product.descripcion}</p>
+                  )}
+                  {cardInfoSettings.precio && (
+                    <p className="text-gray-800 font-bold text-lg mb-2">${product.precio}</p>
+                  )}
+                  {cardInfoSettings.categoria && (
+                    <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
+                      {product.categoria}
+                    </span>
+                  )}
+                  <p className={`text-sm ${product.availability ? 'text-green-600' : 'text-red-600'} mb-2`}>
+                    {product.availability ? 'Disponible' : 'No disponible'}
+                  </p>
+                  {product.extras.length > 0 && (
+                    <div className="mt-2">
+                      <h4 className="font-semibold text-sm mb-1 text-gray-700">Extras:</h4>
+                      <ul className="text-sm text-gray-600">
+                        {product.extras.map((extra) => (
+                          <li key={extra.id}>{extra.name}: ${extra.price}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
+              )}
+              <div className="mt-4 flex justify-between">
+                <button
+                  onClick={() => handleEditProduct(product)}
+                  className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
+                >
+                  <Edit2 className="mr-1 h-4 w-4" /> Editar
+                </button>
+                <button
+                  onClick={() => handleDeleteProduct(product.id)}
+                  className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center"
+                >
+                  <X className="mr-1 h-4 w-4" /> Eliminar
+                </button>
               </div>
             </div>
           </div>
-
-          <div className="mt-6 flex items-center justify-end gap-x-6">
-            {product && (
-              <button
-                type="button"
-                onClick={() => onDelete(product.id)}
-                className="rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-              >
-                Eliminar
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-sm font-semibold leading-6 text-gray-900"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-            >
-              Guardar
-            </button>
-          </div>
-        </form>
+        ))}
       </div>
     </div>
-  );
-};
-
-export default Productos;
+  )
+}
