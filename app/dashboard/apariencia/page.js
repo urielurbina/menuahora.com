@@ -70,7 +70,7 @@ const FontSelector = ({ id, label, value, onChange }) => (
 );
 
 export default function Apariencia() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [titleFont, setTitleFont] = useState(fonts[0].value);
   const [bodyFont, setBodyFont] = useState(fonts[0].value);
   const [buttonFont, setButtonFont] = useState(fonts[0].value);
@@ -80,21 +80,23 @@ export default function Apariencia() {
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    if (session) {
+    if (status === "authenticated") {
       fetchAppearanceData();
     }
-  }, [session]);
+  }, [status]);
 
   const fetchAppearanceData = async () => {
     try {
       const response = await fetch('/api/get-appearance');
       if (response.ok) {
         const data = await response.json();
-        setTitleFont(data.titleFont || fonts[0].value);
-        setBodyFont(data.bodyFont || fonts[0].value);
-        setButtonFont(data.buttonFont || fonts[0].value);
-        setPrimaryColor(data.primaryColor || '#ff0000');
-        setSecondaryColor(data.secondaryColor || '#000000');
+        if (data.appearance) {
+          setTitleFont(data.appearance.titleFont || fonts[0].value);
+          setBodyFont(data.appearance.bodyFont || fonts[0].value);
+          setButtonFont(data.appearance.buttonFont || fonts[0].value);
+          setPrimaryColor(data.appearance.primaryColor || '#ff0000');
+          setSecondaryColor(data.appearance.secondaryColor || '#000000');
+        }
       }
     } catch (error) {
       console.error('Error fetching appearance data:', error);

@@ -14,7 +14,7 @@ const cld = new Cloudinary({
 });
 
 export default function InformacionBasica() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [formData, setFormData] = useState({
     businessName: '',
     description: '',
@@ -45,6 +45,36 @@ export default function InformacionBasica() {
 
   const [dragActive, setDragActive] = useState({ logo: false, cover: false });
   const [previewImage, setPreviewImage] = useState({ logo: null, cover: null });
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      fetchBasicInfo();
+    }
+  }, [status]);
+
+  const fetchBasicInfo = async () => {
+    try {
+      const response = await fetch('/api/get-basic-info');
+      if (response.ok) {
+        const data = await response.json();
+        setFormData(prevData => ({
+          ...prevData,
+          ...data['basic-info'],
+          contact: { ...prevData.contact, ...data['basic-info'].contact },
+          schedule: { ...prevData.schedule, ...data['basic-info'].schedule }
+        }));
+        // Actualizar previewImage si es necesario
+        if (data['basic-info'].logoUrl) {
+          setPreviewImage(prev => ({ ...prev, logo: data['basic-info'].logoUrl }));
+        }
+        if (data['basic-info'].coverPhotoUrl) {
+          setPreviewImage(prev => ({ ...prev, cover: data['basic-info'].coverPhotoUrl }));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching basic info:', error);
+    }
+  };
 
   const handleDrag = useCallback((e, type) => {
     e.preventDefault();
@@ -120,23 +150,6 @@ export default function InformacionBasica() {
       }
     }
   }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (session) {
-        try {
-          const response = await fetch('/api/get-basic-info');
-          if (response.ok) {
-            const data = await response.json();
-            setFormData(data);
-          }
-        } catch (error) {
-          console.error('Error fetching basic info:', error);
-        }
-      }
-    };
-    fetchData();
-  }, [session]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

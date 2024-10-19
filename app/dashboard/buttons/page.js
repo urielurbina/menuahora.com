@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { library } from '@fortawesome/fontawesome-svg-core'
@@ -57,19 +57,32 @@ library.add(
 )
 
 export default function Buttons() {
+  const { data: session, status } = useSession()
   const [links, setLinks] = useState([])
   const [isIconModalOpen, setIsIconModalOpen] = useState(false)
   const [currentEditingLink, setCurrentEditingLink] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
-    // Inicializar los enlaces por defecto
-    setLinks([
-      { id: '1', title: 'WhatsApp', url: '', icon: 'whatsapp', isActive: true },
-      { id: '2', title: 'Uber', url: '', icon: 'car', isActive: true },
-      { id: '3', title: 'Rappi', url: '', icon: 'utensils', isActive: true },
-      { id: '4', title: 'Sitio Web', url: '', icon: 'globe', isActive: true },
-    ])
-  }, [])
+    if (status === "authenticated") {
+      fetchButtonsData()
+    }
+  }, [status])
+
+  const fetchButtonsData = async () => {
+    try {
+      const response = await fetch('/api/get-buttons')
+      if (response.ok) {
+        const data = await response.json()
+        setLinks(data.buttons || [])
+      } else {
+        console.error('Error fetching buttons data')
+      }
+    } catch (error) {
+      console.error('Error:', error)
+    }
+  }
 
   const addLink = () => {
     setLinks([...links, { id: Date.now().toString(), title: '', url: '', icon: '', isActive: true }])
@@ -166,8 +179,47 @@ export default function Buttons() {
     );
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setMessage('')
+
+    if (!session || !session.user) {
+      setMessage('No estás autenticado')
+      setIsLoading(false)
+      return
+    }
+
+    const buttonsData = {
+      buttons: links
+    }
+
+    try {
+      const response = await fetch('/api/update-buttons', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(buttonsData),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setMessage('Botones guardados exitosamente')
+      } else {
+        throw new Error(data.error || 'Error al guardar los botones')
+      }
+    } catch (error) {
+      console.error('Error al guardar los botones:', error)
+      setMessage(error.message || 'Ocurrió un error al guardar los botones')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
-    <div className="space-y-12">
+    <form onSubmit={handleSubmit} className="space-y-12">
       <div className="border-b border-gray-900/10 pb-12">
         <h2 className="text-base font-semibold leading-7 text-gray-900">Gestiona tus Enlaces</h2>
         <p className="mt-1 text-sm leading-6 text-gray-600">
@@ -241,21 +293,29 @@ export default function Buttons() {
       {isIconModalOpen && <IconModal />}
 
       <div className="mt-6 flex items-center justify-end gap-x-6">
-        <Link
-          href="/dashboard"
+        <button
+          type="button"
           className="text-sm font-semibold leading-6 text-gray-900"
+          onClick={() => fetchButtonsData()}
         >
           Cancelar
-        </Link>
+        </button>
         <motion.button
           type="submit"
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          disabled={isLoading}
         >
-          Guardar
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </motion.button>
       </div>
-    </div>
+
+      {message && (
+        <p className={`mt-2 text-sm ${message.includes('error') ? 'text-red-600' : 'text-green-600'}`}>
+          {message}
+        </p>
+      )}
+    </form>
   )
 }
