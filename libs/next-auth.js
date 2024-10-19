@@ -40,11 +40,17 @@ export const authOptions = {
   ...(connectMongo && { adapter: MongoDBAdapter(connectMongo) }),
 
   callbacks: {
-    session: async ({ session, token }) => {
+    session: async ({ session, token, user }) => {
       if (session?.user) {
-        session.user.id = token.sub;
+        session.user.id = token.sub || user.id;
       }
       return session;
+    },
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.uid = user.id;
+      }
+      return token;
     },
   },
   session: {

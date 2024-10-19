@@ -1,4 +1,7 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { NextResponse } from 'next/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -8,12 +11,17 @@ cloudinary.config({
 
 export async function POST(request) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file');
     const type = formData.get('type');
 
     if (!file) {
-      return new Response(JSON.stringify({ error: 'No file uploaded' }), { status: 400 });
+      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
     const buffer = await file.arrayBuffer();
@@ -21,31 +29,14 @@ export async function POST(request) {
     const dataURI = `data:${file.type};base64,${base64File}`;
 
     const uploadOptions = {
-      folder: 'my_uploads',
+      folder: `${session.user.id}/products`,
     };
-
-    // Aplicamos transformaciones específicas según el tipo de imagen
-    if (type === 'cover') {
-      uploadOptions.transformation = [
-        { width: 1200, height: 800, crop: "fit" },
-        { aspect_ratio: "3:2", crop: "crop", gravity: "auto", height: 800 },
-        { quality: "auto:best", fetch_format: "auto" }
-      ];
-    } else if (type === 'logo') {
-      uploadOptions.transformation = [
-        { width: 200, height: 200, crop: "fit" },
-        { aspect_ratio: "1:1", crop: "crop", gravity: "auto", height: 200 },
-        { quality: "auto:best", fetch_format: "auto" }
-      ];
-    }
 
     const result = await cloudinary.uploader.upload(dataURI, uploadOptions);
 
-    console.log('Cloudinary upload result:', result);
-
-    return new Response(JSON.stringify({ url: result.secure_url }), { status: 200 });
+    return NextResponse.json({ url: result.secure_url }, { status: 200 });
   } catch (error) {
     console.error('Detailed error:', error);
-    return new Response(JSON.stringify({ error: error.message || 'Error uploading image' }), { status: 500 });
+    return NextResponse.json({ error: error.message || 'Error uploading image' }, { status: 500 });
   }
 }
