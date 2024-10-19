@@ -75,22 +75,25 @@ export default function ProductDashboard() {
 
   const handleAddProduct = async () => {
     try {
-      const method = editingProduct ? 'PUT' : 'POST'
-      const url = editingProduct ? `/api/products/${editingProduct._id}` : '/api/products'
+      const method = editingProduct ? 'PUT' : 'POST';
+      const url = editingProduct ? `/api/products` : '/api/products';
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newProduct),
-      })
-      if (!response.ok) throw new Error('Error al guardar el producto')
-      await fetchProducts()
-      resetNewProduct()
-      setIsAddingProduct(false)
-      setEditingProduct(null)
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al guardar el producto');
+      }
+      await fetchProducts();
+      resetNewProduct();
+      setIsAddingProduct(false);
+      setEditingProduct(null);
     } catch (error) {
-      setError(error.message)
+      setError(error.message);
     }
-  }
+  };
 
   const resetNewProduct = () => {
     setNewProduct({
@@ -156,13 +159,16 @@ export default function ProductDashboard() {
 
   const handleDeleteProduct = async (id) => {
     try {
-      const response = await fetch(`/api/products/${id}`, { method: 'DELETE' })
-      if (!response.ok) throw new Error('Error al eliminar el producto')
-      await fetchProducts()
+      const response = await fetch(`/api/products?id=${id}`, { method: 'DELETE' });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al eliminar el producto');
+      }
+      await fetchProducts();
     } catch (error) {
-      setError(error.message)
+      setError(error.message);
     }
-  }
+  };
 
   const onDrop = async (acceptedFiles) => {
     const file = acceptedFiles[0]
