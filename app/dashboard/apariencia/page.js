@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import Select from 'react-select';
 
@@ -11,6 +12,18 @@ const fonts = [
   { name: 'Courier New', value: 'Courier New, monospace' },
   { name: 'Verdana', value: 'Verdana, sans-serif' },
 ];
+
+const customStyles = {
+  control: (provided) => ({
+    ...provided,
+    minWidth: '120px',
+    margin: '0 5px'
+  }),
+  menu: (provided) => ({
+    ...provided,
+    minWidth: '120px'
+  })
+};
 
 const ColorPicker = ({ id, label, value, onChange }) => (
   <div className="sm:col-span-3">
@@ -36,12 +49,57 @@ const ColorPicker = ({ id, label, value, onChange }) => (
   </div>
 );
 
+const FontSelector = ({ id, label, value, onChange }) => (
+  <div className="sm:col-span-4">
+    <label htmlFor={id} className="block text-sm font-medium leading-6 text-gray-900">
+      {label}
+    </label>
+    <div className="mt-2">
+      <Select
+        id={id}
+        value={{ value: value, label: value.split(',')[0] }}
+        onChange={(option) => onChange({ target: { value: option.value } })}
+        options={fonts.map(font => ({ value: font.value, label: font.name }))}
+        styles={customStyles}
+      />
+    </div>
+    <p className="mt-2 text-sm text-gray-500" style={{ fontFamily: value }}>
+      The quick brown fox jumps over the lazy dog
+    </p>
+  </div>
+);
+
 export default function Apariencia() {
+  const { data: session } = useSession();
   const [titleFont, setTitleFont] = useState(fonts[0].value);
   const [bodyFont, setBodyFont] = useState(fonts[0].value);
   const [buttonFont, setButtonFont] = useState(fonts[0].value);
   const [primaryColor, setPrimaryColor] = useState('#ff0000');
   const [secondaryColor, setSecondaryColor] = useState('#000000');
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    if (session) {
+      fetchAppearanceData();
+    }
+  }, [session]);
+
+  const fetchAppearanceData = async () => {
+    try {
+      const response = await fetch('/api/get-appearance');
+      if (response.ok) {
+        const data = await response.json();
+        setTitleFont(data.titleFont || fonts[0].value);
+        setBodyFont(data.bodyFont || fonts[0].value);
+        setButtonFont(data.buttonFont || fonts[0].value);
+        setPrimaryColor(data.primaryColor || '#ff0000');
+        setSecondaryColor(data.secondaryColor || '#000000');
+      }
+    } catch (error) {
+      console.error('Error fetching appearance data:', error);
+    }
+  };
 
   const handleFontChange = (e, setFont) => {
     setFont(e.target.value);
@@ -51,43 +109,50 @@ export default function Apariencia() {
     setColor(e.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí iría la lógica para guardar la identidad visual
-    console.log({ titleFont, bodyFont, buttonFont, primaryColor, secondaryColor });
-  };
+    setIsLoading(true);
+    setMessage('');
 
-  const customStyles = {
-    control: (provided) => ({
-      ...provided,
-      minWidth: '120px',
-      margin: '0 5px'
-    }),
-    menu: (provided) => ({
-      ...provided,
-      minWidth: '120px'
-    })
-  };
+    if (!session || !session.user) {
+      setMessage('No estás autenticado');
+      setIsLoading(false);
+      return;
+    }
 
-  const FontSelector = ({ id, label, value, onChange }) => (
-    <div className="sm:col-span-4">
-      <label htmlFor={id} className="block text-sm font-medium leading-6 text-gray-900">
-        {label}
-      </label>
-      <div className="mt-2">
-        <Select
-          id={id}
-          value={{ value: value, label: value.split(',')[0] }}
-          onChange={(option) => onChange({ target: { value: option.value } })}
-          options={fonts.map(font => ({ value: font.value, label: font.name }))}
-          styles={customStyles}
-        />
-      </div>
-      <p className="mt-2 text-sm text-gray-500" style={{ fontFamily: value }}>
-        The quick brown fox jumps over the lazy dog
-      </p>
-    </div>
-  );
+    const appearanceData = {
+      appearance: {
+        titleFont,
+        bodyFont,
+        buttonFont,
+        primaryColor,
+        secondaryColor
+      }
+    };
+
+    try {
+      const response = await fetch('/api/update-appearance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(appearanceData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage('Apariencia guardada exitosamente');
+      } else {
+        throw new Error(data.error || 'Error al guardar la apariencia');
+      }
+    } catch (error) {
+      console.error('Error al guardar la apariencia:', error);
+      setMessage(error.message || 'Ocurrió un error al guardar la apariencia');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-12">
@@ -148,10 +213,17 @@ export default function Apariencia() {
           whileTap={{ scale: 0.95 }}
           type="submit"
           className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          disabled={isLoading}
         >
-          Guardar
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </motion.button>
       </div>
+
+      {message && (
+        <p className={`mt-2 text-sm ${message.includes('error') ? 'text-red-600' : 'text-green-600'}`}>
+          {message}
+        </p>
+      )}
     </form>
   );
 }
