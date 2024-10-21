@@ -443,53 +443,47 @@ export default function ProductDashboard() {
           <p className="col-span-full text-center text-gray-500">No hay productos. Añade un nuevo producto para empezar.</p>
         ) : (
           products.map((product) => (
-            <div key={product._id} className="bg-white shadow-md rounded-lg overflow-hidden">
-              {cardInfoSettings.enabled && cardInfoSettings.imagen && (
-                <img src={product.imagen} alt={product.nombre} className="w-full h-48 object-cover" />
-              )}
+            <div key={product._id} className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col">
               <div className="p-4">
-                <div className="flex justify-between items-start mb-2">
-                  {cardInfoSettings.enabled && cardInfoSettings.nombre && (
-                    <h3 className="font-bold text-xl text-gray-800">{product.nombre}</h3>
+                <div className="flex mb-4">
+                  {product.imagen && (
+                    <div className="w-24 h-24 mr-4 flex-shrink-0 rounded-md overflow-hidden">
+                      <Image
+                        src={product.imagen}
+                        alt={product.nombre}
+                        width={96}
+                        height={96}
+                        objectFit="cover"
+                      />
+                    </div>
                   )}
-                  <button
-                    onClick={() => setExpandedProduct(expandedProduct === product._id ? null : product._id)}
-                    className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                  >
-                    {expandedProduct === product._id ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
-                  </button>
+                  <div className="flex-grow">
+                    <h3 className="font-bold text-xl text-gray-800 mb-2">{product.nombre}</h3>
+                    <p className="text-gray-800 font-bold text-lg">${product.precio}</p>
+                  </div>
                 </div>
-                {(expandedProduct === product._id || cardInfoSettings.enabled) && (
-                  <>
-                    {cardInfoSettings.descripcion && (
-                      <p className="text-gray-600 text-sm mb-2">{product.descripcion}</p>
-                    )}
-                    {cardInfoSettings.precio && (
-                      <p className="text-gray-800 font-bold text-lg mb-2">${product.precio}</p>
-                    )}
-                    {cardInfoSettings.categoria && product.categorias && (
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {product.categorias.map((categoria, index) => (
-                          <span key={index} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">
-                            {categoria}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    <p className={`text-sm ${product.availability ? 'text-green-600' : 'text-red-600'} mb-2`}>
-                      {product.availability ? 'Disponible' : 'No disponible'}
-                    </p>
-                    {product.extras.length > 0 && (
-                      <div className="mt-2">
-                        <h4 className="font-semibold text-sm mb-1 text-gray-700">Extras:</h4>
-                        <ul className="text-sm text-gray-600">
-                          {product.extras.map((extra) => (
-                            <li key={extra.id}>{extra.name}: ${extra.price}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </>
+                <p className="text-gray-600 text-sm mb-2">{product.descripcion}</p>
+                {product.categorias && product.categorias.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {product.categorias.map((categoria, index) => (
+                      <span key={index} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">
+                        {categoria}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className={`text-sm ${product.availability ? 'text-green-600' : 'text-red-600'} mb-2`}>
+                  {product.availability ? 'Disponible' : 'No disponible'}
+                </p>
+                {product.extras && product.extras.length > 0 && (
+                  <div className="mt-2">
+                    <h4 className="font-semibold text-sm mb-1 text-gray-700">Extras:</h4>
+                    <ul className="text-sm text-gray-600">
+                      {product.extras.map((extra) => (
+                        <li key={extra.id}>{extra.name}: ${extra.price}</li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
                 <div className="mt-4 flex justify-between">
                   <button
