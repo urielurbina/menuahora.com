@@ -76,7 +76,7 @@ export default function ProductDashboard() {
   const handleAddProduct = async () => {
     try {
       const method = editingProduct ? 'PUT' : 'POST';
-      const url = editingProduct ? `/api/products` : '/api/products';
+      const url = '/api/products';
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -92,6 +92,7 @@ export default function ProductDashboard() {
       setEditingProduct(null);
     } catch (error) {
       setError(error.message);
+      console.error('Error al guardar el producto:', error);
     }
   };
 

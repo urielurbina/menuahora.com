@@ -28,8 +28,17 @@ export async function GET(req) {
       return NextResponse.json([]);
     }
 
-    console.log('Productos encontrados:', business.products);
-    return NextResponse.json(business.products);
+    // Obtener las categorías válidas
+    const validCategories = business.categories.map(cat => cat.name);
+
+    // Filtrar las categorías de los productos
+    const updatedProducts = business.products.map(product => ({
+      ...product,
+      categorias: product.categorias.filter(cat => validCategories.includes(cat))
+    }));
+
+    console.log('Productos encontrados:', updatedProducts);
+    return NextResponse.json(updatedProducts);
   } catch (error) {
     console.error('Error detallado en GET products:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -88,6 +97,9 @@ export async function PUT(req) {
     }
     product.categorias = product.categorias.slice(0, 2);
 
+    // Eliminar el campo _id del objeto product para evitar errores de MongoDB
+    const { _id, ...updateData } = product;
+
     const result = await db.collection('businesses').updateOne(
       { 
         userId: session.user.id,
@@ -95,7 +107,7 @@ export async function PUT(req) {
       },
       { 
         $set: { 
-          "products.$": { ...product, _id: new ObjectId(product._id) }
+          "products.$": { ...updateData, _id: new ObjectId(product._id) }
         }
       }
     );
@@ -104,11 +116,12 @@ export async function PUT(req) {
       return NextResponse.json({ error: 'Producto no encontrado' }, { status: 404 });
     }
 
-    if (result.modifiedCount === 0) {
+    // Cambiamos esta condición para verificar si se encontró el documento
+    if (result.matchedCount > 0) {
+      return NextResponse.json({ message: 'Producto actualizado con éxito' });
+    } else {
       return NextResponse.json({ error: 'No se pudo actualizar el producto' }, { status: 400 });
     }
-
-    return NextResponse.json({ message: 'Producto actualizado con éxito' });
   } catch (error) {
     console.error('Error en PUT products:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
