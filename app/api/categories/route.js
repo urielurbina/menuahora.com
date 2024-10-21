@@ -6,34 +6,21 @@ import { ObjectId } from 'mongodb';
 
 export async function GET(req) {
   try {
-    console.log('Iniciando GET request para categorías');
     const session = await getServerSession(authOptions);
     if (!session) {
-      console.log('No hay sesión de usuario');
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    console.log('ID de usuario:', session.user.id);
-
     const { db } = await connectToDatabase();
-    console.log('Conexión a la base de datos establecida');
-
     const business = await db.collection('businesses').findOne({ userId: session.user.id });
     
-    if (!business) {
-      console.log('No se encontró el negocio para el usuario');
+    if (!business || !business.categories) {
       return NextResponse.json([]);
     }
 
-    if (!business.categories) {
-      console.log('El negocio no tiene categorías');
-      return NextResponse.json([]);
-    }
-
-    console.log('Categorías encontradas:', business.categories);
     return NextResponse.json(business.categories);
   } catch (error) {
-    console.error('Error detallado en GET categories:', error);
+    console.error('Error fetching categories:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -46,11 +33,17 @@ export async function POST(req) {
     }
 
     const { db } = await connectToDatabase();
-    const category = await req.json();
+    const { name } = await req.json();
     
+    if (!name || typeof name !== 'string' || name.trim() === '') {
+      return NextResponse.json({ error: 'Nombre de categoría inválido' }, { status: 400 });
+    }
+
+    const newCategory = { _id: new ObjectId(), name: name.trim() };
+
     const result = await db.collection('businesses').updateOne(
       { userId: session.user.id },
-      { $push: { categories: { ...category, _id: new ObjectId() } } },
+      { $push: { categories: newCategory } },
       { upsert: true }
     );
 
@@ -58,8 +51,9 @@ export async function POST(req) {
       return NextResponse.json({ error: 'No se pudo agregar la categoría' }, { status: 400 });
     }
 
-    return NextResponse.json({ message: 'Categoría agregada con éxito' });
+    return NextResponse.json(newCategory);
   } catch (error) {
+    console.error('Error adding category:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

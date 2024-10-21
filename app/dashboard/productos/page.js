@@ -15,7 +15,7 @@ export default function ProductDashboard() {
     descripcion: "",
     imagen: "",
     precio: 0,
-    categoria: "",
+    categorias: [], // Cambiado de categoria a categorias como array
     availability: true,
     extras: [],
   })
@@ -101,38 +101,53 @@ export default function ProductDashboard() {
       descripcion: "",
       imagen: "",
       precio: 0,
-      categoria: "",
+      categorias: [], // Cambiado de categoria a categorias como array
       availability: true,
       extras: [],
     })
   }
 
   const handleAddCategory = async () => {
-    if (newCategory) {
+    if (newCategory.trim()) {
       try {
         const response = await fetch('/api/categories', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: newCategory }),
-        })
-        if (!response.ok) throw new Error('Error al añadir la categoría')
-        await fetchCategories()
-        setNewCategory("")
+          body: JSON.stringify({ name: newCategory.trim() }),
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Error al añadir la categoría');
+        }
+        const data = await response.json();
+        console.log('Categoría añadida:', data);
+        await fetchCategories();
+        setNewCategory("");
       } catch (error) {
-        setError(error.message)
+        console.error('Error adding category:', error);
+        setError(error.message);
       }
     }
-  }
+  };
 
   const handleDeleteCategory = async (id) => {
     try {
-      const response = await fetch(`/api/categories/${id}`, { method: 'DELETE' })
-      if (!response.ok) throw new Error('Error al eliminar la categoría')
-      await fetchCategories()
+      const response = await fetch(`/api/categories/${id}`, { 
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al eliminar la categoría');
+      }
+      await fetchCategories();
     } catch (error) {
-      setError(error.message)
+      console.error('Error deleting category:', error);
+      setError(error.message);
     }
-  }
+  };
 
   const handleAddExtra = () => {
     if (newExtra.name && newExtra.price) {
@@ -316,16 +331,42 @@ export default function ProductDashboard() {
                 placeholder="Precio"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <select
-                value={newProduct.categoria}
-                onChange={(e) => setNewProduct({ ...newProduct, categoria: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">Seleccionar categoría</option>
-                {categories.map((category) => (
-                  <option key={category._id} value={category.name}>{category.name}</option>
-                ))}
-              </select>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Categorías (máximo 2)</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {categories.map((category) => (
+                    <div key={category._id} className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id={`category-${category._id}`}
+                        value={category.name}
+                        checked={newProduct.categorias?.includes(category.name) || false}
+                        onChange={(e) => {
+                          const categoryName = e.target.value;
+                          setNewProduct(prev => {
+                            const currentCategories = prev.categorias || [];
+                            if (e.target.checked) {
+                              if (currentCategories.length < 2) {
+                                return { ...prev, categorias: [...currentCategories, categoryName] };
+                              }
+                            } else {
+                              return { ...prev, categorias: currentCategories.filter(cat => cat !== categoryName) };
+                            }
+                            return prev;
+                          });
+                        }}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label htmlFor={`category-${category._id}`} className="ml-2 block text-sm text-gray-900">
+                        {category.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+                {newProduct.categorias && newProduct.categorias.length === 2 && (
+                  <p className="text-sm text-blue-500">Máximo de categorías seleccionadas</p>
+                )}
+              </div>
               <div className="flex items-center justify-between">
                 <span className="text-gray-700">Disponible</span>
                 <label className="relative inline-flex items-center cursor-pointer">
@@ -426,10 +467,14 @@ export default function ProductDashboard() {
                     {cardInfoSettings.precio && (
                       <p className="text-gray-800 font-bold text-lg mb-2">${product.precio}</p>
                     )}
-                    {cardInfoSettings.categoria && (
-                      <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-                        {product.categoria}
-                      </span>
+                    {cardInfoSettings.categoria && product.categorias && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {product.categorias.map((categoria, index) => (
+                          <span key={index} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">
+                            {categoria}
+                          </span>
+                        ))}
+                      </div>
                     )}
                     <p className={`text-sm ${product.availability ? 'text-green-600' : 'text-red-600'} mb-2`}>
                       {product.availability ? 'Disponible' : 'No disponible'}

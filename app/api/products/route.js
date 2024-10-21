@@ -46,6 +46,12 @@ export async function POST(req) {
     const { db } = await connectToDatabase();
     const product = await req.json();
     
+    // Asegúrate de que categorias sea un array y tenga máximo 2 elementos
+    if (!Array.isArray(product.categorias)) {
+      product.categorias = product.categorias ? [product.categorias] : [];
+    }
+    product.categorias = product.categorias.slice(0, 2);
+
     const result = await db.collection('businesses').updateOne(
       { userId: session.user.id },
       { $push: { products: { ...product, _id: new ObjectId() } } },
@@ -75,6 +81,12 @@ export async function PUT(req) {
     if (!product._id) {
       return NextResponse.json({ error: 'ID de producto no proporcionado' }, { status: 400 });
     }
+
+    // Asegúrate de que categorias sea un array y tenga máximo 2 elementos
+    if (!Array.isArray(product.categorias)) {
+      product.categorias = product.categorias ? [product.categorias] : [];
+    }
+    product.categorias = product.categorias.slice(0, 2);
 
     const result = await db.collection('businesses').updateOne(
       { 
