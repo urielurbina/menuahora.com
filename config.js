@@ -7,7 +7,7 @@ const config = {
   appDescription:
     "The NextJS boilerplate with all you need to build your SaaS, AI tool, or any other web app.",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
-  domainName: "menurapido.com",
+  domainName: "menuahora.com",
   crisp: {
     // Crisp website ID. IF YOU DON'T USE CRISP: just remove this => Then add a support email in this config file (mailgun.supportEmail) otherwise customer support won't work.
     id: "",
@@ -84,14 +84,14 @@ const config = {
     // Email shown to customer if need support. Leave empty if not needed => if empty, set up Crisp above, otherwise you won't be able to offer customer support."
     supportEmail: "uriel@menuahora.com",
     // When someone replies to supportEmail sent by the app, forward it to the email below (otherwise it's lost). If you set supportEmail to empty, this will be ignored.
-    forwardRepliesTo: "magio@menuahora.com",
+    forwardRepliesTo: "uriel@menuahora.com",
   },
   colors: {
     // REQUIRED — The DaisyUI theme to use (added to the main layout.js). Leave blank for default (light & dark mode). If you any other theme than light/dark, you need to add it in config.tailwind.js in daisyui.themes.
     theme: "light",
     // REQUIRED — This color will be reflected on the whole app outside of the document (loading bar, Chrome tabs, etc..). By default it takes the primary color from your DaisyUI theme (make sure to update your the theme name after "data-theme=")
     // OR you can just do this to use a custom color: main: "#f37055". HEX only.
-    main: themes["light"]["primary"],
+    main: "#ffffff",
   },
   auth: {
     loginUrl: "/auth/signin",
