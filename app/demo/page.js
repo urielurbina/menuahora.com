@@ -6,11 +6,6 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Head from 'next/head'
 
-export const metadata = {
-  title: 'Demo Page',
-  themeColor: '#FF1C20',
-}
-
 export default function Menu() {
   const [activeCategory, setActiveCategory] = useState('Todo')
   const [isScrolled, setIsScrolled] = useState(false)
@@ -93,6 +88,7 @@ export default function Menu() {
   return (
     <>
       <Head>
+        <title>Demo Page</title>
         <meta name="theme-color" content="#FF1C20" />
       </Head>
       <div className="w-full mx-auto">
