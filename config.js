@@ -19,25 +19,31 @@ const config = {
     plans: [
       {
         // REQUIRED — we use this to find the plan in the webhook (for instance if you want to update the user's credits based on the plan)
-        priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1Q8agAJJJ3WlVwt9nASMLnTQ"
-            : "price_1Q8agAJJJ3WlVwt9nASMLnTQ",
+        priceId: {
+          monthly: "price_monthly_basic",
+          yearly: "price_yearly_basic"
+        },
         //  REQUIRED - Name of the plan, displayed on the pricing page
-        name: "Starter",
+        name: "Plan Esencial",
         // A friendly description of the plan, displayed on the pricing page. Tip: explain why this plan and not others
-        description: "Perfect for small projects",
+        description: "Perfecto para comenzar con una presencia en línea",
         // The price you want to display, the one user will be charged on Stripe.
-        price: 79,
+        price: {
+          monthly: 299,
+          yearly: 1990
+        },
         // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
-        priceAnchor: 99,
+        priceAnchor: {
+          // monthly: 39,
+          // yearly: 399
+        },
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
+          { name: "Plantilla con Personalización Básica" },
+          { name: "Link personalizado" },
+          { name: "Productos ilimitados" },
+          { name: "Categorías ilimitadas" },
+          { name: "Sistema fácil para subir productos" },
+          { name: "Disponible inmediatamente" },
         ],
         // Add this line to specify the payment mode
         mode: "subscription",
@@ -45,26 +51,51 @@ const config = {
       {
         // This plan will look different on the pricing page, it will be highlighted. You can only have one plan with isFeatured: true
         isFeatured: true,
-        priceId:
-          process.env.NODE_ENV === "development"
-            ? "price_1O5KtcAxyNprDp7iftKnrrpw"
-            : "price_456",
-        name: "Advanced",
-        description: "You need more power",
-        price: 99,
-        priceAnchor: 149,
+        priceId: {
+          monthly: "price_monthly_custom",
+          yearly: "price_yearly_custom"
+        },  
+        name: "Plan Custom",
+        description: "Diseño personalizado para tu negocio",
+        price: {
+          monthly: 499,
+          yearly: 3999
+        },
+        priceAnchor: {
+          monthly: 79,
+          yearly: 799
+        },
         features: [
-          {
-            name: "NextJS boilerplate",
-          },
-          { name: "User oauth" },
-          { name: "Database" },
-          { name: "Emails" },
-          { name: "1 year of updates" },
-          { name: "24/7 support" },
+          { name: "Diseño completamente personalizado" },
+          { name: "Link personalizado" },
+          { name: "Productos ilimitados" },
+          { name: "Categorías ilimitadas" },
+          { name: "Sistema fácil para subir productos" },
+          { name: "Entrega en 48 a 96 horas" },
         ],
         // Add this line to specify the payment mode
         mode: "subscription",
+      },
+      {
+        priceId: {
+          yearly: "price_yearly_enterprise"
+        },
+        name: "Plan a medida",
+        description: "Solución completa adaptada a tu marca",
+        price: {
+          yearly: 6999
+        },
+        features: [
+          { name: "Productos ilimitados" },
+          { name: "Categorías ilimitadas" },
+          { name: "Sistema fácil para subir productos" },
+          { name: "Link personalizado" },
+          { name: "Diseño completamente personalizado adaptado a tu marca" },
+          { name: "Dominio propio" },
+          { name: "Sistema de pedidos por WhatsApp" },
+        ],
+        // Add this line to specify the payment mode
+        mode: "payment",
       },
     ],
   },
