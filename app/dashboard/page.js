@@ -34,7 +34,7 @@ export default function Welcome() {
                 </div>
               </div>
             </div>
-            <Link href="/dashboard/products" passHref>
+            <Link href="/dashboard/productos" passHref>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}

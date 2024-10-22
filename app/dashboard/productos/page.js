@@ -211,130 +211,251 @@ export default function ProductDashboard() {
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>
 
   return (
-    <div className="container mx-auto p-4 space-y-8">
-      <h1 className="text-3xl font-bold text-gray-800">Administrador de Productos</h1>
+    <div className="container mx-auto p-4 space-y-12">
+      <h1 className="text-3xl font-bold text-gray-900">Administrador de Productos</h1>
 
-      {/* Categorías */}
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700">Categorías</h2>
-        <div className="flex items-center gap-2 mb-4">
-          <input
-            type="text"
-            value={newCategory}
-            onChange={(e) => setNewCategory(e.target.value)}
-            placeholder="Nueva categoría"
-            className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            onClick={handleAddCategory}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Agregar
-          </button>
-        </div>
-        {categories.length === 0 && dataLoaded ? (
-          <p className="text-gray-500">No hay categorías. Añade una nueva categoría para empezar.</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <span key={category._id} className="px-3 py-1 bg-gray-200 text-gray-700 rounded-full flex items-center">
-                {category.name}
-                <button
-                  onClick={() => handleDeleteCategory(category._id)}
-                  className="ml-2 text-gray-500 hover:text-red-500 focus:outline-none"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              </span>
-            ))}
+      {/* Categorías e Información en Tarjeta en la misma fila */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Categorías */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Categorías</h2>
+          <p className="text-sm text-gray-600 mb-6">
+            Gestiona las categorías de tus productos.
+          </p>
+          <div className="flex items-center gap-2 mb-4">
+            <input
+              type="text"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="Nueva categoría"
+              className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+            />
+            <button
+              onClick={handleAddCategory}
+              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Agregar
+            </button>
           </div>
-        )}
-      </div>
+          <div>
+            {categories.length === 0 && dataLoaded ? (
+              <p className="text-sm text-gray-500">No hay categorías. Añade una nueva categoría para empezar.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <div key={category._id} className="inline-flex items-center bg-gray-200 rounded-full px-3 py-1">
+                    <span className="text-sm font-medium text-gray-700 mr-1">{category.name}</span>
+                    <button
+                      onClick={() => handleDeleteCategory(category._id)}
+                      className="ml-1 text-gray-500 hover:text-red-500 focus:outline-none"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
 
-      {/* Información en Tarjeta */}
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <h2 className="text-xl font-semibold mb-4 text-gray-700">Información en Tarjeta</h2>
-        <div className="space-y-2">
-          {Object.entries(cardInfoSettings)
-            .filter(([key]) => key !== 'detailedView')
-            .map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between">
-                <span className="text-gray-700 capitalize">{key}</span>
+        {/* Información en Tarjeta */}
+        <div className="bg-white shadow rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Información en Tarjeta</h2>
+          <p className="text-sm text-gray-600 mb-6">
+            Configura la información que se mostrará en las tarjetas de productos.
+          </p>
+          <div className="space-y-4">
+            {Object.entries(cardInfoSettings)
+              .filter(([key]) => key !== 'detailedView')
+              .map(([key, value]) => (
+                <div key={key} className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700 capitalize">{key}</span>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="sr-only peer"
+                      checked={value}
+                      onChange={(e) => setCardInfoSettings({ ...cardInfoSettings, [key]: e.target.checked })}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  </label>
+                </div>
+              ))}
+            <div className="pt-4 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">Vista detallada</span>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     className="sr-only peer"
-                    checked={value}
-                    onChange={(e) => setCardInfoSettings({ ...cardInfoSettings, [key]: e.target.checked })}
+                    checked={cardInfoSettings.detailedView}
+                    onChange={(e) => setCardInfoSettings({ ...cardInfoSettings, detailedView: e.target.checked })}
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
                 </label>
               </div>
-            ))}
-          <div className="my-4 border-t border-gray-200"></div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-700 font-semibold">Vista detallada</span>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                className="sr-only peer"
-                checked={cardInfoSettings.detailedView}
-                onChange={(e) => setCardInfoSettings({ ...cardInfoSettings, detailedView: e.target.checked })}
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-            </label>
+            </div>
           </div>
         </div>
       </div>
 
-      <button
-        onClick={() => setIsAddingProduct(true)}
-        className="mb-6 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 flex items-center"
-      >
-        <Plus className="mr-2" /> Agregar Producto
-      </button>
-
-      {isAddingProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">{editingProduct ? "Editar" : "Agregar"} Producto</h2>
-            <div className="space-y-4">
-              <input
-                type="text"
-                value={newProduct.nombre}
-                onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
-                placeholder="Nombre del producto"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <textarea
-                value={newProduct.descripcion}
-                onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
-                placeholder="Descripción"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <div {...getRootProps()} className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center cursor-pointer">
-                <input {...getInputProps()} />
-                {isDragActive ? (
-                  <p>Suelta la imagen aquí ...</p>
-                ) : (
-                  <p>Arrastra y suelta una imagen aquí, o haz clic para seleccionar una</p>
-                )}
-                {newProduct.imagen && (
-                  <div className="mt-2">
-                    <Image src={newProduct.imagen} alt="Preview" width={100} height={100} className="mx-auto" />
+      {/* Agregar Producto y Lista de Productos */}
+      <div className="bg-white shadow rounded-lg p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-xl font-semibold text-gray-900">Productos</h2>
+          <button
+            onClick={() => setIsAddingProduct(true)}
+            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-shadow duration-300 hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            <Plus className="inline-block mr-2 h-5 w-5" /> Agregar Producto
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {products.length === 0 && dataLoaded ? (
+            <p className="col-span-full text-center text-gray-500">No hay productos. Añade un nuevo producto para empezar.</p>
+          ) : (
+            products.map((product) => (
+              <div key={product._id} className="bg-gray-50 shadow rounded-lg overflow-hidden">
+                <div className="p-4">
+                  <div className="flex mb-4">
+                    {product.imagen && (
+                      <div className="w-24 h-24 mr-4 flex-shrink-0 rounded-md overflow-hidden">
+                        <Image
+                          src={product.imagen}
+                          alt={product.nombre}
+                          width={96}
+                          height={96}
+                          objectFit="cover"
+                        />
+                      </div>
+                    )}
+                    <div className="flex-grow">
+                      <h3 className="font-bold text-xl text-gray-800 mb-2">{product.nombre}</h3>
+                      <p className="text-gray-800 font-bold text-lg">${product.precio}</p>
+                    </div>
                   </div>
-                )}
+                  <p className="text-gray-600 text-sm mb-2">{product.descripcion}</p>
+                  {product.categorias && product.categorias.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {product.categorias.map((categoria, index) => (
+                        <span key={index} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-700">
+                          {categoria}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  <p className={`text-sm ${product.availability ? 'text-green-600' : 'text-red-600'} mb-2`}>
+                    {product.availability ? 'Disponible' : 'No disponible'}
+                  </p>
+                  {product.extras && product.extras.length > 0 && (
+                    <div className="mt-2">
+                      <h4 className="font-semibold text-sm mb-1 text-gray-700">Extras:</h4>
+                      <ul className="text-sm text-gray-600">
+                        {product.extras.map((extra) => (
+                          <li key={extra.id}>{extra.name}: ${extra.price}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  <div className="mt-4 flex justify-between">
+                    <button
+                      onClick={() => handleEditProduct(product)}
+                      className="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
+                    >
+                      <Edit2 className="mr-1 h-4 w-4" /> Editar
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProduct(product._id)}
+                      className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
+                    >
+                      <X className="mr-1 h-4 w-4" /> Eliminar
+                    </button>
+                  </div>
+                </div>
               </div>
-              <input
-                type="number"
-                value={newProduct.precio}
-                onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) })}
-                placeholder="Precio"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <div className="space-y-2">
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* Modal para agregar/editar producto */}
+      {isAddingProduct && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg flex flex-col"> {/* Añadido flex flex-col */}
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 sticky top-0 bg-white py-4 px-6 z-10 border-b">
+              {editingProduct ? "Editar" : "Agregar"} Producto
+            </h2>
+            <div className="space-y-6 p-6 flex-grow overflow-y-auto"> {/* Añadido flex-grow y overflow-y-auto */}
+              <div>
+                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre del producto</label>
+                <input
+                  type="text"
+                  id="nombre"
+                  value={newProduct.nombre}
+                  onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">Descripción</label>
+                <textarea
+                  id="descripcion"
+                  value={newProduct.descripcion}
+                  onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
+                  rows={3}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Imagen del producto</label>
+                <div 
+                  {...getRootProps()} 
+                  className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-indigo-500 transition-colors duration-300"
+                >
+                  <div className="space-y-1 text-center">
+                    {newProduct.imagen ? (
+                      <div>
+                        <Image src={newProduct.imagen} alt="Preview" width={200} height={200} className="mx-auto object-cover rounded-md" />
+                        <p className="text-sm text-gray-500 mt-2">Haz clic o arrastra una nueva imagen para cambiarla</p>
+                      </div>
+                    ) : (
+                      <>
+                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <div className="flex text-sm text-gray-600 justify-center">
+                          <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                            <span>Sube un archivo</span>
+                            <input {...getInputProps()} id="file-upload" name="file-upload" type="file" className="sr-only" />
+                          </label>
+                          <p className="pl-1">o arrastra y suelta</p>
+                        </div>
+                        <p className="text-xs text-gray-500">PNG, JPG hasta 10MB</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="precio" className="block text-sm font-medium text-gray-700">Precio</label>
+                <div className="mt-1 relative rounded-md shadow-sm">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <span className="text-gray-500 sm:text-sm">$</span>
+                  </div>
+                  <input
+                    type="number"
+                    id="precio"
+                    value={newProduct.precio}
+                    onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) })}
+                    className="block w-full pl-7 pr-12 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+              <div>
                 <label className="block text-sm font-medium text-gray-700">Categorías (máximo 2)</label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="mt-2 grid grid-cols-2 gap-2">
                   {categories.map((category) => (
                     <div key={category._id} className="flex items-center">
                       <input
@@ -356,7 +477,7 @@ export default function ProductDashboard() {
                             return prev;
                           });
                         }}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                       />
                       <label htmlFor={`category-${category._id}`} className="ml-2 block text-sm text-gray-900">
                         {category.name}
@@ -365,146 +486,93 @@ export default function ProductDashboard() {
                   ))}
                 </div>
                 {newProduct.categorias && newProduct.categorias.length === 2 && (
-                  <p className="text-sm text-blue-500">Máximo de categorías seleccionadas</p>
+                  <p className="mt-2 text-sm text-indigo-600">Máximo de categorías seleccionadas</p>
                 )}
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700">Disponible</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={newProduct.availability}
-                    onChange={(e) => setNewProduct({ ...newProduct, availability: e.target.checked })}
-                  />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                </label>
+              <div>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="availability" className="block text-sm font-medium text-gray-700">Disponible</label>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      id="availability"
+                      className="sr-only peer"
+                      checked={newProduct.availability}
+                      onChange={(e) => setNewProduct({ ...newProduct, availability: e.target.checked })}
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  </label>
+                </div>
               </div>
               <div>
-                <h3 className="font-semibold mb-2 text-gray-700">Extras</h3>
-                {newProduct.extras.map((extra) => (
-                  <div key={extra.id} className="flex items-center justify-between mb-2">
-                    <span>{extra.name}: ${extra.price}</span>
-                    <button
-                      onClick={() => handleDeleteExtra(extra.id)}
-                      className="text-red-500 hover:text-red-700 focus:outline-none"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                ))}
-                <div className="flex gap-2 mt-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Extras</label>
+                <div className="bg-gray-50 rounded-md p-4 mb-4">
+                  {newProduct.extras.length > 0 ? (
+                    <div className="space-y-2">
+                      {newProduct.extras.map((extra) => (
+                        <div key={extra.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm font-medium text-gray-700">{extra.name}</span>
+                            <span className="text-sm text-gray-500">${extra.price.toFixed(2)}</span>
+                          </div>
+                          <button
+                            onClick={() => handleDeleteExtra(extra.id)}
+                            className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
+                          >
+                            <X className="h-5 w-5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 text-center">No hay extras agregados</p>
+                  )}
+                </div>
+                <div className="mt-2 flex gap-2">
                   <input
                     type="text"
                     value={newExtra.name}
                     onChange={(e) => setNewExtra({ ...newExtra, name: e.target.value })}
                     placeholder="Nombre del extra"
-                    className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                   />
                   <input
                     type="number"
                     value={newExtra.price}
                     onChange={(e) => setNewExtra({ ...newExtra, price: parseFloat(e.target.value) })}
                     placeholder="Precio"
-                    className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
                   />
                   <button
                     onClick={handleAddExtra}
-                    className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm transition-colors duration-200"
                   >
                     Agregar
                   </button>
                 </div>
               </div>
             </div>
-            <div className="flex justify-end gap-2 mt-6">
+            <div className="sticky bottom-0 bg-white py-4 px-6 border-t flex justify-end gap-3"> {/* Ajustado el padding y añadido border-t */}
               <button
                 onClick={() => {
                   setIsAddingProduct(false)
                   resetNewProduct()
                   setEditingProduct(null)
                 }}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                className="px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm shadow-sm hover:shadow-md transition-shadow duration-300"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleAddProduct}
-                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm shadow-sm hover:shadow-md transition-shadow duration-300"
               >
-                {editingProduct ? "Guardar" : "Agregar"}
+                {editingProduct ? "Guardar cambios" : "Agregar producto"}
               </button>
             </div>
           </div>
         </div>
       )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.length === 0 && dataLoaded ? (
-          <p className="col-span-full text-center text-gray-500">No hay productos. Añade un nuevo producto para empezar.</p>
-        ) : (
-          products.map((product) => (
-            <div key={product._id} className="bg-white shadow-md rounded-lg overflow-hidden flex flex-col">
-              <div className="p-4">
-                <div className="flex mb-4">
-                  {product.imagen && (
-                    <div className="w-24 h-24 mr-4 flex-shrink-0 rounded-md overflow-hidden">
-                      <Image
-                        src={product.imagen}
-                        alt={product.nombre}
-                        width={96}
-                        height={96}
-                        objectFit="cover"
-                      />
-                    </div>
-                  )}
-                  <div className="flex-grow">
-                    <h3 className="font-bold text-xl text-gray-800 mb-2">{product.nombre}</h3>
-                    <p className="text-gray-800 font-bold text-lg">${product.precio}</p>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm mb-2">{product.descripcion}</p>
-                {product.categorias && product.categorias.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {product.categorias.map((categoria, index) => (
-                      <span key={index} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700">
-                        {categoria}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <p className={`text-sm ${product.availability ? 'text-green-600' : 'text-red-600'} mb-2`}>
-                  {product.availability ? 'Disponible' : 'No disponible'}
-                </p>
-                {product.extras && product.extras.length > 0 && (
-                  <div className="mt-2">
-                    <h4 className="font-semibold text-sm mb-1 text-gray-700">Extras:</h4>
-                    <ul className="text-sm text-gray-600">
-                      {product.extras.map((extra) => (
-                        <li key={extra.id}>{extra.name}: ${extra.price}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                <div className="mt-4 flex justify-between">
-                  <button
-                    onClick={() => handleEditProduct(product)}
-                    className="px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center"
-                  >
-                    <Edit2 className="mr-1 h-4 w-4" /> Editar
-                  </button>
-                  <button
-                    onClick={() => handleDeleteProduct(product._id)}
-                    className="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center"
-                  >
-                    <X className="mr-1 h-4 w-4" /> Eliminar
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
     </div>
   )
 }
