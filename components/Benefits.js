@@ -30,7 +30,7 @@ const benefits = [
 
 export default function Benefits() {
   return (
-    <div className="bg-gradient-to-b from-indigo-100 to-white py-24 sm:py-32">
+    <div className="bg-gradient-to-b from-[#F3FAF0] to-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-base font-semibold leading-7 text-[#0D654A]">Beneficios Clave</h2>

@@ -28,7 +28,7 @@ const testimonials = [
 
 const SocialProof = () => {
   return (
-    <div className="bg-gradient-to-b from-white to-indigo-50 py-24 sm:py-32">
+    <div className="bg-gradient-to-b from-white to-[#F3FAF0] py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-xl text-center">
           <h2 className="flex items-center justify-center text-lg font-semibold leading-8 tracking-tight text-[#0D654A]">Testimonios</h2>
