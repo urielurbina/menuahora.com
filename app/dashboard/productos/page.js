@@ -228,11 +228,11 @@ export default function ProductDashboard() {
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
               placeholder="Nueva categoría"
-              className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
             />
             <button
               onClick={handleAddCategory}
-              className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
             >
               Agregar
             </button>
@@ -277,7 +277,7 @@ export default function ProductDashboard() {
                       checked={value}
                       onChange={(e) => setCardInfoSettings({ ...cardInfoSettings, [key]: e.target.checked })}
                     />
-                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D654A]"></div>
                   </label>
                 </div>
               ))}
@@ -291,7 +291,7 @@ export default function ProductDashboard() {
                     checked={cardInfoSettings.detailedView}
                     onChange={(e) => setCardInfoSettings({ ...cardInfoSettings, detailedView: e.target.checked })}
                   />
-                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D654A]"></div>
                 </label>
               </div>
             </div>
@@ -305,7 +305,7 @@ export default function ProductDashboard() {
           <h2 className="text-xl font-semibold text-gray-900">Productos</h2>
           <button
             onClick={() => setIsAddingProduct(true)}
-            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-shadow duration-300 hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-shadow duration-300 hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
           >
             <Plus className="inline-block mr-2 h-5 w-5" /> Agregar Producto
           </button>
@@ -361,7 +361,7 @@ export default function ProductDashboard() {
                   <div className="mt-4 flex justify-between">
                     <button
                       onClick={() => handleEditProduct(product)}
-                      className="px-3 py-1 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
+                      className="px-3 py-1 bg-[#0D654A] text-white rounded-md hover:bg-[#0D654A] focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
                     >
                       <Edit2 className="mr-1 h-4 w-4" /> Editar
                     </button>
@@ -394,7 +394,7 @@ export default function ProductDashboard() {
                   id="nombre"
                   value={newProduct.nombre}
                   onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
                 />
               </div>
               <div>
@@ -404,14 +404,14 @@ export default function ProductDashboard() {
                   value={newProduct.descripcion}
                   onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
                   rows={3}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Imagen del producto</label>
                 <div 
                   {...getRootProps()} 
-                  className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-indigo-500 transition-colors duration-300"
+                  className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-[#0D654A] transition-colors duration-300"
                 >
                   <div className="space-y-1 text-center">
                     {newProduct.imagen ? (
@@ -425,7 +425,7 @@ export default function ProductDashboard() {
                           <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         <div className="flex text-sm text-gray-600 justify-center">
-                          <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                          <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-[#0D654A] hover:text-[#0D654A] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#0D654A]">
                             <span>Sube un archivo</span>
                             <input {...getInputProps()} id="file-upload" name="file-upload" type="file" className="sr-only" />
                           </label>
@@ -448,7 +448,7 @@ export default function ProductDashboard() {
                     id="precio"
                     value={newProduct.precio}
                     onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) })}
-                    className="block w-full pl-7 pr-12 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                    className="block w-full pl-7 pr-12 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
                     placeholder="0.00"
                   />
                 </div>
@@ -477,7 +477,7 @@ export default function ProductDashboard() {
                             return prev;
                           });
                         }}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 rounded"
                       />
                       <label htmlFor={`category-${category._id}`} className="ml-2 block text-sm text-gray-900">
                         {category.name}
@@ -486,7 +486,7 @@ export default function ProductDashboard() {
                   ))}
                 </div>
                 {newProduct.categorias && newProduct.categorias.length === 2 && (
-                  <p className="mt-2 text-sm text-indigo-600">Máximo de categorías seleccionadas</p>
+                  <p className="mt-2 text-sm text-[#0D654A]">Máximo de categorías seleccionadas</p>
                 )}
               </div>
               <div>
@@ -500,7 +500,7 @@ export default function ProductDashboard() {
                       checked={newProduct.availability}
                       onChange={(e) => setNewProduct({ ...newProduct, availability: e.target.checked })}
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D654A]"></div>
                   </label>
                 </div>
               </div>
@@ -534,18 +534,18 @@ export default function ProductDashboard() {
                     value={newExtra.name}
                     onChange={(e) => setNewExtra({ ...newExtra, name: e.target.value })}
                     placeholder="Nombre del extra"
-                    className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                    className="flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
                   />
                   <input
                     type="number"
                     value={newExtra.price}
                     onChange={(e) => setNewExtra({ ...newExtra, price: parseFloat(e.target.value) })}
                     placeholder="Precio"
-                    className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 sm:text-sm"
+                    className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
                   />
                   <button
                     onClick={handleAddExtra}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:text-sm transition-colors duration-200"
+                    className="px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 sm:text-sm transition-colors duration-200"
                   >
                     Agregar
                   </button>
@@ -559,13 +559,13 @@ export default function ProductDashboard() {
                   resetNewProduct()
                   setEditingProduct(null)
                 }}
-                className="px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] sm:text-sm shadow-sm hover:shadow-md transition-shadow duration-300"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleAddProduct}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] sm:text-sm shadow-sm hover:shadow-md transition-shadow duration-300"
               >
                 {editingProduct ? "Guardar cambios" : "Agregar producto"}
               </button>

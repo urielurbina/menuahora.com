@@ -31,10 +31,10 @@ const SocialProof = () => {
     <div className="bg-gradient-to-b from-white to-indigo-50 py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-xl text-center">
-          <h2 className="flex items-center justify-center text-lg font-semibold leading-8 tracking-tight text-indigo-600">Testimonios</h2>
+          <h2 className="flex items-center justify-center text-lg font-semibold leading-8 tracking-tight text-[#0D654A]">Testimonios</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Nuestros usuarios están{' '}
-            <span className="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md mt-2">
+            <span className="inline-block bg-[#0D654A] text-white px-4 py-2 rounded-md mt-2">
                 encantados
               </span>
           </p>
@@ -54,7 +54,7 @@ const SocialProof = () => {
                   </blockquote>
                 </div>
                 <div className="mt-8 flex items-center gap-x-4">
-                  <img src={testimonial.image} alt="" className="h-12 w-12 rounded-full bg-gray-50 ring-2 ring-indigo-600" />
+                  <img src={testimonial.image} alt="" className="h-12 w-12 rounded-full bg-gray-50 ring-2 ring-[#0D654A]" />
                   <div>
                     <div className="font-semibold text-gray-900">{testimonial.author}</div>
                     <div className="text-sm leading-6 text-gray-600">{testimonial.role}</div>
@@ -64,7 +64,7 @@ const SocialProof = () => {
                   href={testimonial.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-6 inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  className="mt-6 inline-flex items-center justify-center rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
                 >
                   Ver sitio
                   <ArrowTopRightOnSquareIcon className="ml-2 -mr-0.5 h-4 w-4" aria-hidden="true" />

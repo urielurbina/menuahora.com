@@ -301,7 +301,7 @@ export default function InformacionBasica() {
                 name="businessName"
                 value={formData.businessName}
                 onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
                 placeholder="Tu negocio"
               />
             </div>
@@ -318,7 +318,7 @@ export default function InformacionBasica() {
                 name="slogan"
                 value={formData.slogan}
                 onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
                 placeholder="Tu slogan aquí"
               />
             </div>
@@ -336,7 +336,7 @@ export default function InformacionBasica() {
                 onChange={handleChange}
                 maxLength={200}
                 rows={3}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
                 placeholder="Breve descripción de tu negocio"
               />
             </div>
@@ -348,7 +348,7 @@ export default function InformacionBasica() {
               Logotipo
             </label>
             <div 
-              className={`mt-2 flex justify-center rounded-lg border border-dashed ${dragActive.logo ? 'border-indigo-600' : 'border-gray-900/25'} px-6 py-10`}
+              className={`mt-2 flex justify-center rounded-lg border border-dashed ${dragActive.logo ? 'border-[#0D654A]' : 'border-gray-900/25'} px-6 py-10`}
               onDragEnter={(e) => handleDrag(e, 'logo')}
               onDragLeave={(e) => handleDrag(e, 'logo')}
               onDragOver={(e) => handleDrag(e, 'logo')}
@@ -363,7 +363,7 @@ export default function InformacionBasica() {
                 <div className="mt-4 flex text-sm leading-6 text-gray-600">
                   <label
                     htmlFor="logoFile"
-                    className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                    className="relative cursor-pointer rounded-md bg-white font-semibold text-[#0D654A] focus-within:outline-none focus-within:ring-2 focus-within:ring-[#0D654A] focus-within:ring-offset-2 hover:text-[#0D654A]"
                   >
                     <span>Sube un archivo</span>
                     <input 
@@ -387,7 +387,7 @@ export default function InformacionBasica() {
               Foto de portada
             </label>
             <div 
-              className={`mt-2 flex justify-center rounded-lg border border-dashed ${dragActive.cover ? 'border-indigo-600' : 'border-gray-900/25'} px-6 py-10`}
+              className={`mt-2 flex justify-center rounded-lg border border-dashed ${dragActive.cover ? 'border-[#0D654A]' : 'border-gray-900/25'} px-6 py-10`}
               onDragEnter={(e) => handleDrag(e, 'cover')}
               onDragLeave={(e) => handleDrag(e, 'cover')}
               onDragOver={(e) => handleDrag(e, 'cover')}
@@ -402,7 +402,7 @@ export default function InformacionBasica() {
                 <div className="mt-4 flex text-sm leading-6 text-gray-600">
                   <label
                     htmlFor="coverFile"
-                    className="relative cursor-pointer rounded-md bg-white font-semibold text-indigo-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 hover:text-indigo-500"
+                    className="relative cursor-pointer rounded-md bg-white font-semibold text-[#0D654A] focus-within:outline-none focus-within:ring-2 focus-within:ring-[#0D654A] focus-within:ring-offset-2 hover:text-[#0D654A]"
                   >
                     <span>Sube un archivo</span>
                     <input 
@@ -439,7 +439,7 @@ export default function InformacionBasica() {
                 name="contact.address"
                 value={formData.contact.address}
                 onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
                 placeholder="Ingresa la dirección de tu negocio"
               />
             </div>
@@ -456,7 +456,7 @@ export default function InformacionBasica() {
                 name="contact.whatsappLink"
                 value={formData.contact.whatsappLink}
                 onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
                 placeholder="https://wa.me/1234567890"
               />
             </div>
@@ -473,7 +473,7 @@ export default function InformacionBasica() {
                 name="contact.facebookLink"
                 value={formData.contact.facebookLink}
                 onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
                 placeholder="https://www.facebook.com/tu-pagina"
               />
             </div>
@@ -489,7 +489,7 @@ export default function InformacionBasica() {
             id="schedule.enabled"
             checked={formData.schedule.enabled}
             onChange={handleScheduleToggle}
-            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+            className="h-4 w-4 rounded border-gray-300 text-[#0D654A] focus:ring-[#0D654A]"
           />
           <label htmlFor="schedule.enabled" className="ml-2 block text-sm font-medium leading-6 text-gray-900">
             ¿Deseas agregar un horario de atención?
@@ -507,7 +507,7 @@ export default function InformacionBasica() {
                       type="checkbox"
                       checked={!hours.isClosed}
                       onChange={(e) => handleScheduleChange(day, 'isClosed', !e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                      className="h-4 w-4 rounded border-gray-300 text-[#0D654A] focus:ring-[#0D654A]"
                     />
                     <label className="block text-sm font-medium leading-6 text-gray-900 w-24">
                       {day.charAt(0).toUpperCase() + day.slice(1)}
@@ -545,7 +545,7 @@ export default function InformacionBasica() {
         </button>
         <button
           type="submit"
-          className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
           disabled={isLoading}
         >
           {isLoading ? 'Guardando...' : 'Guardar información'}

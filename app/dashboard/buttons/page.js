@@ -115,8 +115,8 @@ export default function Buttons() {
     return (
       <button
         onClick={onToggle}
-        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${
-            isOn ? 'bg-indigo-600' : 'bg-gray-200'
+        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 ${
+            isOn ? 'bg-[#0D654A]' : 'bg-gray-200'
         }`}
       >
         <span className="sr-only">Activar enlace</span>
@@ -186,7 +186,7 @@ export default function Buttons() {
             <div key={link.id} className="col-span-full">
               <div className="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-4 mb-4">
                 {index === 0 && (
-                  <div className="text-sm text-indigo-600 font-semibold mb-2">
+                  <div className="text-sm text-[#0D654A] font-semibold mb-2">
                     <FaIcons.FaStar className="inline mr-1" /> Este es tu link destacado
                   </div>
                 )}
@@ -197,7 +197,7 @@ export default function Buttons() {
                       value={link.title}
                       onChange={(e) => updateLink(link.id, 'title', e.target.value)}
                       placeholder="Título del enlace"
-                      className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
                     />
                   </div>
                   <Switch
@@ -211,7 +211,7 @@ export default function Buttons() {
                     value={link.url}
                     onChange={(e) => updateLink(link.id, 'url', e.target.value)}
                     placeholder="URL del enlace"
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 mr-2"
+                    className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6 mr-2"
                   />
                   <button
                     onClick={() => openIconModal(link.id)}
@@ -235,7 +235,7 @@ export default function Buttons() {
         <div className="mt-6">
           <motion.button
             onClick={addLink}
-            className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -257,7 +257,7 @@ export default function Buttons() {
         </button>
         <motion.button
           type="submit"
-          className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           disabled={isLoading}

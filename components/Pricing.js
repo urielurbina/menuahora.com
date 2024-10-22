@@ -20,7 +20,7 @@ const Pricing = () => {
               {plan.description}
             </p>
             <div className="mt-10 flex items-center gap-x-4">
-              <h4 className="flex-none text-sm font-semibold leading-6 text-indigo-600">What&apos;s included</h4>
+              <h4 className="flex-none text-sm font-semibold leading-6 text-[#0D654A]">What&apos;s included</h4>
               <div className="h-px flex-auto bg-gray-100" />
             </div>
             {plan.features && (
@@ -28,7 +28,7 @@ const Pricing = () => {
                 {plan.features.map((feature, i) => (
                   <li key={i} className="flex gap-x-3">
                     <svg
-                      className="h-6 w-5 flex-none text-indigo-600"
+                      className="h-6 w-5 flex-none text-[#0D654A]"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                       aria-hidden="true"

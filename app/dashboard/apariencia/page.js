@@ -42,7 +42,7 @@ const ColorPicker = ({ id, label, value, onChange }) => (
         type="text"
         value={value}
         onChange={(e) => onChange({ target: { value: e.target.value } })}
-        className="ml-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+        className="ml-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
         placeholder="#000000"
       />
     </div>
@@ -214,7 +214,7 @@ export default function Apariencia() {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           type="submit"
-          className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
           disabled={isLoading}
         >
           {isLoading ? 'Guardando...' : 'Guardar'}

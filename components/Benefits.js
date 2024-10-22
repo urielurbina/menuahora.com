@@ -33,10 +33,10 @@ export default function Benefits() {
     <div className="bg-gradient-to-b from-indigo-100 to-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-base font-semibold leading-7 text-indigo-600">Beneficios Clave</h2>
+          <h2 className="text-base font-semibold leading-7 text-[#0D654A]">Beneficios Clave</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Sistema Intuitivo de<br className="hidden sm:inline" />
-            <span className="inline-block bg-indigo-600 text-white px-4 py-2 rounded-md mt-2">
+            <span className="inline-block bg-[#0D654A] text-white px-4 py-2 rounded-md mt-2">
               Administración de Menús
             </span>
           </p>
@@ -60,7 +60,7 @@ export default function Benefits() {
         <dl className="mx-auto grid max-w-2xl grid-cols-1 gap-x-8 gap-y-16 sm:grid-cols-2 lg:mx-0 lg:max-w-none lg:grid-cols-4">
           {benefits.map((benefit) => (
             <div key={benefit.name} className="flex flex-col items-center text-center sm:items-start sm:text-left">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-indigo-600 mb-6">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[#0D654A] mb-6">
                 <benefit.icon className="h-6 w-6 text-white" aria-hidden="true" />
               </div>
               <dt className="text-base font-semibold leading-7 text-gray-900">

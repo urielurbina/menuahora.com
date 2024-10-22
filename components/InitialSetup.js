@@ -62,7 +62,7 @@ export default function InitialSetup({ userId }) {
                   type="text"
                   name="username"
                   id="username"
-                  className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
+                  className="focus:ring-[#0D654A] focus:border-[#0D654A] flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
                   placeholder="tu-negocio"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -76,7 +76,7 @@ export default function InitialSetup({ userId }) {
                 whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={checkAvailability}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#0D654A] hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A]"
               >
                 Verificar disponibilidad
               </motion.button>

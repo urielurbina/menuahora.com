@@ -108,7 +108,7 @@ export default function Bienvenida() {
               id="username"
               value={username}
               onChange={handleUsernameChange}
-              className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              className="block w-full min-w-0 flex-1 rounded-none rounded-r-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
               placeholder="tacosuriel"
               disabled={hasUsername}
             />
@@ -118,7 +118,7 @@ export default function Bienvenida() {
           </p>
           <button
             onClick={handleSaveUsername}
-            className="w-full mt-4 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full mt-4 rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A] disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={hasUsername || isLoading}
           >
             {isLoading ? 'Guardando...' : 'Guardar username'}

@@ -44,7 +44,7 @@ export default function HowItWorks() {
     <div className="bg-white py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:text-center">
-          <h2 className="text-base font-semibold leading-7 text-indigo-600">How it works</h2>
+          <h2 className="text-base font-semibold leading-7 text-[#0D654A]">How it works</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
             Cómo Funciona
           </p>
@@ -73,12 +73,12 @@ export default function HowItWorks() {
                 <li key={step.name} className="relative">
                   <div className="flex items-center space-x-4">
                     <div className="flex-shrink-0">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-indigo-600">
+                      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0D654A]">
                         <step.icon className="h-6 w-6 text-white" aria-hidden="true" />
                       </span>
                     </div>
                     <div>
-                      <div className="text-xs font-semibold uppercase tracking-wide text-indigo-600">
+                      <div className="text-xs font-semibold uppercase tracking-wide text-[#0D654A]">
                         Paso {stepIdx + 1}
                       </div>
                       <p className="mt-1 text-lg font-semibold text-gray-900">{step.name}</p>
