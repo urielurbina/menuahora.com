@@ -19,19 +19,24 @@ const Pricing = () => {
         </div>
         
         <div className="mt-8 flex justify-center">
-          <div className="relative flex rounded-full bg-white p-1 shadow-sm">
-            <button
-              onClick={() => setBillingPeriod('monthly')}
-              className={`${billingPeriod === 'monthly' ? 'bg-indigo-600 text-white' : 'text-gray-500'} rounded-full py-2 px-4 text-sm font-semibold focus:outline-none`}
-            >
-              Mensual
-            </button>
-            <button
-              onClick={() => setBillingPeriod('yearly')}
-              className={`${billingPeriod === 'yearly' ? 'bg-indigo-600 text-white' : 'text-gray-500'} ml-2 rounded-full py-2 px-4 text-sm font-semibold focus:outline-none`}
-            >
-              Anual
-            </button>
+          <div className="inline-flex flex-col items-center">
+            {/* <span className="mb-2 bg-[#A1D683] text-xs font-bold px-2 py-1 rounded-full text-gray-800 animate-pulse-soft">
+              Ahorra 30% en plan anual
+            </span> */}
+            <div className="relative flex rounded-full bg-white p-1 shadow-sm">
+              <button
+                onClick={() => setBillingPeriod('monthly')}
+                className={`${billingPeriod === 'monthly' ? 'bg-[#0D654A] text-white' : 'text-gray-500'} rounded-full py-2 px-4 text-sm font-semibold focus:outline-none`}
+              >
+                Mensual
+              </button>
+              <button
+                onClick={() => setBillingPeriod('yearly')}
+                className={`${billingPeriod === 'yearly' ? 'bg-[#0D654A] text-white' : 'text-gray-500'} ml-2 rounded-full py-2 px-4 text-sm font-semibold focus:outline-none`}
+              >
+                Anual
+              </button>
+            </div>
           </div>
         </div>
 
@@ -60,11 +65,18 @@ const PlanCard = ({ plan, billingPeriod, index }) => {
   const savings = plan.price.monthly && yearlyPrice ? plan.price.monthly * 12 - yearlyPrice : 0;
 
   return (
-    <div className={`flex flex-col justify-between rounded-3xl bg-white p-8 shadow-xl ring-1 ring-gray-900/10 sm:p-10 ${plan.isFeatured ? 'lg:z-10 ring-2 ring-indigo-600' : ''} ${plan.isFeatured ? '-mt-2 -mb-2' : ''}`}>
+    <div className={`flex flex-col justify-between rounded-3xl bg-white p-8 shadow-xl ring-1 ring-gray-900/10 sm:p-10 
+      ${plan.isFeatured ? 'lg:z-10 ring-2 ring-emerald-700 scale-105' : ''} 
+      ${plan.isFeatured ? 'relative' : ''}`}>
+      {plan.isFeatured && (
+        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-[#A1D683] text-black px-4 py-1 rounded-full text-sm font-semibold">
+          Más popular
+        </div>
+      )}
       <div>
         <h3 className="text-2xl font-bold tracking-tight text-gray-900">{plan.name}</h3>
         {plan.isFeatured && (
-          <p className="mt-4 text-sm font-semibold text-indigo-600">Recomendado</p>
+          <p className="mt-4 text-sm font-semibold text-emerald-700">Recomendado</p>
         )}
         <p className="mt-6 text-base leading-7 text-gray-600">
           {plan.description}
@@ -93,7 +105,7 @@ const PlanCard = ({ plan, billingPeriod, index }) => {
         <ul className="mt-8 space-y-3 text-sm leading-6 text-gray-600">
           {plan.features.map((feature, i) => (
             <li key={i} className="flex gap-x-3">
-              <svg className="h-6 w-5 flex-none text-indigo-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <svg className="h-6 w-5 flex-none text-emerald-700" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" />
               </svg>
               {feature.name}
@@ -104,7 +116,7 @@ const PlanCard = ({ plan, billingPeriod, index }) => {
       <div className="mt-8">
         <ButtonCheckout 
           priceId={isEnterprise ? plan.priceId.yearly : plan.priceId[currentBillingPeriod]} 
-          className="w-full"
+          className={`w-full ${plan.isFeatured ? 'bg-emerald-700 hover:bg-emerald-800' : ''}`}
         >
           {isEnterprise ? 'Contactar' : 'Comenzar'}
         </ButtonCheckout>

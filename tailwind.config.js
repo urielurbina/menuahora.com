@@ -17,6 +17,7 @@ module.exports = {
         wiggle: "wiggle 1.5s ease-in-out infinite",
         popup: "popup 0.25s ease-in-out",
         shimmer: "shimmer 3s ease-out infinite alternate",
+        'pulse-soft': 'pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
         opacity: {
@@ -53,6 +54,10 @@ module.exports = {
           "0%": { backgroundPosition: "0 50%" },
           "50%": { backgroundPosition: "100% 50%" },
           "100%": { backgroundPosition: "0% 50%" },
+        },
+        'pulse-soft': {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(1.05)' },
         },
       },
     },
