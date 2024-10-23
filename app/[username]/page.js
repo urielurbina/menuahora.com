@@ -67,15 +67,27 @@ export default function UserPage({ params }) {
   if (!businessData) return notFound()
 
   const {
-    'basic-info': basicInfo,
-    cardInfoSettings,
-    categories,
-    products,
-    buttons,
+    'basic-info': basicInfo = {},
+    cardInfoSettings = {},
+    categories = [],
+    products = [],
+    buttons = [],
     appearance = {}
-  } = businessData
+  } = businessData || {}
 
   const primaryColor = appearance.primaryColor || '#FF1C20'
+
+  // Valores predeterminados para basicInfo
+  const defaultBasicInfo = {
+    coverPhotoUrl: '/default-cover.jpg',
+    logoUrl: '/default-logo.png',
+    businessName: params.username,
+    description: 'Descripción no disponible',
+    // Agrega aquí otros campos que necesites con valores predeterminados
+  }
+
+  // Combinar los valores reales con los predeterminados
+  const mergedBasicInfo = { ...defaultBasicInfo, ...basicInfo }
 
   return (
     <div className="w-full mx-auto relative">
@@ -85,7 +97,7 @@ export default function UserPage({ params }) {
           {/* Header with background image and logo */}
           <div className="relative">
             <Image
-              src={basicInfo.coverPhotoUrl || '/default-cover.jpg'}
+              src={mergedBasicInfo.coverPhotoUrl}
               alt="Fondo de negocio"
               width={500}
               height={300}
@@ -95,7 +107,7 @@ export default function UserPage({ params }) {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="bg-white rounded-full w-32 h-32 flex items-center justify-center overflow-hidden">
                 <Image
-                  src={basicInfo.logoUrl || '/default-logo.png'}
+                  src={mergedBasicInfo.logoUrl}
                   alt="Logotipo"
                   width={128}
                   height={128}
@@ -105,7 +117,7 @@ export default function UserPage({ params }) {
             </div>
           </div>
 
-          <BusinessInfo basicInfo={basicInfo} appearance={appearance} />
+          <BusinessInfo basicInfo={mergedBasicInfo} appearance={appearance} />
           <ActionButtons buttons={buttons} appearance={appearance} />
         </div>
 

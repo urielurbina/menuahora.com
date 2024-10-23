@@ -20,7 +20,7 @@ const config = {
       {
         // REQUIRED — we use this to find the plan in the webhook (for instance if you want to update the user's credits based on the plan)
         priceId: {
-          monthly: "price_monthly_basic",
+          monthly: "price_1Q8agAJJJ3WlVwt9nASMLnTQ",
           yearly: "price_yearly_basic"
         },
         //  REQUIRED - Name of the plan, displayed on the pricing page
