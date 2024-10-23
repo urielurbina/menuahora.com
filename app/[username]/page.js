@@ -8,6 +8,9 @@ import CategoryList from '@/components/CategoryList'
 import ProductList from '@/components/ProductList'
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { Inter } from 'next/font/google'
+
+const inter = Inter({ subsets: ['latin'] })
 
 export default function UserPage({ params }) {
   const [businessData, setBusinessData] = useState(null)
@@ -92,8 +95,11 @@ export default function UserPage({ params }) {
   // Combinar los valores reales con los predeterminados
   const mergedBasicInfo = { ...defaultBasicInfo, ...basicInfo }
 
+  const headingFont = appearance.headingFont || inter.className
+  const bodyFont = appearance.bodyFont || inter.className
+
   return (
-    <div className="w-full mx-auto relative">
+    <div className={`w-full mx-auto relative ${bodyFont}`}>
       <div className="lg:flex">
         {/* Column 1: Logo and Info */}
         <div style={{backgroundColor: primaryColor}} className="lg:w-1/4 lg:fixed lg:top-0 lg:left-0 lg:bottom-0 lg:overflow-y-auto">
@@ -129,7 +135,7 @@ export default function UserPage({ params }) {
           <div className="bg-gray-100">
             {/* Categories */}
             <div className="bg-white border-b border-gray-200">
-              <h2 className="text-2xl font-bold px-6 pt-4" style={{ fontFamily: appearance.headingFont || 'sans-serif' }}>
+              <h2 className={`text-2xl font-bold px-6 pt-4 ${headingFont}`}>
                 Categorías
               </h2>
               <CategoryList 
@@ -199,9 +205,8 @@ export default function UserPage({ params }) {
 
               {/* Botón de cerrar en la esquina inferior derecha */}
               <button
-                className="absolute bottom-4 right-4 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800"
+                className={`absolute bottom-4 right-4 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 ${bodyFont}`}
                 onClick={() => toggleProductDetails(selectedProduct)}
-                style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}
               >
                 Cerrar
               </button>

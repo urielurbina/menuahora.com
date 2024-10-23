@@ -39,12 +39,17 @@ const fonts = [
 const customStyles = {
   control: (provided) => ({
     ...provided,
-    minWidth: '120px',
+    minWidth: '200px',
     margin: '0 5px'
   }),
   menu: (provided) => ({
     ...provided,
-    minWidth: '120px'
+    minWidth: '200px'
+  }),
+  option: (provided, state) => ({
+    ...provided,
+    fontFamily: state.data.value,
+    fontSize: '16px',
   })
 };
 
@@ -82,8 +87,15 @@ const FontSelector = ({ id, label, value, onChange }) => (
         id={id}
         value={{ value: value, label: value.split(',')[0] }}
         onChange={(option) => onChange({ target: { value: option.value } })}
-        options={fonts.map(font => ({ value: font.value, label: font.name }))}
+        options={fonts.map(font => ({ 
+          value: font.value, 
+          label: font.name,
+          style: { fontFamily: font.value }
+        }))}
         styles={customStyles}
+        formatOptionLabel={({ label, style }) => (
+          <span style={style}>{label}</span>
+        )}
       />
     </div>
     <p className="mt-2 text-sm text-gray-500" style={{ fontFamily: value }}>

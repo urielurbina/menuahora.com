@@ -108,7 +108,7 @@ export default function ResponsiveLayout({ children }) {
           </div>
           <main className="flex-1 relative z-0 overflow-hidden flex">
             {/* Contenido del dashboard */}
-            <div className="w-2/3 overflow-y-auto">
+            <div className="w-full lg:w-2/3 overflow-y-auto">
               <div className="py-6">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                   {children}
@@ -116,8 +116,8 @@ export default function ResponsiveLayout({ children }) {
               </div>
             </div>
 
-            {/* Previsualización del menú */}
-            <div className="w-1/3 border-l border-gray-200 overflow-hidden flex flex-col border-l-2 border-l-black">
+            {/* Previsualización del menú (visible solo en pantallas grandes) */}
+            <div className="hidden lg:flex lg:w-1/3 border-l border-gray-200 overflow-hidden flex-col border-l-2 border-l-black">
               <div className="p-4 bg-gray-100 border-b border-gray-200">
                 <div className="flex items-center mb-2">
                   <button
