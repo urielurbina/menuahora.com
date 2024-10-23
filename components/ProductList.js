@@ -1,20 +1,24 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
 
-export default function ProductList({ products, cardInfoSettings, appearance }) {
-  const [localProducts, setLocalProducts] = useState(products)
-
-  useEffect(() => {
-    setLocalProducts(products)
-  }, [products])
+export default function ProductList({ products, cardInfoSettings, appearance, activeCategory, onProductClick }) {
+  const filteredProducts = activeCategory === 'Todo'
+    ? products
+    : products.filter(product => product.categorias.includes(activeCategory))
 
   return (
     <div className="px-6 py-4">
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {localProducts.map((product) => (
-          <div key={product._id} className="bg-white rounded-lg overflow-hidden">
+        {filteredProducts.map((product) => (
+          <div 
+            key={product._id} 
+            className="bg-white rounded-lg overflow-hidden cursor-pointer"
+            onClick={() => {
+              console.log('Product clicked:', product);
+              onProductClick(product);
+            }}
+          >
             {cardInfoSettings.imagen && (
               <div className="aspect-square relative overflow-hidden">
                 <Image

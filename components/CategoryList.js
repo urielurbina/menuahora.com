@@ -1,15 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-
-export default function CategoryList({ categories }) {
-  const [activeCategory, setActiveCategory] = useState('Todo')
-  const [localCategories, setLocalCategories] = useState(categories)
-
-  useEffect(() => {
-    setLocalCategories(categories)
-  }, [categories])
-
+export default function CategoryList({ categories, activeCategory, setActiveCategory, appearance }) {
   return (
     <div className="px-6 py-4 bg-white border-b border-gray-200">
       <h2 className="text-2xl font-bold mb-4">Categorías</h2>
@@ -24,7 +15,7 @@ export default function CategoryList({ categories }) {
         >
           Todo
         </button>
-        {localCategories.map((category) => (
+        {categories.map((category) => (
           <button
             key={category._id}
             onClick={() => setActiveCategory(category.name)}
