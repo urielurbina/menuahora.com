@@ -37,6 +37,7 @@ export default function ProductDashboard() {
   useEffect(() => {
     fetchProducts()
     fetchCategories()
+    fetchCardInfoSettings()
   }, [])
 
   const fetchProducts = async () => {
@@ -70,6 +71,38 @@ export default function ProductDashboard() {
     } catch (error) {
       console.error('Error fetching categories:', error)
       setError(`No se pudieron cargar las categorías: ${error.message}`);
+    }
+  }
+
+  const fetchCardInfoSettings = async () => {
+    try {
+      const response = await fetch('/api/card-info-settings')
+      if (!response.ok) {
+        throw new Error('Error al cargar la configuración de la tarjeta')
+      }
+      const data = await response.json()
+      setCardInfoSettings(data.cardInfoSettings)
+    } catch (error) {
+      console.error('Error fetching card info settings:', error)
+      setError(`No se pudo cargar la configuración de la tarjeta: ${error.message}`)
+    }
+  }
+
+  const handleCardInfoSettingChange = async (key, value) => {
+    const newSettings = { ...cardInfoSettings, [key]: value }
+    setCardInfoSettings(newSettings)
+    try {
+      const response = await fetch('/api/card-info-settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newSettings),
+      })
+      if (!response.ok) {
+        throw new Error('Error al guardar la configuración de la tarjeta')
+      }
+    } catch (error) {
+      console.error('Error saving card info settings:', error)
+      setError(`No se pudo guardar la configuración de la tarjeta: ${error.message}`)
     }
   }
 
@@ -275,7 +308,7 @@ export default function ProductDashboard() {
                       type="checkbox"
                       className="sr-only peer"
                       checked={value}
-                      onChange={(e) => setCardInfoSettings({ ...cardInfoSettings, [key]: e.target.checked })}
+                      onChange={(e) => handleCardInfoSettingChange(key, e.target.checked)}
                     />
                     <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D654A]"></div>
                   </label>
@@ -289,7 +322,7 @@ export default function ProductDashboard() {
                     type="checkbox"
                     className="sr-only peer"
                     checked={cardInfoSettings.detailedView}
-                    onChange={(e) => setCardInfoSettings({ ...cardInfoSettings, detailedView: e.target.checked })}
+                    onChange={(e) => handleCardInfoSettingChange('detailedView', e.target.checked)}
                   />
                   <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D654A]"></div>
                 </label>
