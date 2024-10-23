@@ -1,9 +1,10 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import ButtonAccount from "@/components/ButtonAccount";
 import PrivateRoute from '@/components/PrivateRoute';
+import { useSession } from 'next-auth/react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
@@ -15,6 +16,39 @@ const navigation = [
 
 export default function ResponsiveLayout({ children }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [username, setUsername] = useState('');
+  const [error, setError] = useState('');
+  const [iframeKey, setIframeKey] = useState(0);
+  const { data: session, status } = useSession();
+
+  const fetchUsername = useCallback(async () => {
+    if (status === 'authenticated' && session?.user?.id) {
+      console.log("User ID:", session.user.id);
+      try {
+        const response = await fetch(`/api/user/${session.user.id}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.username) {
+          setUsername(data.username);
+        } else {
+          setError('No se pudo obtener el nombre de usuario');
+        }
+      } catch (error) {
+        console.error('Error fetching username:', error);
+        setError('Error al cargar el nombre de usuario');
+      }
+    }
+  }, [session, status]);
+
+  useEffect(() => {
+    fetchUsername();
+  }, [fetchUsername]);
+
+  const handleReload = () => {
+    setIframeKey(prevKey => prevKey + 1);
+  };
 
   return (
     <PrivateRoute>
@@ -37,7 +71,7 @@ export default function ResponsiveLayout({ children }) {
             ></div>
 
             <div
-              className={`relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white transition ease-in-out duration-300 transform ${
+              className={`relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white transition ease-in-out duration-300 ${
                 isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }`}
             >
@@ -72,10 +106,43 @@ export default function ResponsiveLayout({ children }) {
               </svg>
             </button>
           </div>
-          <main className="flex-1 relative z-0 overflow-y-auto focus:outline-none">
-            <div className="py-6">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                {children}
+          <main className="flex-1 relative z-0 overflow-hidden flex">
+            {/* Contenido del dashboard */}
+            <div className="w-1/2 overflow-y-auto">
+              <div className="py-6">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                  {children}
+                </div>
+              </div>
+            </div>
+
+            {/* Previsualización del menú */}
+            <div className="w-1/2 border-l border-gray-200 overflow-hidden flex flex-col">
+              <div className="p-4 bg-gray-100 border-b border-gray-200">
+                <button
+                  onClick={handleReload}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  Recargar previsualización
+                </button>
+              </div>
+              <div className="flex-grow">
+                {error ? (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-red-500">{error}</p>
+                  </div>
+                ) : username ? (
+                  <iframe
+                    key={iframeKey}
+                    src={`/${username}`}
+                    className="w-full h-full"
+                    title="Previsualización del menú"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <p>Cargando previsualización...</p>
+                  </div>
+                )}
               </div>
             </div>
           </main>
