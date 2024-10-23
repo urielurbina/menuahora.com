@@ -28,12 +28,12 @@ export default function BusinessInfo({ basicInfo, appearance = {} }) {
       <h1 className="text-2xl font-bold tracking-tight" style={{fontFamily: titleFont}}>{basicInfo.businessName}</h1>
       <p className="text-sm mt-1">{basicInfo.slogan}</p>
       <div className="mt-4">
-        <p className="font-bold">Dirección:</p>
-        <p>{basicInfo.contact?.address || 'Dirección no disponible'}</p>
+        <p className="text-sm font-bold">Dirección:</p>
+        <p className="text-sm">{basicInfo.contact?.address || 'Dirección no disponible'}</p>
       </div>
       <div className="mt-4">
-        <p className="font-bold">Horario:</p>
-        <p>{formatSchedule(basicInfo.schedule)}</p>
+        <p className="text-sm font-bold">Horario:</p>
+        <p className="text-sm">{formatSchedule(basicInfo.schedule)}</p>
         <button 
           className="text-sm underline mt-1"
           onClick={() => setShowFullSchedule(!showFullSchedule)}
@@ -55,7 +55,7 @@ export default function BusinessInfo({ basicInfo, appearance = {} }) {
         )}
       </div>
       <div className="mt-4">
-        <p>{basicInfo.description}</p>
+        <p className="text-sm">{basicInfo.description}</p>
       </div>
     </div>
   );

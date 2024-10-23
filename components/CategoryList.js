@@ -1,34 +1,37 @@
 'use client'
 
-export default function CategoryList({ categories, activeCategory, setActiveCategory, appearance }) {
+export default function CategoryList({ categories = [], activeCategory, setActiveCategory, appearance }) {
+  if (!Array.isArray(categories) || categories.length === 0) {
+    return null; // O podrías devolver un mensaje como "No hay categorías disponibles"
+  }
+
   return (
-    <div className="px-6 py-4 bg-white border-b border-gray-200">
-      <h2 className="text-2xl font-bold mb-4">Categorías</h2>
-      <div className="flex space-x-2 overflow-x-auto">
+    <div className="flex overflow-x-auto whitespace-nowrap p-4">
+      <button
+        className={`px-4 py-2 rounded-full mr-2 text-sm ${
+          activeCategory === 'Todo'
+            ? 'bg-black text-white'
+            : 'bg-gray-100 text-black'
+        }`}
+        onClick={() => setActiveCategory('Todo')}
+        style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}
+      >
+        Todo
+      </button>
+      {categories.map((category) => (
         <button
-          onClick={() => setActiveCategory('Todo')}
-          className={`px-4 py-2 rounded-full text-sm ${
-            activeCategory === 'Todo'
+          key={category._id}
+          className={`px-4 py-2 rounded-full mr-2 text-sm ${
+            activeCategory === category.name
               ? 'bg-black text-white'
               : 'bg-gray-100 text-black'
           }`}
+          onClick={() => setActiveCategory(category.name)}
+          style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}
         >
-          Todo
+          {category.name}
         </button>
-        {categories.map((category) => (
-          <button
-            key={category._id}
-            onClick={() => setActiveCategory(category.name)}
-            className={`px-4 py-2 rounded-full text-sm ${
-              activeCategory === category.name
-                ? 'bg-black text-white'
-                : 'bg-gray-100 text-black'
-            }`}
-          >
-            {category.name}
-          </button>
-        ))}
-      </div>
+      ))}
     </div>
-  )
+  );
 }

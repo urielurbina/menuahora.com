@@ -17,14 +17,9 @@ export async function POST(req) {
   await connectMongo();
 
   const body = await req.text();
-
   const signature = headers().get("stripe-signature");
 
-  let data;
-  let eventType;
   let event;
-
-  // verify Stripe event is legit
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
@@ -32,59 +27,73 @@ export async function POST(req) {
     return NextResponse.json({ error: err.message }, { status: 400 });
   }
 
-  data = event.data;
-  eventType = event.type;
+  const { type, data } = event;
 
   try {
-    switch (eventType) {
-      case "checkout.session.completed": {
-        // First payment is successful and a subscription is created (if mode was set to "subscription" in ButtonCheckout)
-        // ✅ Grant access to the product
+    console.log("Processing event:", type);
 
+    switch (type) {
+      case "checkout.session.completed": {
+        console.log("Checkout session completed:", data.object.id);
+        
         const session = await findCheckoutSession(data.object.id);
+        console.log("Session details:", session);
 
         const customerId = session?.customer;
         const priceId = session?.line_items?.data[0]?.price.id;
         const userId = data.object.client_reference_id;
-        const plan = configFile.stripe.plans.find((p) => p.priceId === priceId);
+        
+        console.log("Customer ID:", customerId);
+        console.log("Price ID:", priceId);
+        console.log("User ID:", userId);
 
-        if (!plan) break;
+        const plan = configFile.stripe.plans.find(p => 
+          p.priceId.monthly === priceId || p.priceId.yearly === priceId
+        );
+
+        if (!plan) {
+          console.error("No plan found for priceId:", priceId);
+          break;
+        }
+
+        console.log("Plan found:", plan.name);
 
         const customer = await stripe.customers.retrieve(customerId);
+        console.log("Customer details:", customer);
 
         let user;
 
-        // Get or create the user. userId is normally pass in the checkout session (clientReferenceID) to identify the user when we get the webhook event
         if (userId) {
           user = await User.findById(userId);
+          console.log("Existing user found by ID:", user);
         } else if (customer.email) {
           user = await User.findOne({ email: customer.email });
+          console.log("Existing user found by email:", user);
 
           if (!user) {
-            user = await User.create({
+            user = new User({
               email: customer.email,
               name: customer.name,
+              customerId: customerId,
+              priceId: priceId,
+              hasAccess: true,
+              plan: plan.name,
             });
-
-            await user.save();
+            console.log("New user created:", user);
           }
         } else {
-          console.error("No user found");
-          throw new Error("No user found");
+          console.error("No user information found");
+          throw new Error("No user information found");
         }
 
-        // Update user data + Grant user access to your product. It's a boolean in the database, but could be a number of credits, etc...
+        // Update user data
         user.priceId = priceId;
         user.customerId = customerId;
         user.hasAccess = true;
-        await user.save();
+        user.plan = plan.name;
 
-        // Extra: send email with user link, product page, etc...
-        // try {
-        //   await sendEmail({to: ...});
-        // } catch (e) {
-        //   console.error("Email issue:" + e?.message);
-        // }
+        await user.save();
+        console.log("User saved successfully:", user);
 
         break;
       }
@@ -119,12 +128,19 @@ export async function POST(req) {
       }
 
       case "invoice.paid": {
+        console.log("Invoice paid:", data.object.id);
         // Customer just paid an invoice (for instance, a recurring payment for a subscription)
         // ✅ Grant access to the product
         const priceId = data.object.lines.data[0].price.id;
         const customerId = data.object.customer;
 
         const user = await User.findOne({ customerId });
+
+        if (!user) {
+          console.error("No user found for customerId:", customerId);
+          // You might want to create a new user here or handle this case differently
+          break;
+        }
 
         // Make sure the invoice is for the same plan (priceId) the user subscribed to
         if (user.priceId !== priceId) break;
@@ -149,8 +165,8 @@ export async function POST(req) {
       // Unhandled event type
     }
   } catch (e) {
-    console.error("stripe error: " + e.message + " | EVENT TYPE: " + eventType);
+    console.error("Stripe webhook error:", e.message, "| EVENT TYPE:", type);
   }
 
-  return NextResponse.json({});
+  return NextResponse.json({ received: true });
 }
