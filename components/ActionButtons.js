@@ -1,4 +1,28 @@
 import Link from 'next/link'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { 
+  faWhatsapp, 
+  faFacebook, 
+  faInstagram, 
+  faTwitter 
+} from '@fortawesome/free-brands-svg-icons'
+import { 
+  faMapMarkerAlt, 
+  faEnvelope, 
+  faPhone,
+  faGlobe
+} from '@fortawesome/free-solid-svg-icons'
+
+const iconMap = {
+  whatsapp: faWhatsapp,
+  facebook: faFacebook,
+  instagram: faInstagram,
+  twitter: faTwitter,
+  'map-marker-alt': faMapMarkerAlt,
+  envelope: faEnvelope,
+  phone: faPhone,
+  globe: faGlobe
+}
 
 export default function ActionButtons({ buttons, appearance = {} }) {
   const buttonFont = appearance.buttonFont || 'sans-serif';
@@ -16,6 +40,9 @@ export default function ActionButtons({ buttons, appearance = {} }) {
           }`}
           style={{ fontFamily: buttonFont }}
         >
+          {button.icon && iconMap[button.icon] && (
+            <FontAwesomeIcon icon={iconMap[button.icon]} className="mr-2" />
+          )}
           {button.title}
         </Link>
       ))}
