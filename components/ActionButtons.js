@@ -24,6 +24,25 @@ const iconMap = {
   globe: faGlobe
 }
 
+const processUrl = (url) => {
+  // Verificar si es un número de teléfono
+  if (/^\d+$/.test(url)) {
+    return `tel:${url}`;
+  }
+  
+  // Verificar si la URL ya tiene un protocolo
+  if (!/^https?:\/\//i.test(url)) {
+    // Agregar "https://www." si no está presente
+    if (!/^www\./i.test(url)) {
+      return `https://www.${url}`;
+    } else {
+      return `https://${url}`;
+    }
+  }
+  
+  return url;
+}
+
 export default function ActionButtons({ buttons, appearance = {} }) {
   const buttonFont = appearance.buttonFont || 'sans-serif';
 
@@ -32,7 +51,7 @@ export default function ActionButtons({ buttons, appearance = {} }) {
       {buttons.map((button, index) => (
         <Link 
           key={button.id} 
-          href={button.url}
+          href={processUrl(button.url)}
           className={`w-full h-12 text-lg rounded-md flex items-center justify-center ${
             index === 0
               ? 'bg-black text-white hover:bg-gray-800'
