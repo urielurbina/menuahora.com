@@ -119,8 +119,8 @@ export default function UserPage({ params }) {
         <div className="lg:w-3/4 lg:ml-[25%]">
           <div className="bg-gray-100">
             {/* Categories */}
-            <div className="bg-white">
-              <h2 className="text-2xl font-bold p-4" style={{ fontFamily: appearance.headingFont || 'sans-serif' }}>
+            <div className="bg-white border-b border-gray-200">
+              <h2 className="text-2xl font-bold px-6 pt-4" style={{ fontFamily: appearance.headingFont || 'sans-serif' }}>
                 Categorías
               </h2>
               <CategoryList 
