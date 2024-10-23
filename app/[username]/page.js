@@ -37,16 +37,25 @@ export default function UserPage({ params }) {
     fetchData()
   }, [params.username])
 
-  const toggleProductDetails = useCallback((product) => {
-    console.log('Toggling product details:', product);
-    setSelectedProduct(prevProduct => prevProduct?._id === product._id ? null : product);
-  }, []);
-
   useEffect(() => {
     return () => {
       document.body.style.overflow = 'auto'
     }
   }, [])
+
+  const [toggleProductDetails, setToggleProductDetails] = useState(() => () => {});
+
+  useEffect(() => {
+    if (businessData) {
+      const { cardInfoSettings = {} } = businessData;
+      setToggleProductDetails(() => (product) => {
+        if (cardInfoSettings.detailedView) {
+          console.log('Toggling product details:', product);
+          setSelectedProduct(prevProduct => prevProduct?._id === product._id ? null : product);
+        }
+      });
+    }
+  }, [businessData]);
 
   if (isLoading) return (
     <div className="flex justify-center items-center h-screen">
@@ -111,7 +120,7 @@ export default function UserPage({ params }) {
             </div>
           </div>
 
-          <BusinessInfo basicInfo={mergedBasicInfo} appearance={appearance} />
+          <BusinessInfo basicInfo={basicInfo} appearance={appearance} />
           <ActionButtons buttons={buttons} appearance={appearance} />
         </div>
 
@@ -138,6 +147,7 @@ export default function UserPage({ params }) {
               appearance={appearance}
               activeCategory={activeCategory}
               onProductClick={toggleProductDetails}
+              detailedView={cardInfoSettings.detailedView}
             />
           </div>
         </div>
@@ -145,7 +155,7 @@ export default function UserPage({ params }) {
 
       {/* Modal para detalles del producto */}
       <AnimatePresence>
-        {selectedProduct && (
+        {selectedProduct && cardInfoSettings.detailedView && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

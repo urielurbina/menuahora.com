@@ -108,7 +108,7 @@ export default function ResponsiveLayout({ children }) {
           </div>
           <main className="flex-1 relative z-0 overflow-hidden flex">
             {/* Contenido del dashboard */}
-            <div className="w-1/2 overflow-y-auto">
+            <div className="w-2/3 overflow-y-auto">
               <div className="py-6">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                   {children}
@@ -117,12 +117,12 @@ export default function ResponsiveLayout({ children }) {
             </div>
 
             {/* Previsualización del menú */}
-            <div className="w-1/2 border-l border-gray-200 overflow-hidden flex flex-col border-l-2 border-l-black">
+            <div className="w-1/3 border-l border-gray-200 overflow-hidden flex flex-col border-l-2 border-l-black">
               <div className="p-4 bg-gray-100 border-b border-gray-200">
                 <div className="flex items-center mb-2">
                   <button
                     onClick={handleReload}
-                    className="flex items-center px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-[#0A4D3A] transition-colors mr-4 text-sm font-medium"
+                    className="flex items-center px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 transition-colors mr-4 text-sm font-medium"
                     title="Recargar previsualización"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
