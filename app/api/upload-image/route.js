@@ -11,32 +11,41 @@ cloudinary.config({
 
 export async function POST(request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-    }
-
     const formData = await request.formData();
     const file = formData.get('file');
     const type = formData.get('type');
+    const transformation = formData.get('transformation');
 
     if (!file) {
-      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+      return NextResponse.json({ error: 'No se proporcionó ningún archivo' }, { status: 400 });
     }
 
-    const buffer = await file.arrayBuffer();
-    const base64File = Buffer.from(buffer).toString('base64');
-    const dataURI = `data:${file.type};base64,${base64File}`;
+    // Convertir el archivo a un buffer
+    const fileBuffer = await file.arrayBuffer();
+    const mime = file.type;
+    const encoding = 'base64';
+    const base64Data = Buffer.from(fileBuffer).toString('base64');
+    const fileUri = 'data:' + mime + ';' + encoding + ',' + base64Data;
 
+    // Configurar las opciones de carga
     const uploadOptions = {
-      folder: `${session.user.id}/products`,
+      folder: type,
     };
 
-    const result = await cloudinary.uploader.upload(dataURI, uploadOptions);
+    // Aplicar la transformación si se proporciona
+    if (transformation) {
+      uploadOptions.transformation = transformation.split('/').map(t => {
+        const [key, value] = t.split(',');
+        return { [key]: value };
+      });
+    }
 
-    return NextResponse.json({ url: result.secure_url }, { status: 200 });
+    // Subir la imagen a Cloudinary con las opciones configuradas
+    const result = await cloudinary.uploader.upload(fileUri, uploadOptions);
+
+    return NextResponse.json({ url: result.secure_url });
   } catch (error) {
-    console.error('Detailed error:', error);
-    return NextResponse.json({ error: error.message || 'Error uploading image' }, { status: 500 });
+    console.error('Error al subir la imagen:', error);
+    return NextResponse.json({ error: 'Error al subir la imagen' }, { status: 500 });
   }
 }

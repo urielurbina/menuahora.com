@@ -224,6 +224,7 @@ export default function ProductDashboard() {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('type', 'product')
+    formData.append('transformation', 'c_fit,h_800/ar_4:5,c_crop,g_auto,h_800/q_auto:best/f_webp')
 
     try {
       const response = await fetch('/api/upload-image', {
