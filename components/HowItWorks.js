@@ -32,11 +32,8 @@ const steps = [
 ]
 
 const images = [
-  { src: "/images/menu-digital-1.jpg", alt: "Ejemplo de menú digital", className: "col-span-2 row-span-2" },
-  { src: "/images/restaurante-2.jpg", alt: "Interior de restaurante", className: "col-span-1 row-span-1" },
-  { src: "/images/chef-3.jpg", alt: "Chef preparando platillo", className: "col-span-1 row-span-2" },
-  { src: "/images/cliente-4.jpg", alt: "Cliente usando menú digital", className: "col-span-2 row-span-1" },
-  // { src: "/images/plato-5.jpg", alt: "Plato gourmet", className: "col-span-3 row-span-1" }, // Quitamos hidden lg:block
+  { src: "https://res.cloudinary.com/dkuss2bup/image/upload/c_auto,g_auto,w_1000/assets%20marca/cdvt7xlqcgrdudfksle2.jpg", alt: "Ejemplo de menú digital" },
+  { src: "https://res.cloudinary.com/dkuss2bup/image/upload/c_auto,g_auto,w_1000/assets%20marca/nzb3dx7p66hlg2jm65p6.jpg", alt: "Cliente usando menú digital" },
 ]
 
 export default function HowItWorks() {
@@ -53,11 +50,11 @@ export default function HowItWorks() {
           </p>
         </div>
         <div className="mt-12 sm:mt-16">
-          <div className="lg:flex lg:items-stretch lg:space-x-16">
-            <div className="lg:w-1/2 mb-8 lg:mb-0">
-              <div className="grid grid-cols-3 grid-rows-3 gap-4 aspect-[4/3] lg:aspect-auto lg:h-full">
+          <div className="flex flex-col lg:flex-row lg:items-stretch lg:space-x-16">
+            <div className="w-full lg:w-1/2 mb-8 lg:mb-0">
+              <div className="grid grid-cols-1 gap-1 h-full">
                 {images.map((image, index) => (
-                  <div key={index} className={`relative ${image.className}`}>
+                  <div key={index} className="relative w-full aspect-[2/1]">
                     <Image
                       src={image.src}
                       alt={image.alt}
@@ -68,21 +65,21 @@ export default function HowItWorks() {
                 ))}
               </div>
             </div>
-            <ul role="list" className="lg:w-1/2 space-y-8 flex flex-col justify-between">
+            <ul role="list" className="w-full lg:w-1/2 space-y-6">
               {steps.map((step, stepIdx) => (
                 <li key={step.name} className="relative">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex-shrink-0">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0D654A]">
-                        <step.icon className="h-6 w-6 text-white" aria-hidden="true" />
+                  <div className="flex items-start space-x-4">
+                    <div className="flex-shrink-0 pt-1">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0D654A]">
+                        <step.icon className="h-5 w-5 text-white" aria-hidden="true" />
                       </span>
                     </div>
                     <div>
                       <div className="text-xs font-semibold uppercase tracking-wide text-[#0D654A]">
                         Paso {stepIdx + 1}
                       </div>
-                      <p className="mt-1 text-lg font-semibold text-gray-900">{step.name}</p>
-                      <p className="mt-2 text-base text-gray-500">{step.description}</p>
+                      <p className="mt-1 text-base font-semibold text-gray-900">{step.name}</p>
+                      <p className="mt-1 text-sm text-gray-500">{step.description}</p>
                     </div>
                   </div>
                 </li>
