@@ -13,13 +13,13 @@ const Footer = () => {
         <div className="flex flex-col items-center text-center">
           <Link href="/#" className="flex items-center mb-8">
             <Image
-              src={logo}
-              alt={`${config.appName} logo`}
-              className="w-8 h-8"
-              width={32}
-              height={32}
+              alt="Logo MenúAhora"
+              src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
+              className="h-6 w-auto"
+              width={200}
+              height={50}
             />
-            <span className="ml-3 text-xl font-bold text-gray-900">{config.appName}</span>
+            {/* <span className="ml-3 text-xl font-bold text-gray-900">{config.appName}</span> */}
           </Link>
           <p className="text-gray-500 text-base max-w-md mb-8">
             {config.appDescription}

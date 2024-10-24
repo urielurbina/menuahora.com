@@ -49,10 +49,10 @@ export default function Benefits() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <img
             alt="App screenshot"
-            src="https://tailwindui.com/plus/img/component-images/project-app-screenshot.png"
+            src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729741048/assets%20marca/f1lx2vgbczhnwzfwjufm.png"
             width={2432}
             height={1442}
-            className="mb-[-12%] rounded-xl shadow-2xl ring-1 ring-gray-900/10"
+            className="mb-[-4%] rounded-xl shadow-2xl ring-1 ring-gray-900/10"
           />
         </div>
       </div>

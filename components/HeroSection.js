@@ -10,10 +10,10 @@ import ButtonSignIn from '@/components/ButtonSignin'
 import TestimonialsAvatars from './TestimonialsAvatars'
 
 const navigation = [
-  { name: 'Product', href: '#' },
-  { name: 'Features', href: '#' },
-  { name: 'Marketplace', href: '#' },
-  { name: 'Company', href: '#' },
+  { name: 'Beneficios', href: '#beneficios' },
+  { name: 'Cómo funciona', href: '#como-funciona' },
+  { name: 'Precios', href: '#precios' },
+  { name: 'FAQ', href: '#faq' },
 ]
 
 export default function Example() {
@@ -27,9 +27,9 @@ export default function Example() {
             <a href="#" className="-m-1.5 p-1.5">
               <span className="sr-only">Your Company</span>
               <img
-                alt=""
-                src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-                className="h-8 w-auto"
+                alt="Logo MenúAhora"
+                src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
+                className="h-6 w-auto"
               />
             </a>
           </div>

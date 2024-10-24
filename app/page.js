@@ -26,12 +26,18 @@ export default function Home() {
           <hr className="my-12 border-t border-gray-200" />
         </div> */}
         <WithWithout />
-        <Benefits />
-        <HowItWorks />
-        <section id="pricing">
+        <section id="beneficios">
+          <Benefits />
+        </section>
+        <section id="como-funciona">
+          <HowItWorks />
+        </section>
+        <section id="precios">
           <Pricing />
         </section>
-        <Questions />
+        <section id="faq">
+          <Questions />
+        </section>
         <BigCTA />
       </main>
       <Footer />

@@ -35,13 +35,13 @@ const images = [
   { src: "/images/menu-digital-1.jpg", alt: "Ejemplo de menú digital", className: "col-span-2 row-span-2" },
   { src: "/images/restaurante-2.jpg", alt: "Interior de restaurante", className: "col-span-1 row-span-1" },
   { src: "/images/chef-3.jpg", alt: "Chef preparando platillo", className: "col-span-1 row-span-2" },
-  { src: "/images/cliente-4.jpg", alt: "Cliente usando menú digital", className: "col-span-1 row-span-1" },
-  { src: "/images/plato-5.jpg", alt: "Plato gourmet", className: "col-span-3 row-span-1" }, // Quitamos hidden lg:block
+  { src: "/images/cliente-4.jpg", alt: "Cliente usando menú digital", className: "col-span-2 row-span-1" },
+  // { src: "/images/plato-5.jpg", alt: "Plato gourmet", className: "col-span-3 row-span-1" }, // Quitamos hidden lg:block
 ]
 
 export default function HowItWorks() {
   return (
-    <div className="bg-white py-24 sm:py-32">
+    <div className="bg-white py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl lg:text-center">
           <h2 className="text-base font-semibold leading-7 text-[#0D654A]">How it works</h2>
@@ -52,10 +52,10 @@ export default function HowItWorks() {
             Obtén tu menú digital en solo cinco sencillos pasos. Nuestra plataforma facilita a los restaurantes la modernización de su proceso de pedidos.
           </p>
         </div>
-        <div className="mt-16 sm:mt-24">
-          <div className="lg:flex lg:items-start lg:space-x-16">
-            <div className="lg:w-1/2 mb-12 lg:mb-0">
-              <div className="grid grid-cols-3 grid-rows-4 gap-4 aspect-[3/5]"> {/* Cambiamos a aspect-[3/5] para todos los tamaños */}
+        <div className="mt-12 sm:mt-16">
+          <div className="lg:flex lg:items-stretch lg:space-x-16">
+            <div className="lg:w-1/2 mb-8 lg:mb-0">
+              <div className="grid grid-cols-3 grid-rows-3 gap-4 aspect-[4/3] lg:aspect-auto lg:h-full">
                 {images.map((image, index) => (
                   <div key={index} className={`relative ${image.className}`}>
                     <Image
@@ -68,7 +68,7 @@ export default function HowItWorks() {
                 ))}
               </div>
             </div>
-            <ul role="list" className="lg:w-1/2 space-y-12">
+            <ul role="list" className="lg:w-1/2 space-y-8 flex flex-col justify-between">
               {steps.map((step, stepIdx) => (
                 <li key={step.name} className="relative">
                   <div className="flex items-center space-x-4">
