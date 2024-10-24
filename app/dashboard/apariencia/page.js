@@ -192,14 +192,14 @@ export default function Apariencia() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-12">
-      <div className="border-b border-gray-900/10 pb-12">
-        <h2 className="text-3xl font-bold text-gray-900">Apariencia</h2>
+    <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-12">
+      <div className="border-b border-gray-900/10 pb-8 sm:pb-12">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Apariencia</h2>
         <p className="mt-1 text-sm leading-6 text-gray-600">
           Personaliza la apariencia visual de tu sitio.
         </p>
 
-        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+        <div className="mt-6 sm:mt-10 grid grid-cols-1 gap-x-4 gap-y-6 sm:gap-y-8 sm:grid-cols-6">
           <FontSelector
             id="titleFont"
             label="Tipografía del título"
@@ -222,7 +222,7 @@ export default function Apariencia() {
           />
 
           <div className="sm:col-span-6">
-            <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
               <ColorPicker
                 id="primaryColor"
                 label="Color del fondo"
@@ -241,15 +241,15 @@ export default function Apariencia() {
         </div>
       </div>
 
-      <div className="mt-6 flex items-center justify-end gap-x-6">
-        <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
+      <div className="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
+        <button type="button" className="w-full sm:w-auto text-sm font-semibold leading-6 text-gray-900">
           Cancelar
         </button>
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           type="submit"
-          className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
+          className="w-full sm:w-auto rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
           disabled={isLoading}
         >
           {isLoading ? 'Guardando...' : 'Guardar'}

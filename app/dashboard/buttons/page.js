@@ -174,17 +174,17 @@ export default function Buttons() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-12">
-      <div className="border-b border-gray-900/10 pb-12">
-        <h2 className="text-3xl font-bold text-gray-900">Gestiona tus Enlaces</h2>
+    <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-12">
+      <div className="border-b border-gray-900/10 pb-8 sm:pb-12">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Gestiona tus Enlaces</h2>
         <p className="mt-1 text-sm leading-6 text-gray-600">
           Añade y personaliza los enlaces que aparecerán en tu perfil.
         </p>
 
-        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+        <div className="mt-6 sm:mt-10 grid grid-cols-1 gap-x-4 gap-y-6 sm:gap-y-8">
           {links.map((link, index) => (
             <div key={link.id} className="col-span-full">
-              <div className="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-4 mb-4">
+              <div className="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-4">
                 {index === 0 && (
                   <div className="text-sm text-[#0D654A] font-semibold mb-2">
                     <FaIcons.FaStar className="inline mr-1" /> Este es tu link destacado
@@ -235,7 +235,7 @@ export default function Buttons() {
         <div className="mt-6">
           <motion.button
             onClick={addLink}
-            className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
+            className="w-full sm:w-auto rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -247,17 +247,17 @@ export default function Buttons() {
 
       {isIconModalOpen && <IconModal />}
 
-      <div className="mt-6 flex items-center justify-end gap-x-6">
+      <div className="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
         <button
           type="button"
-          className="text-sm font-semibold leading-6 text-gray-900"
+          className="w-full sm:w-auto text-sm font-semibold leading-6 text-gray-900"
           onClick={() => fetchButtonsData()}
         >
           Cancelar
         </button>
         <motion.button
           type="submit"
-          className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
+          className="w-full sm:w-auto rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           disabled={isLoading}

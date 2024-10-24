@@ -282,14 +282,14 @@ export default function InformacionBasica() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-12">
-      <div className="border-b border-gray-900/10 pb-12">
-        <h2 className="text-3xl font-bold text-gray-900">Información básica</h2>
+    <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-12">
+      <div className="border-b border-gray-900/10 pb-8 sm:pb-12">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Información básica</h2>
         <p className="mt-1 text-sm leading-6 text-gray-600">
           Esta información será mostrada públicamente, así que ten cuidado con lo que compartes.
         </p>
 
-        <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+        <div className="mt-6 sm:mt-10 grid grid-cols-1 gap-x-4 gap-y-6 sm:gap-y-8 sm:grid-cols-6">
           <div className="sm:col-span-4">
             <label htmlFor="businessName" className="block text-sm font-medium leading-6 text-gray-900">
               Nombre del negocio
@@ -423,11 +423,11 @@ export default function InformacionBasica() {
         </div>
       </div>
 
-      <div className="border-b border-gray-900/10 pb-12">
-        <h2 className="text-base font-semibold leading-7 text-gray-900">Información de contacto</h2>
+      <div className="border-b border-gray-900/10 pb-8 sm:pb-12">
+        <h2 className="text-xl sm:text-2xl font-semibold leading-7 text-gray-900">Información de contacto</h2>
         <p className="mt-1 text-sm leading-6 text-gray-600">Usa información de contacto donde puedas ser localizado.</p>
 
-        <div className="mt-10 space-y-10">
+        <div className="mt-6 sm:mt-10 space-y-6 sm:space-y-8">
           <div className="sm:col-span-3">
             <label htmlFor="contact.address" className="block text-sm font-medium leading-6 text-gray-900">
               Dirección <span className="text-gray-500">(opcional)</span>
@@ -482,7 +482,7 @@ export default function InformacionBasica() {
       </div>
 
       {/* Sección de horario (opcional) */}
-      <div className="border-b border-gray-900/10 pb-12">
+      <div className="border-b border-gray-900/10 pb-8 sm:pb-12">
         <div className="flex items-center mb-4">
           <input
             type="checkbox"
@@ -539,13 +539,13 @@ export default function InformacionBasica() {
         )}
       </div>
 
-      <div className="mt-6 flex items-center justify-end gap-x-6">
-        <button type="button" className="text-sm font-semibold leading-6 text-gray-900">
+      <div className="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
+        <button type="button" className="w-full sm:w-auto text-sm font-semibold leading-6 text-gray-900">
           Cancelar
         </button>
         <button
           type="submit"
-          className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
+          className="w-full sm:w-auto rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
           disabled={isLoading}
         >
           {isLoading ? 'Guardando...' : 'Guardar información'}

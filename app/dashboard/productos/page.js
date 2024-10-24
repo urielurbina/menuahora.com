@@ -245,11 +245,11 @@ export default function ProductDashboard() {
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>
 
   return (
-    <div className="container mx-auto p-4 space-y-12">
-      <h1 className="text-3xl font-bold text-gray-900">Administrador de Productos</h1>
+    <div className="container mx-auto p-4 space-y-8 sm:space-y-12">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Administrador de Productos</h1>
 
-      {/* Categorías e Información en Tarjeta en la misma fila */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      {/* Categorías e Información en Tarjeta */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
         {/* Categorías */}
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Categorías</h2>
@@ -334,18 +334,18 @@ export default function ProductDashboard() {
       </div>
 
       {/* Agregar Producto y Lista de Productos */}
-      <div className="bg-white shadow rounded-lg p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Productos</h2>
+      <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2 sm:mb-0">Productos</h2>
           <button
             onClick={() => setIsAddingProduct(true)}
-            className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-shadow duration-300 hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
+            className="w-full sm:w-auto rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-shadow duration-300 hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
           >
             <Plus className="inline-block mr-2 h-5 w-5" /> Agregar Producto
           </button>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
           {products.length === 0 && dataLoaded ? (
             <p className="col-span-full text-center text-gray-500">No hay productos. Añade un nuevo producto para empezar.</p>
           ) : (

@@ -93,7 +93,7 @@ export default function ResponsiveLayout({ children }) {
           </div>
         </div>
 
-        <div className="flex flex-col w-full flex-1 overflow-hidden">
+        <div className="flex flex-col w-0 flex-1 overflow-hidden">
           {/* Botón de menú para móvil */}
           <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3">
             <button
@@ -106,51 +106,51 @@ export default function ResponsiveLayout({ children }) {
               </svg>
             </button>
           </div>
-          <main className="flex-1 relative z-0 overflow-hidden flex">
-            {/* Contenido del dashboard */}
-            <div className="w-full lg:w-2/3 overflow-y-auto">
-              <div className="py-6">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+          <main className="flex-1 relative z-0 overflow-hidden focus:outline-none">
+            <div className="h-screen py-6">
+              <div className="h-full max-w-full mx-auto px-4 sm:px-6 md:px-8 flex flex-col xl:flex-row">
+                {/* Contenido del dashboard */}
+                <div className="w-full xl:w-2/3 mb-8 xl:mb-0 xl:pr-8 overflow-y-auto h-[calc(100vh-3rem)]">
                   {children}
                 </div>
-              </div>
-            </div>
 
-            {/* Previsualización del menú (visible solo en pantallas grandes) */}
-            <div className="hidden lg:flex lg:w-1/3 border-l border-gray-200 overflow-hidden flex-col border-l-2 border-l-black">
-              <div className="p-4 bg-gray-100 border-b border-gray-200">
-                <div className="flex items-center mb-2">
-                  <button
-                    onClick={handleReload}
-                    className="flex items-center px-4 py-2 bg-gray-200 text-black rounded-md hover:bg-gray-300 transition-colors mr-4 text-sm font-medium"
-                    title="Recargar previsualización"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
-                    </svg>
-                    Recargar
-                  </button>
-                  <h2 className="text-xl font-semibold">Vista Previa</h2>
+                {/* Previsualización del menú (visible en pantallas xl y superiores) */}
+                <div className="hidden xl:flex xl:flex-col xl:w-1/3 border-l border-gray-200 h-[calc(100vh-3rem)]">
+                  <div className="p-2 bg-gray-100 border-b border-gray-200 sticky top-0 z-10">
+                    <div className="flex items-center mb-2">
+                      <button
+                        onClick={handleReload}
+                        className="flex items-center px-2 py-1 bg-gray-200 text-black rounded-md hover:bg-gray-300 transition-colors mr-2 text-xs font-medium"
+                        title="Recargar previsualización"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+                        </svg>
+                        Recargar
+                      </button>
+                      <h2 className="text-lg font-semibold">Vista Previa</h2>
+                    </div>
+                    <p className="text-xs text-gray-600">Recarga la vista previa para ver los cambios más recientes.</p>
+                  </div>
+                  <div className="flex-grow overflow-y-auto">
+                    {error ? (
+                      <div className="flex items-center justify-center h-full">
+                        <p className="text-red-500">{error}</p>
+                      </div>
+                    ) : username ? (
+                      <iframe
+                        key={iframeKey}
+                        src={`/${username}`}
+                        className="w-full h-full"
+                        title="Previsualización del menú"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full">
+                        <p>Cargando previsualización...</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600">Recarga la vista previa con el botón de arriba para ver los cambios más recientes.</p>
-              </div>
-              <div className="flex-grow">
-                {error ? (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-red-500">{error}</p>
-                  </div>
-                ) : username ? (
-                  <iframe
-                    key={iframeKey}
-                    src={`/${username}`}
-                    className="w-full h-full"
-                    title="Previsualización del menú"
-                  />
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <p>Cargando previsualización...</p>
-                  </div>
-                )}
               </div>
             </div>
           </main>
