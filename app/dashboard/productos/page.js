@@ -415,7 +415,7 @@ export default function ProductDashboard() {
 
       {/* Modal para agregar/editar producto */}
       {isAddingProduct && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[100] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-0 overflow-y-auto">
           <div className="bg-white rounded-lg w-full max-w-2xl h-[80vh] flex flex-col shadow-lg m-2 sm:m-4">
             <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 text-gray-900 sticky top-0 bg-white py-3 px-4 sm:px-6 z-10 border-b">
               {editingProduct ? "Editar" : "Agregar"} Producto
