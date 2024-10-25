@@ -46,9 +46,12 @@ const processUrl = (url) => {
 export default function ActionButtons({ buttons, appearance = {} }) {
   const buttonFont = appearance.buttonFont || 'sans-serif';
 
+  // Filtrar solo los botones activos
+  const activeButtons = buttons.filter(button => button.isActive !== false);
+
   return (
     <div className="px-6 py-4 space-y-2">
-      {buttons.map((button, index) => (
+      {activeButtons.map((button, index) => (
         <Link 
           key={button.id} 
           href={processUrl(button.url)}

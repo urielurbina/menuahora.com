@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import ButtonAccount from "@/components/ButtonAccount";
 import PrivateRoute from '@/components/PrivateRoute';
 import { useSession } from 'next-auth/react';
@@ -20,6 +21,7 @@ export default function ResponsiveLayout({ children }) {
   const [error, setError] = useState('');
   const [iframeKey, setIframeKey] = useState(0);
   const { data: session, status } = useSession();
+  const pathname = usePathname();
 
   const fetchUsername = useCallback(async () => {
     if (status === 'authenticated' && session?.user?.id) {
@@ -56,7 +58,7 @@ export default function ResponsiveLayout({ children }) {
         {/* Sidebar para desktop */}
         <div className="hidden md:flex md:flex-shrink-0">
           <div className="flex flex-col w-64">
-            <SidebarContent />
+            <SidebarContent pathname={pathname} />
           </div>
         </div>
 
@@ -101,10 +103,16 @@ export default function ResponsiveLayout({ children }) {
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="group flex items-center px-2 py-2 text-base font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+                      className={`group flex items-center px-2 py-2 text-base font-medium rounded-md ${
+                        pathname === item.href
+                          ? 'bg-gray-100 text-gray-900'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      }`}
                     >
                       <svg
-                        className="text-gray-400 group-hover:text-gray-500 mr-4 h-6 w-6"
+                        className={`mr-4 h-6 w-6 ${
+                          pathname === item.href ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500'
+                        }`}
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -194,7 +202,7 @@ export default function ResponsiveLayout({ children }) {
   );
 }
 
-function SidebarContent() {
+function SidebarContent({ pathname }) {
   return (
     <div className="flex flex-col h-0 flex-1 border-r border-gray-200 bg-white">
       <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
@@ -207,9 +215,19 @@ function SidebarContent() {
         </div>
         <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
           {navigation.map((item) => (
-            <Link key={item.name} href={item.href} className="group flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900">
+            <Link
+              key={item.name}
+              href={item.href}
+              className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+                pathname === item.href
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
               <svg
-                className="text-gray-400 group-hover:text-gray-500 mr-3 h-6 w-6"
+                className={`mr-3 h-6 w-6 ${
+                  pathname === item.href ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500'
+                }`}
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
