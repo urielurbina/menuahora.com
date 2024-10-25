@@ -416,173 +416,175 @@ export default function ProductDashboard() {
       {/* Modal para agregar/editar producto */}
       {isAddingProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[95vh] overflow-y-auto shadow-lg flex flex-col m-2 sm:m-4">
+          <div className="bg-white rounded-lg w-full max-w-2xl h-[80vh] flex flex-col shadow-lg m-2 sm:m-4">
             <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 text-gray-900 sticky top-0 bg-white py-3 px-4 sm:px-6 z-10 border-b">
               {editingProduct ? "Editar" : "Agregar"} Producto
             </h2>
-            <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 flex-grow overflow-y-auto">
-              <div>
-                <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre del producto</label>
-                <input
-                  type="text"
-                  id="nombre"
-                  value={newProduct.nombre}
-                  onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
-                />
-              </div>
-              <div>
-                <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">Descripción</label>
-                <textarea
-                  id="descripcion"
-                  value={newProduct.descripcion}
-                  onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
-                  rows={3}
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Imagen del producto</label>
-                <div 
-                  {...getRootProps()} 
-                  className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-[#0D654A] transition-colors duration-300"
-                >
-                  <div className="space-y-1 text-center">
-                    {newProduct.imagen ? (
-                      <div>
-                        <Image src={newProduct.imagen} alt="Preview" width={200} height={200} className="mx-auto object-cover rounded-md" />
-                        <p className="text-sm text-gray-500 mt-2">Haz clic o arrastra una nueva imagen para cambiarla</p>
-                      </div>
-                    ) : (
-                      <>
-                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <div className="flex text-sm text-gray-600 justify-center">
-                          <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-[#0D654A] hover:text-[#0D654A] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#0D654A]">
-                            <span>Sube un archivo</span>
-                            <input {...getInputProps()} id="file-upload" name="file-upload" type="file" className="sr-only" />
-                          </label>
-                          <p className="pl-1">o arrastra y suelta</p>
-                        </div>
-                        <p className="text-xs text-gray-500">PNG, JPG hasta 10MB</p>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div>
-                <label htmlFor="precio" className="block text-sm font-medium text-gray-700">Precio</label>
-                <div className="mt-1 relative rounded-md shadow-sm">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <span className="text-gray-500 sm:text-sm">$</span>
-                  </div>
-                  <input
-                    type="number"
-                    id="precio"
-                    value={newProduct.precio}
-                    onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) })}
-                    className="block w-full pl-7 pr-12 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
-                    placeholder="0.00"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Categorías (máximo 2)</label>
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  {categories.map((category) => (
-                    <div key={category._id} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        id={`category-${category._id}`}
-                        value={category.name}
-                        checked={newProduct.categorias?.includes(category.name) || false}
-                        onChange={(e) => {
-                          const categoryName = e.target.value;
-                          setNewProduct(prev => {
-                            const currentCategories = prev.categorias || [];
-                            if (e.target.checked) {
-                              if (currentCategories.length < 2) {
-                                return { ...prev, categorias: [...currentCategories, categoryName] };
-                              }
-                            } else {
-                              return { ...prev, categorias: currentCategories.filter(cat => cat !== categoryName) };
-                            }
-                            return prev;
-                          });
-                        }}
-                        className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 rounded"
-                      />
-                      <label htmlFor={`category-${category._id}`} className="ml-2 block text-sm text-gray-900">
-                        {category.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                {newProduct.categorias && newProduct.categorias.length === 2 && (
-                  <p className="mt-2 text-sm text-[#0D654A]">Máximo de categorías seleccionadas</p>
-                )}
-              </div>
-              <div>
-                <div className="flex items-center justify-between">
-                  <label htmlFor="availability" className="block text-sm font-medium text-gray-700">Disponible</label>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      id="availability"
-                      className="sr-only peer"
-                      checked={newProduct.availability}
-                      onChange={(e) => setNewProduct({ ...newProduct, availability: e.target.checked })}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D654A]"></div>
-                  </label>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Extras</label>
-                <div className="bg-gray-50 rounded-md p-4 mb-4">
-                  {newProduct.extras.length > 0 ? (
-                    <div className="space-y-2">
-                      {newProduct.extras.map((extra) => (
-                        <div key={extra.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-700">{extra.name}</span>
-                            <span className="text-sm text-gray-500">${extra.price.toFixed(2)}</span>
-                          </div>
-                          <button
-                            onClick={() => handleDeleteExtra(extra.id)}
-                            className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
-                          >
-                            <X className="h-5 w-5" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-sm text-gray-500 text-center">No hay extras agregados</p>
-                  )}
-                </div>
-                <div className="mt-2 flex flex-col sm:flex-row gap-2">
+            <div className="flex-grow overflow-y-auto px-4 sm:px-6 py-4">
+              <div className="space-y-4 sm:space-y-6">
+                <div>
+                  <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre del producto</label>
                   <input
                     type="text"
-                    value={newExtra.name}
-                    onChange={(e) => setNewExtra({ ...newExtra, name: e.target.value })}
-                    placeholder="Nombre del extra"
-                    className="w-full sm:flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                    id="nombre"
+                    value={newProduct.nombre}
+                    onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
                   />
-                  <input
-                    type="number"
-                    value={newExtra.price}
-                    onChange={(e) => setNewExtra({ ...newExtra, price: parseFloat(e.target.value) })}
-                    placeholder="Precio"
-                    className="w-full sm:w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                </div>
+                <div>
+                  <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">Descripción</label>
+                  <textarea
+                    id="descripcion"
+                    value={newProduct.descripcion}
+                    onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
+                    rows={3}
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
                   />
-                  <button
-                    onClick={handleAddExtra}
-                    className="w-full sm:w-auto px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 text-sm transition-colors duration-200"
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Imagen del producto</label>
+                  <div 
+                    {...getRootProps()} 
+                    className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-[#0D654A] transition-colors duration-300"
                   >
-                    Agregar
-                  </button>
+                    <div className="space-y-1 text-center">
+                      {newProduct.imagen ? (
+                        <div>
+                          <Image src={newProduct.imagen} alt="Preview" width={200} height={200} className="mx-auto object-cover rounded-md" />
+                          <p className="text-sm text-gray-500 mt-2">Haz clic o arrastra una nueva imagen para cambiarla</p>
+                        </div>
+                      ) : (
+                        <>
+                          <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                          <div className="flex text-sm text-gray-600 justify-center">
+                            <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-[#0D654A] hover:text-[#0D654A] focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#0D654A]">
+                              <span>Sube un archivo</span>
+                              <input {...getInputProps()} id="file-upload" name="file-upload" type="file" className="sr-only" />
+                            </label>
+                            <p className="pl-1">o arrastra y suelta</p>
+                          </div>
+                          <p className="text-xs text-gray-500">PNG, JPG hasta 10MB</p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="precio" className="block text-sm font-medium text-gray-700">Precio</label>
+                  <div className="mt-1 relative rounded-md shadow-sm">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-gray-500 sm:text-sm">$</span>
+                    </div>
+                    <input
+                      type="number"
+                      id="precio"
+                      value={newProduct.precio}
+                      onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) })}
+                      className="block w-full pl-7 pr-12 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Categorías (máximo 2)</label>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {categories.map((category) => (
+                      <div key={category._id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`category-${category._id}`}
+                          value={category.name}
+                          checked={newProduct.categorias?.includes(category.name) || false}
+                          onChange={(e) => {
+                            const categoryName = e.target.value;
+                            setNewProduct(prev => {
+                              const currentCategories = prev.categorias || [];
+                              if (e.target.checked) {
+                                if (currentCategories.length < 2) {
+                                  return { ...prev, categorias: [...currentCategories, categoryName] };
+                                }
+                              } else {
+                                return { ...prev, categorias: currentCategories.filter(cat => cat !== categoryName) };
+                              }
+                              return prev;
+                            });
+                          }}
+                          className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 rounded"
+                        />
+                        <label htmlFor={`category-${category._id}`} className="ml-2 block text-sm text-gray-900">
+                          {category.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                  {newProduct.categorias && newProduct.categorias.length === 2 && (
+                    <p className="mt-2 text-sm text-[#0D654A]">Máximo de categorías seleccionadas</p>
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="availability" className="block text-sm font-medium text-gray-700">Disponible</label>
+                    <label className="relative inline-flex items-center cursor-pointer">
+                      <input
+                        type="checkbox"
+                        id="availability"
+                        className="sr-only peer"
+                        checked={newProduct.availability}
+                        onChange={(e) => setNewProduct({ ...newProduct, availability: e.target.checked })}
+                      />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D654A]"></div>
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Extras</label>
+                  <div className="bg-gray-50 rounded-md p-4 mb-4">
+                    {newProduct.extras.length > 0 ? (
+                      <div className="space-y-2">
+                        {newProduct.extras.map((extra) => (
+                          <div key={extra.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm font-medium text-gray-700">{extra.name}</span>
+                              <span className="text-sm text-gray-500">${extra.price.toFixed(2)}</span>
+                            </div>
+                            <button
+                              onClick={() => handleDeleteExtra(extra.id)}
+                              className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
+                            >
+                              <X className="h-5 w-5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500 text-center">No hay extras agregados</p>
+                    )}
+                  </div>
+                  <div className="mt-2 flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={newExtra.name}
+                      onChange={(e) => setNewExtra({ ...newExtra, name: e.target.value })}
+                      placeholder="Nombre del extra"
+                      className="w-full sm:flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                    />
+                    <input
+                      type="number"
+                      value={newExtra.price}
+                      onChange={(e) => setNewExtra({ ...newExtra, price: parseFloat(e.target.value) })}
+                      placeholder="Precio"
+                      className="w-full sm:w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                    />
+                    <button
+                      onClick={handleAddExtra}
+                      className="w-full sm:w-auto px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 text-sm transition-colors duration-200"
+                    >
+                      Agregar
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
