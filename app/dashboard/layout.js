@@ -111,7 +111,9 @@ export default function ResponsiveLayout({ children }) {
               <div className="max-w-full mx-auto px-4 sm:px-6 md:px-8 flex flex-col xl:flex-row">
                 {/* Contenido del dashboard */}
                 <div className="w-full xl:w-2/3 mb-8 xl:mb-0 xl:pr-8 md:h-[calc(100vh-3rem)] md:overflow-y-auto">
-                  {children}
+                  <div className="md:h-auto md:overflow-visible">
+                    {children}
+                  </div>
                 </div>
 
                 {/* Previsualización del menú (visible en pantallas xl y superiores) */}
