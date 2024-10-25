@@ -1,90 +1,62 @@
 'use client'
-
+import 'swiper/css'
+import 'swiper/css/pagination'
 import Image from 'next/image'
-import { LinkIcon, InformationCircleIcon, ClipboardDocumentListIcon, CheckCircleIcon, DevicePhoneMobileIcon } from '@heroicons/react/24/outline'
+import { PencilSquareIcon, ClipboardDocumentListIcon, DevicePhoneMobileIcon } from '@heroicons/react/24/outline'
 
 const steps = [
   {
-    name: 'Elige tu username',
-    description: 'Selecciona un link personalizado para tu menú, que sea fácil de compartir y recordar.',
-    icon: LinkIcon,
-  },
-  {
-    name: 'Completa la información básica',
-    description: 'Agrega los detalles de tu negocio, como el nombre, logotipo y descripción, para personalizar la apariencia de tu menú.',
-    icon: InformationCircleIcon,
+    name: 'Personaliza tu sitio',
+    description: 'Agrega los detalles clave de tu negocio, como nombre, logotipo y descripción, para que tu menú refleje la identidad de tu marca.',
+    icon: PencilSquareIcon,
+    imageSrc: 'https://res.cloudinary.com/dkuss2bup/image/upload/v1729742857/assets%20marca/cdvt7xlqcgrdudfksle2.jpg', // Reemplaza con la ruta de tu imagen real
   },
   {
     name: 'Sube tus productos',
-    description: 'Carga tus platillos, precios y categorías. Nuestro sistema intuitivo te facilita organizar todo rápidamente.',
+    description: 'Carga fácilmente tus platillos, precios y categorías. Nuestro sistema intuitivo te permite organizar y gestionar todo en minutos.',
     icon: ClipboardDocumentListIcon,
+    imageSrc: 'https://res.cloudinary.com/dkuss2bup/image/upload/v1729742857/assets%20marca/cdvt7xlqcgrdudfksle2.jpg', // Reemplaza con la ruta de tu imagen real
   },
   {
-    name: 'Revisión y confirmación',
-    description: 'Nos aseguramos de que todo esté en orden antes de comenzar con el diseño.',
-    icon: CheckCircleIcon,
-  },
-  {
-    name: 'Recibe tu menú personalizado',
-    description: 'En 24-72 horas, tendrás un menú digital profesional listo para compartir y actualizar cuando lo necesites.',
+    name: 'Disfruta de tu menú',
+    description: 'Mantén tu menú actualizado en todo momento. Cambia productos y ajusta el diseño con total libertad.',
     icon: DevicePhoneMobileIcon,
+    imageSrc: 'https://res.cloudinary.com/dkuss2bup/image/upload/v1729742857/assets%20marca/cdvt7xlqcgrdudfksle2.jpg', // Reemplaza con la ruta de tu imagen real
   },
-]
-
-const images = [
-  { src: "https://res.cloudinary.com/dkuss2bup/image/upload/c_auto,g_auto,w_1000/assets%20marca/cdvt7xlqcgrdudfksle2.jpg", alt: "Ejemplo de menú digital" },
-  { src: "https://res.cloudinary.com/dkuss2bup/image/upload/c_auto,g_auto,w_1000/assets%20marca/nzb3dx7p66hlg2jm65p6.jpg", alt: "Cliente usando menú digital" },
 ]
 
 export default function HowItWorks() {
   return (
     <div className="bg-white py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl lg:text-center">
-          <h2 className="text-base font-semibold leading-7 text-[#0D654A]">How it works</h2>
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-base font-semibold leading-7 text-[#0D654A]">CÓMO FUNCIONA</h2>
           <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-            Cómo Funciona
+            Obtén el menú que siempre has querido
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Obtén tu menú digital en solo cinco sencillos pasos. Nuestra plataforma facilita a los restaurantes la modernización de su proceso de pedidos.
+            Crea tu sitio en 3 sencillos pasos y personalízalo a tu medida.
           </p>
         </div>
-        <div className="mt-12 sm:mt-16">
-          <div className="flex flex-col lg:flex-row lg:items-stretch lg:space-x-16">
-            <div className="w-full lg:w-1/2 mb-8 lg:mb-0">
-              <div className="grid grid-cols-1 gap-1 h-full">
-                {images.map((image, index) => (
-                  <div key={index} className="relative w-full aspect-[2/1]">
-                    <Image
-                      src={image.src}
-                      alt={image.alt}
-                      fill
-                      className="rounded-lg shadow-md object-cover"
-                    />
-                  </div>
-                ))}
+        <div className="mt-16">
+          <div className="grid grid-cols-1 gap-y-16 md:grid-cols-3 md:gap-x-12">
+            {steps.map((step, index) => (
+              <div key={step.name} className="flex flex-col items-center text-center">
+                <div className="w-full aspect-[4/3] relative mb-6">
+                  <Image
+                    src={step.imageSrc}
+                    alt={`Paso ${index + 1}: ${step.name}`}
+                    fill
+                    className="object-cover rounded-lg"
+                  />
+                </div>
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0D654A]">
+                  <step.icon className="h-8 w-8 text-white" aria-hidden="true" />
+                </div>
+                <h3 className="mt-6 text-xl font-semibold text-gray-900">{index + 1}. {step.name}</h3>
+                <p className="mt-2 text-base text-gray-600">{step.description}</p>
               </div>
-            </div>
-            <ul role="list" className="w-full lg:w-1/2 space-y-6">
-              {steps.map((step, stepIdx) => (
-                <li key={step.name} className="relative">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 pt-1">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0D654A]">
-                        <step.icon className="h-5 w-5 text-white" aria-hidden="true" />
-                      </span>
-                    </div>
-                    <div>
-                      <div className="text-xs font-semibold uppercase tracking-wide text-[#0D654A]">
-                        Paso {stepIdx + 1}
-                      </div>
-                      <p className="mt-1 text-base font-semibold text-gray-900">{step.name}</p>
-                      <p className="mt-1 text-sm text-gray-500">{step.description}</p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            ))}
           </div>
         </div>
       </div>

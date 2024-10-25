@@ -21,6 +21,9 @@ export default function Home() {
       </Suspense> */}
       <main>
         <HeroSection/>
+        <section id="como-funciona">
+          <HowItWorks />
+        </section>
         <SocialProof/>
         {/* <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <hr className="my-12 border-t border-gray-200" />
@@ -29,9 +32,7 @@ export default function Home() {
         <section id="beneficios">
           <Benefits />
         </section>
-        <section id="como-funciona">
-          <HowItWorks />
-        </section>
+        
         <section id="precios">
           <Pricing />
         </section>
