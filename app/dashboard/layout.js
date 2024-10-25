@@ -62,7 +62,7 @@ export default function ResponsiveLayout({ children }) {
 
         {/* Sidebar móvil */}
         <div className="md:hidden">
-          <div className={`fixed inset-0 flex z-40 ${isMobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+          <div className={`fixed inset-0 flex z-30 ${isMobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
             <div
               className={`fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity ease-linear duration-300 ${
                 isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
@@ -95,7 +95,7 @@ export default function ResponsiveLayout({ children }) {
 
         <div className="flex flex-col w-0 flex-1 overflow-hidden">
           {/* Botón de menú para móvil */}
-          <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3">
+          <div className="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 z-30">
             <button
               className="h-12 w-12 inline-flex items-center justify-center rounded-md text-gray-500 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#0D654A]"
               onClick={() => setIsMobileMenuOpen(true)}
