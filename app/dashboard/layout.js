@@ -62,7 +62,7 @@ export default function ResponsiveLayout({ children }) {
 
         {/* Sidebar móvil */}
         <div className="md:hidden">
-          <div className={`fixed inset-0 flex z-40 ${isMobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+          <div className={`fixed inset-0 flex z-0 ${isMobileMenuOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}>
             <div
               className={`fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity ease-linear duration-300 ${
                 isMobileMenuOpen ? 'opacity-100' : 'opacity-0'
