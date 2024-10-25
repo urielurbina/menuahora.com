@@ -416,8 +416,8 @@ export default function ProductDashboard() {
       {/* Modal para agregar/editar producto */}
       {isAddingProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg flex flex-col m-4">
-            <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-gray-900 sticky top-0 bg-white py-4 px-4 sm:px-6 z-10 border-b">
+          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[95vh] overflow-y-auto shadow-lg flex flex-col m-2 sm:m-4">
+            <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 text-gray-900 sticky top-0 bg-white py-3 px-4 sm:px-6 z-10 border-b">
               {editingProduct ? "Editar" : "Agregar"} Producto
             </h2>
             <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 flex-grow overflow-y-auto">
@@ -586,14 +586,14 @@ export default function ProductDashboard() {
                 </div>
               </div>
             </div>
-            <div className="sticky bottom-0 bg-white py-4 px-4 sm:px-6 border-t flex flex-col sm:flex-row justify-end gap-3">
+            <div className="sticky bottom-0 bg-white py-3 px-4 sm:px-6 border-t flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
               <button
                 onClick={() => {
                   setIsAddingProduct(false)
                   resetNewProduct()
                   setEditingProduct(null)
                 }}
-                className="w-full sm:w-auto px-4 py-2 mb-2 sm:mb-0 bg-white text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm shadow-sm hover:shadow-md transition-shadow duration-300"
+                className="w-full sm:w-auto px-4 py-2 bg-white text-gray-700 rounded-md border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm shadow-sm hover:shadow-md transition-shadow duration-300"
               >
                 Cancelar
               </button>
