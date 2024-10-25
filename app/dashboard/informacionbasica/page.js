@@ -265,13 +265,21 @@ export default function InformacionBasica() {
   const customStyles = {
     control: (provided) => ({
       ...provided,
-      minWidth: '120px',
-      margin: '0 5px'
+      minWidth: '100px',
+      margin: '0',
+      fontSize: '0.875rem',
     }),
     menu: (provided) => ({
       ...provided,
-      minWidth: '120px'
-    })
+      minWidth: '100px',
+    }),
+    container: (provided) => ({
+      ...provided,
+      width: '100%',
+      '@media (min-width: 640px)': {
+        width: 'auto',
+      },
+    }),
   };
 
   const handleOptionalFieldToggle = (field) => {
@@ -502,24 +510,27 @@ export default function InformacionBasica() {
               <legend className="text-sm font-semibold leading-6 text-gray-900">Horario de atención</legend>
               <div className="mt-6 space-y-6">
                 {Object.entries(formData.schedule.days).map(([day, hours]) => (
-                  <div key={day} className="flex items-center gap-x-3">
-                    <input
-                      type="checkbox"
-                      checked={!hours.isClosed}
-                      onChange={(e) => handleScheduleChange(day, 'isClosed', !e.target.checked)}
-                      className="h-4 w-4 rounded border-gray-300 text-[#0D654A] focus:ring-[#0D654A]"
-                    />
-                    <label className="block text-sm font-medium leading-6 text-gray-900 w-24">
-                      {day.charAt(0).toUpperCase() + day.slice(1)}
-                    </label>
+                  <div key={day} className="flex flex-col sm:flex-row sm:items-center gap-y-2 sm:gap-x-3">
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={!hours.isClosed}
+                        onChange={(e) => handleScheduleChange(day, 'isClosed', !e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-[#0D654A] focus:ring-[#0D654A]"
+                      />
+                      <label className="ml-2 block text-sm font-medium leading-6 text-gray-900 w-24">
+                        {day.charAt(0).toUpperCase() + day.slice(1)}
+                      </label>
+                    </div>
                     {!hours.isClosed && (
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-2 mt-2 sm:mt-0">
                         <Select
                           options={timeOptions}
                           value={{ value: hours.open, label: hours.open }}
                           onChange={(option) => handleScheduleChange(day, 'open', option.value)}
                           styles={customStyles}
                           isDisabled={hours.isClosed}
+                          className="w-full sm:w-auto"
                         />
                         <span className="text-sm font-medium text-gray-700">a</span>
                         <Select
@@ -528,6 +539,7 @@ export default function InformacionBasica() {
                           onChange={(option) => handleScheduleChange(day, 'close', option.value)}
                           styles={customStyles}
                           isDisabled={hours.isClosed}
+                          className="w-full sm:w-auto"
                         />
                       </div>
                     )}
