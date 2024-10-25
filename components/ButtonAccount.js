@@ -39,7 +39,7 @@ const ButtonAccount = () => {
   if (status === "unauthenticated") return null;
 
   return (
-    <Popover className="relative z-10">
+    <Popover className="relative z-0">
       {({ open }) => (
         <>
           <Popover.Button className="btn">

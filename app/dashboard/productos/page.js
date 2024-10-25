@@ -245,12 +245,12 @@ export default function ProductDashboard() {
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>
 
   return (
-    <div className="container mx-auto p-4 space-y-8 sm:space-y-12">
+    <div className="container mx-auto p-4 ">
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Administrador de Productos</h1>
 
       {/* Categorías e Información en Tarjeta */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
         {/* Categorías */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
         <div className="bg-white shadow rounded-lg p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Categorías</h2>
           <p className="text-sm text-gray-600 mb-6">
@@ -334,7 +334,7 @@ export default function ProductDashboard() {
       </div>
 
       {/* Agregar Producto y Lista de Productos */}
-      <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+      <div className="bg-white shadow rounded-lg p-4 mt-4 sm:mt-6 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-2 sm:mb-0">Productos</h2>
           <button
@@ -415,7 +415,7 @@ export default function ProductDashboard() {
 
       {/* Modal para agregar/editar producto */}
       {isAddingProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[60] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 z-[100] overflow-y-auto">
           <div className="bg-white rounded-lg w-full max-w-2xl h-[80vh] flex flex-col shadow-lg m-2 sm:m-4">
             <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 text-gray-900 sticky top-0 bg-white py-3 px-4 sm:px-6 z-10 border-b">
               {editingProduct ? "Editar" : "Agregar"} Producto
