@@ -415,9 +415,9 @@ export default function ProductDashboard() {
 
       {/* Modal para agregar/editar producto */}
       {isAddingProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-start justify-center p-4 overflow-y-auto z-2">
-          <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] flex flex-col shadow-lg m-2 sm:m-4 mt-8">
-            <h2 className="text-xl sm:text-2xl font-bold mb-2 sm:mb-4 text-gray-900 sticky top-0 bg-white py-3 px-4 sm:px-6 border-b">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg w-full max-w-2xl h-[90vh] flex flex-col shadow-lg">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 py-3 px-4 sm:px-6 border-b">
               {editingProduct ? "Editar" : "Agregar"} Producto
             </h2>
             <div className="flex-grow overflow-y-auto px-4 sm:px-6 py-4">
@@ -588,7 +588,7 @@ export default function ProductDashboard() {
                 </div>
               </div>
             </div>
-            <div className="sticky bottom-0 bg-white py-3 px-4 sm:px-6 border-t flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 z-10">
+            <div className="bg-white py-3 px-4 sm:px-6 border-t flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
               <button
                 onClick={() => {
                   setIsAddingProduct(false)
