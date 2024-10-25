@@ -282,15 +282,15 @@ export default function InformacionBasica() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-12">
-      <div className="border-b border-gray-900/10 pb-8 sm:pb-12">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Información básica</h2>
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="border-b border-gray-900/10 pb-8">
+        <h2 className="text-2xl font-bold text-gray-900">Información básica</h2>
         <p className="mt-1 text-sm leading-6 text-gray-600">
           Esta información será mostrada públicamente, así que ten cuidado con lo que compartes.
         </p>
 
-        <div className="mt-6 sm:mt-10 grid grid-cols-1 gap-x-4 gap-y-6 sm:gap-y-8 sm:grid-cols-6">
-          <div className="sm:col-span-4">
+        <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
+          <div className="col-span-full sm:col-span-4">
             <label htmlFor="businessName" className="block text-sm font-medium leading-6 text-gray-900">
               Nombre del negocio
             </label>
@@ -307,7 +307,7 @@ export default function InformacionBasica() {
             </div>
           </div>
 
-          <div className="sm:col-span-4">
+          <div className="col-span-full sm:col-span-4">
             <label htmlFor="slogan" className="block text-sm font-medium leading-6 text-gray-900">
               Slogan
             </label>
@@ -423,11 +423,11 @@ export default function InformacionBasica() {
         </div>
       </div>
 
-      <div className="border-b border-gray-900/10 pb-8 sm:pb-12">
-        <h2 className="text-xl sm:text-2xl font-semibold leading-7 text-gray-900">Información de contacto</h2>
+      <div className="border-b border-gray-900/10 pb-8">
+        <h2 className="text-xl font-semibold leading-7 text-gray-900">Información de contacto</h2>
         <p className="mt-1 text-sm leading-6 text-gray-600">Usa información de contacto donde puedas ser localizado.</p>
 
-        <div className="mt-6 sm:mt-10 space-y-6 sm:space-y-8">
+        <div className="mt-6 space-y-6 sm:space-y-8">
           <div className="sm:col-span-3">
             <label htmlFor="contact.address" className="block text-sm font-medium leading-6 text-gray-900">
               Dirección <span className="text-gray-500">(opcional)</span>
@@ -482,7 +482,7 @@ export default function InformacionBasica() {
       </div>
 
       {/* Sección de horario (opcional) */}
-      <div className="border-b border-gray-900/10 pb-8 sm:pb-12">
+      <div className="border-b border-gray-900/10 pb-8">
         <div className="flex items-center mb-4">
           <input
             type="checkbox"
