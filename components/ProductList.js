@@ -27,9 +27,17 @@ export default function ProductList({ products, cardInfoSettings, appearance, ac
               </div>
             )}
             {cardInfoSettings.categoria && (
-              <span className="text-xs bg-gray-100 px-2 py-1 rounded-full mt-2 inline-block" style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}>
-                {product.categorias[0]}
-              </span>
+              <div className="mt-2 space-x-1">
+                {product.categorias.slice(0, 2).map((categoria, index) => (
+                  <span 
+                    key={index} 
+                    className="text-xs bg-gray-100 px-2 py-1 rounded-full inline-block" 
+                    style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}
+                  >
+                    {categoria}
+                  </span>
+                ))}
+              </div>
             )}
             {cardInfoSettings.nombre && (
               <h3 className="font-semibold text-md mt-2" style={{ fontFamily: appearance.headingFont || 'sans-serif' }}>
