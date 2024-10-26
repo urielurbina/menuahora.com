@@ -29,8 +29,8 @@ const config = {
         description: "Perfecto para comenzar con una presencia en línea",
         // The price you want to display, the one user will be charged on Stripe.
         price: {
-          monthly: 299,
-          yearly: 1990
+          monthly: 199,
+          yearly: 1499
         },
         // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
         priceAnchor: {
@@ -45,6 +45,9 @@ const config = {
           { name: "Sistema fácil para subir productos" },
           { name: "Disponible inmediatamente" },
         ],
+
+
+      
         // Add this line to specify the payment mode
         mode: "subscription",
       },
@@ -56,7 +59,7 @@ const config = {
           yearly: "price_yearly_custom"
         },  
         name: "Plan Custom",
-        description: "Diseño personalizado para tu negocio",
+        description: "Solución completa adaptada a tu marca",
         price: {
           monthly: 499,
           yearly: 3999
@@ -66,12 +69,13 @@ const config = {
           yearly: 799
         },
         features: [
-          { name: "Diseño completamente personalizado" },
-          { name: "Link personalizado" },
           { name: "Productos ilimitados" },
           { name: "Categorías ilimitadas" },
           { name: "Sistema fácil para subir productos" },
-          { name: "Entrega en 48 a 96 horas" },
+          { name: "Link personalizado" },
+          { name: "Diseño completamente personalizado adaptado a tu marca" },
+          { name: "Dominio propio" },
+          { name: "Sistema de pedidos por WhatsApp" },
         ],
         // Add this line to specify the payment mode
         mode: "subscription",
