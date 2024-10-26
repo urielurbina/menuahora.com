@@ -174,77 +174,78 @@ export default function UserPage({ params }) {
             />
           </div>
           {/* Modificar el footer para centrar los elementos */}
-      <footer className="w-full bg-gray-100 py-4 px-4 text-center text-sm text-gray-600 mt-8">
-        <Link href="https://menuahora.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center">
-          <span className="mr-2">Sitio creado en:</span>
-          <Image
-            src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
-            alt="Logo MenúAhora"
-            width={100}
-              height={20}
+  <footer className="w-full bg-gray-100 py-4 px-4 text-center text-sm text-gray-600 mt-8">
+    <Link href="https://menuahora.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center">
+      <span className="mr-2">Sitio creado en:</span>
+      <Image
+        src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
+        alt="Logo MenúAhora"
+        width={100}
+          height={20}
+        />
+        </Link>
+      </footer>
+    </div>
+  </div>
+
+  
+
+  {/* Modal para detalles del producto */}
+  <AnimatePresence>
+    {selectedProduct && cardInfoSettings.detailedView && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+        onClick={() => toggleProductDetails(selectedProduct)}
+      >
+        <motion.div
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 50, opacity: 0 }}
+          className="bg-white rounded-lg p-6 max-w-md w-full relative"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Imagen del producto */}
+          <div className="aspect-[3/2] w-full mb-4 relative overflow-hidden rounded-lg">
+            <Image
+              src={selectedProduct.imagen}
+              alt={selectedProduct.nombre}
+              layout="fill"
+              objectFit="cover"
             />
-            </Link>
-          </footer>
-        </div>
-      </div>
+          </div>
 
-      
+          <h2 className="text-2xl font-bold mb-2">{selectedProduct.nombre}</h2>
+          <p className="text-gray-600 mb-2">{selectedProduct.categorias[0]}</p>
+          <p className="font-bold text-lg mb-4">${selectedProduct.precio.toFixed(2)}</p>
+          {selectedProduct.descripcion && (
+            <p className="text-gray-700 mb-4">{selectedProduct.descripcion}</p>
+          )}
+          {selectedProduct.extras && selectedProduct.extras.length > 0 && (
+            <div>
+              <h4 className="font-semibold mb-2">Extras:</h4>
+              <ul className="list-disc list-inside text-sm">
+                {selectedProduct.extras.map((extra, index) => (
+                  <li key={index}>{extra.name} - ${extra.price.toFixed(2)}</li>
+                ))}
+              </ul>
+            </div>
+          )}
 
-      {/* Modal para detalles del producto */}
-      <AnimatePresence>
-        {selectedProduct && cardInfoSettings.detailedView && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+          {/* Botón de cerrar en la esquina inferior derecha */}
+          <button
+            className={`absolute bottom-4 right-4 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 ${bodyFont}`}
             onClick={() => toggleProductDetails(selectedProduct)}
           >
-            <motion.div
-              initial={{ y: 50, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 50, opacity: 0 }}
-              className="bg-white rounded-lg p-6 max-w-md w-full relative"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Imagen del producto */}
-              <div className="aspect-[3/2] w-full mb-4 relative overflow-hidden rounded-lg">
-                <Image
-                  src={selectedProduct.imagen}
-                  alt={selectedProduct.nombre}
-                  layout="fill"
-                  objectFit="cover"
-                />
-              </div>
+            Cerrar
+          </button>
+        </motion.div>
+      </motion.div>
+    )}
+  </AnimatePresence>
+</div>
 
-              <h2 className="text-2xl font-bold mb-2">{selectedProduct.nombre}</h2>
-              <p className="text-gray-600 mb-2">{selectedProduct.categorias[0]}</p>
-              <p className="font-bold text-lg mb-4">${selectedProduct.precio.toFixed(2)}</p>
-              {selectedProduct.descripcion && (
-                <p className="text-gray-700 mb-4">{selectedProduct.descripcion}</p>
-              )}
-              {selectedProduct.extras && selectedProduct.extras.length > 0 && (
-                <div>
-                  <h4 className="font-semibold mb-2">Extras:</h4>
-                  <ul className="list-disc list-inside text-sm">
-                    {selectedProduct.extras.map((extra, index) => (
-                      <li key={index}>{extra.name} - ${extra.price.toFixed(2)}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {/* Botón de cerrar en la esquina inferior derecha */}
-              <button
-                className={`absolute bottom-4 right-4 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 ${bodyFont}`}
-                onClick={() => toggleProductDetails(selectedProduct)}
-              >
-                Cerrar
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
   )
 }
