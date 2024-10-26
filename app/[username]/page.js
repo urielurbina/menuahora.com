@@ -20,6 +20,15 @@ export default function UserPage({ params }) {
   const [error, setError] = useState(null)
   const [selectedProduct, setSelectedProduct] = useState(null)
 
+  const [cardInfoSettings, setCardInfoSettings] = useState({
+    nombre: true,
+    descripcion: true,
+    precio: true,
+    categoria: true,
+    imagen: true,
+    detailedView: true
+  });
+
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true)
@@ -31,6 +40,14 @@ export default function UserPage({ params }) {
         }
         const data = await response.json()
         setBusinessData(data)
+        
+        // Actualizar cardInfoSettings solo si hay datos en la base de datos
+        if (data.cardInfoSettings) {
+          setCardInfoSettings(prevSettings => ({
+            ...prevSettings,
+            ...data.cardInfoSettings
+          }));
+        }
       } catch (err) {
         console.error('Error details:', err)
         setError(err.message)
@@ -76,7 +93,6 @@ export default function UserPage({ params }) {
 
   const {
     'basic-info': basicInfo = {},
-    cardInfoSettings = {},
     categories = [],
     products = [],
     buttons = [],
