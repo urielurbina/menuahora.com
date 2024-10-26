@@ -102,6 +102,8 @@ const config = {
         mode: "payment",
       },
     ],
+    // Add this new property for the coupon
+    coupon: "promo_1QE1McJJJ3WlVwt9fJvqZ9G6",
   },
   aws: {
     // If you use AWS S3/Cloudfront, put values in here
