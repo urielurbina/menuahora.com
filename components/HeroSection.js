@@ -106,7 +106,7 @@ export default function Example() {
         </Dialog>
       </header>
 
-      <div className="relative isolate pt-10">
+      <div className="relative isolate pt-14 sm:pt-16 lg:pt-20">
         <svg
           aria-hidden="true"
           className="absolute inset-0 -z-10 h-full w-full stroke-gray-200 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]"
@@ -131,20 +131,20 @@ export default function Example() {
           </svg>
           <rect fill="url(#83fd4e5a-9d52-42fc-97b6-718e5d7ee527)" width="100%" height="100%" strokeWidth={0} />
         </svg>
-        <div className="mx-auto max-w-7xl px-6 py-8 sm:py-12 sm:pb-32 lg:px-8 lg:py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
           <div className="lg:flex lg:items-center lg:gap-x-10">
-            <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto sm:mt-24 lg:mt-0 lg:w-1/2">
+            <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto lg:w-1/2">
               <h1 className="max-w-lg text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl text-center lg:text-left mx-auto lg:mx-0">
                 Recibe tu menú digital en minutos{' '}
-                <span className="inline-block bg-[#0D654A] text-white px-4 py-2 rounded-md mt-2">
+                <span className="inline-block bg-[#0D654A] text-white px-4 py-2 rounded-md mt-2 sm:mt-4">
                   no semanas.
                 </span>
               </h1>
-              <p className="mt-4 text-lg leading-8 text-gray-600 text-center lg:text-left">
-              Elige los detalles, sube tus productos y gestiona tu menú al instante.
-              Fácil de compartir y actualizar en cualquier momento.
+              <p className="mt-6 text-lg leading-8 text-gray-600 text-center lg:text-left">
+                Elige los detalles, sube tus productos y gestiona tu menú al instante.
+                Fácil de compartir y actualizar en cualquier momento.
               </p>
-              <div className="mt-8 flex items-center justify-center lg:justify-start gap-x-6">
+              <div className="mt-8 sm:mt-10 flex items-center justify-center lg:justify-start gap-x-6">
                 <a
                   href="/#pricing"
                   className="rounded-md bg-[#0D654A] px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
@@ -158,12 +158,12 @@ export default function Example() {
                   Ver Demo
                 </a>
               </div>
-              <div className="mt-8 flex justify-center lg:justify-start">
+              <div className="mt-8 sm:mt-10 flex justify-center lg:justify-start">
                 <TestimonialsAvatars priority={true} />
               </div>
             </div>
             <div className="mt-12 sm:mt-16 lg:mt-0 lg:flex-shrink-0 lg:flex-grow lg:w-1/2">
-              <div className="flex justify-center space-x-8">
+              <div className="flex justify-center space-x-4 sm:space-x-8">
                 <AppScreenshot imageUrl="/images/screenshot-menuahora-1.webp" />
                 <AppScreenshot imageUrl="/images/screenshot-menuahora-2.webp" />
               </div>
