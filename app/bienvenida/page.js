@@ -85,14 +85,14 @@ export default function Bienvenida() {
           <p className="text-md text-gray-600 mb-2">
             Estamos emocionados de ayudarte a mostrar tus productos.
           </p>
-          <p className="text-md text-gray-600 mb-8">
+          {/* <p className="text-md text-gray-600 mb-8">
             Comencemos con un breve tutorial.
-          </p>
+          </p> */}
         </div>
         
-        <div className="bg-gray-200 w-full aspect-video flex items-center justify-center rounded-lg">
+        {/* <div className="bg-gray-200 w-full aspect-video flex items-center justify-center rounded-lg">
           <p className="text-2xl text-gray-600">Aquí irá el video tutorial sobre cómo gestionar tu menú</p>
-        </div>
+        </div> */}
         
         <div className="w-full max-w-md mx-auto bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <label htmlFor="username" className="block text-xl font-semibold leading-6 text-gray-800 text-center mb-4">
