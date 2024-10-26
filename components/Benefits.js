@@ -3,13 +3,16 @@ import {
   CurrencyDollarIcon,
   ChartBarIcon,
   UserGroupIcon,
+  PencilSquareIcon,
+  DevicePhoneMobileIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline'
 
 const benefits = [
   {
-    name: 'Menú Digital QR',
-    description: 'Crea fácilmente un menú digital accesible mediante un código QR, eliminando menús físicos.',
-    icon: QrCodeIcon,
+    name: 'Actualización en Tiempo Real',
+    description: 'Modifica tu menú instantáneamente, sin esperas ni complicaciones. Mantén tu oferta siempre al día.',
+    icon: ClockIcon,
   },
   {
     name: 'Link Personalizado',
@@ -17,14 +20,14 @@ const benefits = [
     icon: CurrencyDollarIcon,
   },
   {
-    name: 'SEO Optimizado',
-    description: 'Mejora la visibilidad de tu menú en buscadores con palabras clave relevantes.',
-    icon: ChartBarIcon,
+    name: 'Diseño Responsivo',
+    description: 'Tu menú se adapta perfectamente a cualquier dispositivo, ofreciendo una experiencia óptima en móviles, tablets y ordenadores.',
+    icon: DevicePhoneMobileIcon,
   },
   {
-    name: 'Diseño Profesional',
-    description: 'Un diseñador experto se encarga de crear tu menú, adaptándolo a la identidad de tu marca.',
-    icon: UserGroupIcon,
+    name: 'Personalización Sencilla',
+    description: 'Ajusta fácilmente el aspecto de tu menú para que refleje la identidad de tu negocio, sin necesidad de conocimientos técnicos.',
+    icon: PencilSquareIcon,
   },
 ]
 
