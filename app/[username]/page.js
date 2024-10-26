@@ -9,6 +9,7 @@ import ProductList from '@/components/ProductList'
 import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Inter } from 'next/font/google'
+import Link from 'next/link'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -99,7 +100,7 @@ export default function UserPage({ params }) {
   const bodyFont = appearance.bodyFont || inter.className
 
   return (
-    <div className={`w-full mx-auto relative ${bodyFont}`}>
+    <div className={`w-full mx-auto bg-gray-100 relative ${bodyFont}`}>
       <div className="lg:flex">
         {/* Column 1: Logo and Info */}
         <div style={{backgroundColor: primaryColor}} className="lg:w-1/4 lg:fixed lg:top-0 lg:left-0 lg:bottom-0 lg:overflow-y-auto">
@@ -156,8 +157,22 @@ export default function UserPage({ params }) {
               detailedView={cardInfoSettings.detailedView}
             />
           </div>
+          {/* Modificar el footer para centrar los elementos */}
+      <footer className="w-full bg-gray-100 py-4 px-4 text-center text-sm text-gray-600 mt-8">
+        <Link href="https://menuahora.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center">
+          <span className="mr-2">Sitio creado en:</span>
+          <Image
+            src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
+            alt="Logo MenúAhora"
+            width={100}
+              height={20}
+            />
+            </Link>
+          </footer>
         </div>
       </div>
+
+      
 
       {/* Modal para detalles del producto */}
       <AnimatePresence>
