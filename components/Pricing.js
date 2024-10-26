@@ -121,7 +121,7 @@ const CustomPlanCard = () => {
         <div className="mt-8 flex flex-col items-center lg:mt-0 lg:w-80 lg:flex-none">
           <p className="text-base font-semibold text-gray-600">Precio a medida según tus necesidades</p>
           <a 
-            href="mailto:contacto@menuahora.com"
+            href="mailto:soyurielurbina@gmail.com"
             className="mt-6 block w-full rounded-md bg-emerald-700 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-emerald-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
           >
             Contáctanos para más información

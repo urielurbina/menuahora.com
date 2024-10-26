@@ -25,7 +25,7 @@ export default function Example() {
         <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
           <div className="flex lg:flex-1">
             <a href="#" className="-m-1.5 p-1.5">
-              <span className="sr-only">Your Company</span>
+              <span className="sr-only">MenúAhora</span>
               <img
                 alt="Logo MenúAhora"
                 src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
@@ -62,11 +62,11 @@ export default function Example() {
           <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div className="flex items-center justify-between">
               <a href="#" className="-m-1.5 p-1.5">
-                <span className="sr-only">Your Company</span>
+                <span className="sr-only">MenúAhora</span>
                 <img
-                  alt=""
-                  src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-                  className="h-8 w-auto"
+                  alt="MenúAhora"
+                  src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
+                  className="h-6 w-auto"
                 />
               </a>
               <button
@@ -74,7 +74,7 @@ export default function Example() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="-m-2.5 rounded-md p-2.5 text-gray-700"
               >
-                <span className="sr-only">Close menu</span>
+                <span className="sr-only">Cerrar menú</span>
                 <XMarkIcon aria-hidden="true" className="h-6 w-6" />
               </button>
             </div>
@@ -152,10 +152,10 @@ export default function Example() {
                   Empieza ya
                 </a>
                 <a
-                  href="#"
+                  href="https://www.menuahora.com/demo"
                   className="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-[#0D654A] shadow-sm ring-1 ring-inset ring-[#0D654A] hover:bg-indigo-50"
                 >
-                  Ver Demos
+                  Ver Demo
                 </a>
               </div>
               <div className="mt-8 flex justify-center lg:justify-start">

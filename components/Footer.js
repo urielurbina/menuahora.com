@@ -25,31 +25,20 @@ const Footer = () => {
             {config.appDescription}
           </p>
           <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-8">
-            {config.mailgun.supportEmail && (
-              <a href={`mailto:${config.mailgun.supportEmail}`} className="text-base text-gray-500 hover:text-gray-900">
-                Support
-              </a>
-            )}
             <Link href="/#pricing" className="text-base text-gray-500 hover:text-gray-900">
-              Pricing
+              Precios
             </Link>
-            <Link href="/blog" className="text-base text-gray-500 hover:text-gray-900">
-              Blog
-            </Link>
-            <a href="/#" className="text-base text-gray-500 hover:text-gray-900">
-              Affiliates
-            </a>
             <Link href="/tos" className="text-base text-gray-500 hover:text-gray-900">
-              Terms of Service
+              Términos de Servicio
             </Link>
             <Link href="/privacy-policy" className="text-base text-gray-500 hover:text-gray-900">
-              Privacy Policy
+              Política de Privacidad
             </Link>
           </nav>
         </div>
         <div className="mt-8 border-t border-gray-200 pt-8">
           <p className="text-base text-gray-400 text-center">
-            &copy; {new Date().getFullYear()} {config.appName}. All rights reserved.
+            &copy; {new Date().getFullYear()} {config.appName}. Todos los derechos reservados.
           </p>
         </div>
       </div>

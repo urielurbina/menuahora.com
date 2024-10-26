@@ -14,21 +14,21 @@ const testimonials = [
     author: "Alejandro Gómez",
     role: "Taquería Los Amigos",
     image: "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=96&h=96&q=80",
-    website: "https://losamigos.com"
+    website: "https://www.menuahora.com"
   },
   {
     content: "La facilidad para actualizar el menú es un cambio total. Nuestros clientes valoran la conveniencia y nosotros disfrutamos del tiempo que ahorramos.",
     author: "Carla Fernández",
     role: "Restaurante La Fiesta",
     image: "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=96&h=96&q=80",
-    website: "https://lafiesta.com"
+    website: "https://www.menuahora.com"
   },
   {
     content: "El diseño personalizado ha sido clave para mantener nuestra imagen de marca. Ha mejorado la manera en que presentamos nuestros productos.",
     author: "Martín López",
     role: "Delicias Gourmet",
     image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=96&h=96&q=80",
-    website: "https://deliciasgourmet.com"
+    website: "https://www.menuahora.com"
   }
 ]
 
@@ -68,7 +68,7 @@ const SocialProof = () => {
               <div className="text-sm leading-6 text-gray-600">{testimonial.role}</div>
             </div>
           </div>
-          <a
+          {/* <a
             href={testimonial.website}
             target="_blank"
             rel="noopener noreferrer"
@@ -76,7 +76,7 @@ const SocialProof = () => {
           >
             Ver sitio
             <ArrowTopRightOnSquareIcon className="ml-2 -mr-0.5 h-4 w-4" aria-hidden="true" />
-          </a>
+          </a> */}
         </div>
       </div>
     </div>
