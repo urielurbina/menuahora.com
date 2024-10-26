@@ -2,11 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import PrivateRoute from '@/components/PrivateRoute';
 
 const PantallaPlanes = () => {
   return (
-    <PrivateRoute>
       <div className="min-h-screen bg-gray-100 flex flex-col justify-center items-center">
         <div className="w-full max-w-2xl px-4 py-8 sm:px-6 lg:px-8">
           <main>
@@ -30,7 +28,6 @@ const PantallaPlanes = () => {
           </main>
         </div>
       </div>
-    </PrivateRoute>
   );
 };
 
