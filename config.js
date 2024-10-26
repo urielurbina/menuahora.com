@@ -20,8 +20,8 @@ const config = {
       {
         // REQUIRED — we use this to find the plan in the webhook (for instance if you want to update the user's credits based on the plan)
         priceId: {
-          monthly: "price_1Q8agAJJJ3WlVwt9nASMLnTQ",
-          yearly: "price_1Q8agAJJJ3WlVwt9nASMLnTQ"  // Update this to the correct yearly price ID
+          monthly: process.env.NODE_ENV === 'production' ? "price_1QDzlkJJJ3WlVwt961PJVKdL" : "price_1QDzlkJJJ3WlVwt961PJVKdL",
+          yearly: process.env.NODE_ENV === 'production' ? "price_1QDzp8JJJ3WlVwt9tp8lHMx7" : "price_1QDzp8JJJ3WlVwt9tp8lHMx7"  // Update this to the correct yearly price ID
         },
         //  REQUIRED - Name of the plan, displayed on the pricing page
         name: "Plan Esencial",
