@@ -241,7 +241,7 @@ export default function ProductDashboard() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
-  if (isLoading) return <div className="text-center py-10">Cargando...</div>
+  // if (isLoading) return <LoadingScreen />
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>
 
   return (

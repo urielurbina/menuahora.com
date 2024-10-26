@@ -33,7 +33,7 @@ export default function Home() {
           <Benefits />
         </section>
         
-        <section id="precios">
+        <section id="pricing">
           <Pricing />
         </section>
         <section id="faq">

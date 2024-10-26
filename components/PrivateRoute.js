@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import LoadingScreen from '@/components/LoadingScreen'
 
 export default function PrivateRoute({ children }) {
   const { data: session, status } = useSession()
@@ -33,7 +34,7 @@ export default function PrivateRoute({ children }) {
   }, [session, status, router])
 
   if (isLoading) {
-    return <div>Cargando...</div>
+    return <LoadingScreen />
   }
 
   return children
