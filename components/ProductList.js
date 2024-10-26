@@ -40,12 +40,12 @@ export default function ProductList({ products, cardInfoSettings, appearance, ac
               </div>
             )}
             {cardInfoSettings.nombre && (
-              <h3 className="font-semibold text-md mt-2" style={{ fontFamily: appearance.headingFont || 'sans-serif' }}>
+              <h3 className="font-semibold text-md lg:text-lg mt-2" style={{ fontFamily: appearance.headingFont || 'sans-serif' }}>
                 {product.nombre}
               </h3>
             )}
             {cardInfoSettings.precio && (
-              <span className="font-bold text-md mt-1 block" style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}>
+              <span className="font-regular text-md mt-1 block" style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}>
                 ${product.precio.toFixed(2)}
               </span>
             )}

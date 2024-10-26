@@ -12,7 +12,7 @@ export default function CategoryList({ categories = [], activeCategory, setActiv
   `;
 
   return (
-    <div className="flex items-center justify-start overflow-x-auto whitespace-nowrap px-6 py-4 space-x-1">
+    <div className="flex items-center justify-start overflow-x-auto whitespace-nowrap px-6 py-4 space-x-2">
       <button
         className={buttonClasses(activeCategory === 'Todo')}
         onClick={() => setActiveCategory('Todo')}

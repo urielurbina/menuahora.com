@@ -50,7 +50,7 @@ export default function ActionButtons({ buttons, appearance = {} }) {
   const activeButtons = buttons.filter(button => button.isActive !== false);
 
   return (
-    <div className="px-6 py-4 space-y-2">
+    <div className="px-6 pt-4 pb-8 space-y-2">
       {activeButtons.map((button, index) => (
         <Link 
           key={button.id} 

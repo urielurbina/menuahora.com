@@ -25,11 +25,11 @@ export default function BusinessInfo({ basicInfo, appearance }) {
   const bodyFont = appearance.bodyFont || 'sans-serif';
 
   return (
-    <div className="px-6 py-4" style={{color: secondaryColor, fontFamily: bodyFont}}>
+    <div className="px-6 py-8" style={{color: secondaryColor, fontFamily: bodyFont}}>
       <div className="flex justify-between items-start">
         {/* Columna 1: Nombre del negocio y slogan */}
         <div className="text-left">
-          <h1 className="text-2xl font-bold tracking-tight" style={{fontFamily: titleFont}}>
+          <h1 className="text-3xl font-regular tracking-tight" style={{fontFamily: titleFont}}>
             {basicInfo.businessName}
           </h1>
           <p className="text-sm mt-1">{basicInfo.slogan}</p>

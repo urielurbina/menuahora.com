@@ -133,18 +133,20 @@ export default function UserPage({ params }) {
 
         {/* Columns 2-4: Categories and Products */}
         <div className="lg:w-3/4 lg:ml-[25%]">
-          <div className="bg-gray-100">
+          <div className="bg-gray-100 ">
             {/* Categories */}
-            <div className="bg-white border-b border-gray-200">
-              <h2 className={`text-2xl font-bold px-6 pt-4 ${headingFont}`}>
+            <div className="py-6 lg:py-2 bg-white border-b border-gray-200 text-center lg:text-left">
+              <h2 className={`text-3xl font-regular px-6 pt-4 ${headingFont}`}>
                 Categorías
               </h2>
-              <CategoryList 
-                categories={categories} 
-                activeCategory={activeCategory}
-                setActiveCategory={setActiveCategory}
-                appearance={appearance}
-              />
+              <div className="flex justify-center lg:justify-start">
+                <CategoryList 
+                  categories={categories} 
+                  activeCategory={activeCategory}
+                  setActiveCategory={setActiveCategory}
+                  appearance={appearance}
+                />
+              </div>
             </div>
 
             {/* Products */}
