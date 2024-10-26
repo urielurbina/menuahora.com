@@ -38,7 +38,7 @@ const config = {
           // yearly: 399
         },
         features: [
-          { name: "Plantilla con Personalización Básica" },
+          { name: "Plantilla con Personalización Básica " },
           { name: "Link personalizado" },
           { name: "Productos ilimitados" },
           { name: "Categorías ilimitadas" },
