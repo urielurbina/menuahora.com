@@ -6,16 +6,21 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 async function fetchBusinessData(username) {
-  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/api/business/${username}`;
+  // Aseguramos que usemos una URL absoluta
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://tu-dominio.com';
+  const url = new URL(`/api/business/${username}`, baseUrl).toString();
   
   const response = await fetch(url, {
     cache: 'no-store',
     headers: {
       'Content-Type': 'application/json',
     },
+    // Agregamos next: { revalidate: 0 } para forzar revalidación
+    next: { revalidate: 0 }
   });
   
   if (!response.ok) {
+    console.error(`Error fetching business data: ${response.status} - ${response.statusText}`);
     throw new Error(`Failed to fetch business data: ${response.status}`);
   }
   
