@@ -1,4 +1,4 @@
-import { ImageResponse } from 'next/server';
+import { ImageResponse } from '@vercel/og';
 
 export const runtime = 'edge';
 
@@ -6,15 +6,25 @@ export async function GET(request, { params }) {
   const { username } = params;
 
   try {
-    // Obtener los datos del negocio a través de la API existente
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/business/${username}`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch business data');
+    if (!username) {
+      throw new Error('Username is required');
     }
+
+    // Obtener los datos del negocio a través de la API existente
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/business/${username}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const businessData = await response.json();
 
-    if (!businessData) {
-      throw new Error('Business not found');
+    if (!businessData || !businessData['basic-info']) {
+      throw new Error('Invalid business data format');
     }
 
     return new ImageResponse(
