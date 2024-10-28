@@ -7,7 +7,7 @@ export const revalidate = 0;
 
 async function fetchBusinessData(username) {
   // Aseguramos que usemos una URL absoluta
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://tu-dominio.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://menuahora.com';
   const url = new URL(`/api/business/${username}`, baseUrl).toString();
   
   const response = await fetch(url, {
