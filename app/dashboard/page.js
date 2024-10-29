@@ -3,10 +3,12 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useQRCode } from 'next-qrcode';
 
 export default function Welcome() {
   const [username, setUsername] = useState('');
   const [copied, setCopied] = useState(false);
+  const { Canvas } = useQRCode();
 
   useEffect(() => {
     // Obtener el username al cargar el componente
@@ -33,6 +35,16 @@ export default function Welcome() {
       setTimeout(() => setCopied(false), 2000); // Reset después de 2 segundos
     } catch (err) {
       console.error('Error al copiar:', err);
+    }
+  };
+
+  const handleDownloadPNG = () => {
+    const canvas = document.querySelector('#qr-canvas canvas');
+    if (canvas) {
+      const link = document.createElement('a');
+      link.download = `menuahora-${username}-qr.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
     }
   };
 
@@ -92,7 +104,40 @@ export default function Welcome() {
               </div>
             </div>
 
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 sm:mb-6">
+            {/* Nuevo código QR */}
+            <div className="mt-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Código QR de tu menú
+              </label>
+              <div className="flex flex-col items-center space-y-4">
+                <div id="qr-canvas" className="p-4 bg-white rounded-lg shadow">
+                  <Canvas
+                    text={`https://menuahora.com/${username}`}
+                    options={{
+                      level: 'M',
+                      margin: 2,
+                      scale: 4,
+                      width: 200,
+                      color: {
+                        dark: '#000000',
+                        light: '#ffffff',
+                      },
+                    }}
+                  />
+                </div>
+                <button
+                  onClick={handleDownloadPNG}
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#0D654A] hover:bg-[#0C5A42]"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                  Descargar QR
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 sm:mb-6 mt-6">
               <div className="flex">
                 <div className="flex-shrink-0">
                   <svg className="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
