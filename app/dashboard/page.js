@@ -2,8 +2,40 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 export default function Welcome() {
+  const [username, setUsername] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    // Obtener el username al cargar el componente
+    const fetchUsername = async () => {
+      try {
+        const response = await fetch('/api/username');
+        const data = await response.json();
+        if (data.hasUsername) {
+          setUsername(data.username);
+        }
+      } catch (error) {
+        console.error('Error al obtener el username:', error);
+      }
+    };
+
+    fetchUsername();
+  }, []);
+
+  const handleCopyLink = async () => {
+    const menuLink = `https://menuahora.com/${username}`;
+    try {
+      await navigator.clipboard.writeText(menuLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000); // Reset después de 2 segundos
+    } catch (err) {
+      console.error('Error al copiar:', err);
+    }
+  };
+
   return (
     <div className="py-4 sm:py-6 md:py-10 px-4 sm:px-6 lg:px-8">
       <motion.div 
@@ -20,6 +52,46 @@ export default function Welcome() {
             <p className="text-base sm:text-lg text-gray-700 mb-4 sm:mb-6">
               Aquí podrás personalizar y gestionar tu menú digital de manera fácil y eficiente.
             </p>
+
+            {/* Nuevo campo para copiar el link */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Link de tu menú
+              </label>
+              <div className="flex rounded-md shadow-sm">
+                <div className="relative flex flex-grow items-stretch focus-within:z-10">
+                  <input
+                    type="text"
+                    value={`https://menuahora.com/${username}`}
+                    readOnly
+                    className="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6 cursor-default select-none pointer-events-none bg-gray-50"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-white bg-[#0D654A] hover:bg-[#0C5A42]"
+                >
+                  {copied ? (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                      Copiado
+                    </>
+                  ) : (
+                    <>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                        <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                      </svg>
+                      Copiar
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4 sm:mb-6">
               <div className="flex">
                 <div className="flex-shrink-0">
