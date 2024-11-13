@@ -542,33 +542,38 @@ export default function ProductDashboard() {
               {editingProduct ? "Editar" : "Agregar"} Producto
             </h2>
             <div className="flex-grow overflow-y-auto px-4 sm:px-6 py-4">
-              <div className="space-y-4 sm:space-y-6">
+              <div className="space-y-8">
                 <div>
-                  <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre del producto</label>
-                  <input
-                    type="text"
-                    id="nombre"
-                    value={newProduct.nombre}
-                    onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
-                  />
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Información Básica</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">Nombre del producto</label>
+                      <input
+                        type="text"
+                        id="nombre"
+                        value={newProduct.nombre}
+                        onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">Descripción</label>
+                      <textarea
+                        id="descripcion"
+                        value={newProduct.descripcion}
+                        onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
+                        rows={3}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
+                      />
+                    </div>
+                  </div>
                 </div>
+
+                <div className="border-t border-gray-200" />
+
                 <div>
-                  <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700">Descripción</label>
-                  <textarea
-                    id="descripcion"
-                    value={newProduct.descripcion}
-                    onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
-                    rows={3}
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Imagen del producto</label>
-                  <div 
-                    {...getRootProps()} 
-                    className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-[#0D654A] transition-colors duration-300"
-                  >
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Imagen del Producto</h3>
+                  <div {...getRootProps()} className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md cursor-pointer hover:border-[#0D654A] transition-colors duration-300">
                     <div className="space-y-1 text-center">
                       {newProduct.imagen ? (
                         <div>
@@ -590,79 +595,108 @@ export default function ProductDashboard() {
                     </div>
                   </div>
                 </div>
+
+                <div className="border-t border-gray-200" />
+
                 <div>
-                  <label htmlFor="precio" className="block text-sm font-medium text-gray-700">Precio</label>
-                  <div className="mt-1 relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-gray-500 sm:text-sm">$</span>
-                    </div>
-                    <input
-                      type="number"
-                      id="precio"
-                      value={newProduct.precio}
-                      onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) })}
-                      className="block w-full pl-7 pr-12 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
-                      placeholder="0.00"
-                    />
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Variantes</label>
-                    <input
-                      type="text"
-                      value={newProduct.tipos?.titulo || ""}
-                      onChange={(e) => handleTiposTituloChange(e.target.value)}
-                      placeholder="Ej: Tallas, Sabores, Tortillas, Temperaturas, etc."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                    />
-                  </div>
-                  <div className="bg-gray-50 rounded-md p-4 mb-4">
-                    {newProduct.tipos?.opciones?.length > 0 ? (
-                      <div className="space-y-2">
-                        {newProduct.tipos.opciones.map((tipo) => (
-                          <div key={tipo.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
-                            <span className="text-sm font-medium text-gray-700">{tipo.nombre}</span>
-                            <div className="flex items-center space-x-2">
-                              <button
-                                onClick={() => handleEditTipo(tipo)}
-                                className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
-                              >
-                                <Edit2 className="h-5 w-5" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteTipo(tipo.id)}
-                                className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
-                              >
-                                <X className="h-5 w-5" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Precio y Disponibilidad</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="precio" className="block text-sm font-medium text-gray-700">Precio</label>
+                      <div className="mt-1 relative rounded-md shadow-sm">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <span className="text-gray-500 sm:text-sm">$</span>
+                        </div>
+                        <input
+                          type="number"
+                          id="precio"
+                          value={newProduct.precio}
+                          onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) })}
+                          className="block w-full pl-7 pr-12 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
+                          placeholder="0.00"
+                        />
                       </div>
-                    ) : (
-                      <p className="text-sm text-gray-500 text-center">No hay {newProduct.tipos?.titulo?.toLowerCase() || 'variantes'} agregadas</p>
-                    )}
-                  </div>
-                  <div className="mt-2 flex flex-col sm:flex-row gap-2">
-                    <input
-                      type="text"
-                      value={newTipo}
-                      onChange={(e) => setNewTipo(e.target.value)}
-                      placeholder={`Nueva ${newProduct.tipos?.titulo?.toLowerCase() || 'variante'}`}
-                      className="w-full sm:flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                    />
-                    <button
-                      onClick={editingTipo ? handleUpdateTipo : handleAddTipo}
-                      className="w-full sm:w-auto px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 text-sm transition-colors duration-200"
-                    >
-                      {editingTipo ? "Actualizar" : "Agregar"}
-                    </button>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <label htmlFor="availability" className="block text-sm font-medium text-gray-700">Disponible</label>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          id="availability"
+                          className="sr-only peer"
+                          checked={newProduct.availability}
+                          onChange={(e) => setNewProduct({ ...newProduct, availability: e.target.checked })}
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D654A]"></div>
+                      </label>
+                    </div>
                   </div>
                 </div>
-                <div> {/* Extras */}
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Extras</label>
+
+                <div className="border-t border-gray-200" />
+
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Variantes del Producto</h3>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Variantes</label>
+                      <input
+                        type="text"
+                        value={newProduct.tipos?.titulo || ""}
+                        onChange={(e) => handleTiposTituloChange(e.target.value)}
+                        placeholder="Ej: Tallas, Sabores, Tortillas, Temperaturas, etc."
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                      />
+                    </div>
+                    <div className="bg-gray-50 rounded-md p-4 mb-4">
+                      {newProduct.tipos?.opciones?.length > 0 ? (
+                        <div className="space-y-2">
+                          {newProduct.tipos.opciones.map((tipo) => (
+                            <div key={tipo.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
+                              <span className="text-sm font-medium text-gray-700">{tipo.nombre}</span>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={() => handleEditTipo(tipo)}
+                                  className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
+                                >
+                                  <Edit2 className="h-5 w-5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDeleteTipo(tipo.id)}
+                                  className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
+                                >
+                                  <X className="h-5 w-5" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500 text-center">No hay {newProduct.tipos?.titulo?.toLowerCase() || 'variantes'} agregadas</p>
+                      )}
+                    </div>
+                    <div className="mt-2 flex flex-col sm:flex-row gap-2">
+                      <input
+                        type="text"
+                        value={newTipo}
+                        onChange={(e) => setNewTipo(e.target.value)}
+                        placeholder={`Nueva ${newProduct.tipos?.titulo?.toLowerCase() || 'variante'}`}
+                        className="w-full sm:flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                      />
+                      <button
+                        onClick={editingTipo ? handleUpdateTipo : handleAddTipo}
+                        className="w-full sm:w-auto px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200"
+                      >
+                        {editingTipo ? "Actualizar" : "Agregar"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t border-gray-200" />
+
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Extras</h3>
                   <div className="bg-gray-50 rounded-md p-4 mb-4">
                     {newProduct.extras.length > 0 ? (
                       <div className="space-y-2">
@@ -716,8 +750,11 @@ export default function ProductDashboard() {
                     </button>
                   </div>
                 </div>
-                <div> {/* Categorías */}
-                  <label className="block text-sm font-medium text-gray-700">Categorías (máximo 2)</label>
+
+                <div className="border-t border-gray-200" />
+
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Categorías</h3>
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     {categories.map((category) => (
                       <div key={category._id} className="flex items-center">
@@ -752,22 +789,6 @@ export default function ProductDashboard() {
                     <p className="mt-2 text-sm text-[#0D654A]">Máximo de categorías seleccionadas</p>
                   )}
                 </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="availability" className="block text-sm font-medium text-gray-700">Disponible</label>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        type="checkbox"
-                        id="availability"
-                        className="sr-only peer"
-                        checked={newProduct.availability}
-                        onChange={(e) => setNewProduct({ ...newProduct, availability: e.target.checked })}
-                      />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D654A]"></div>
-                    </label>
-                  </div>
-                </div>
-                
               </div>
             </div>
             <div className="bg-white py-3 px-4 sm:px-6 border-t flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">

@@ -31,6 +31,8 @@ export default function UserPage({ params }) {
 
   const [showScrollTop, setShowScrollTop] = useState(false);
 
+  const [productQuantities, setProductQuantities] = useState({});
+
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true)
@@ -92,6 +94,20 @@ export default function UserPage({ params }) {
       top: 0,
       behavior: 'smooth'
     });
+  };
+
+  const handleIncreaseQuantity = (productId) => {
+    setProductQuantities(prev => ({
+      ...prev,
+      [productId]: (prev[productId] || 0) + 1
+    }));
+  };
+
+  const handleDecreaseQuantity = (productId) => {
+    setProductQuantities(prev => ({
+      ...prev,
+      [productId]: Math.max((prev[productId] || 0) - 1, 0)
+    }));
   };
 
   if (isLoading) return (
@@ -189,6 +205,9 @@ export default function UserPage({ params }) {
               activeCategory={activeCategory}
               onProductClick={toggleProductDetails}
               detailedView={cardInfoSettings.detailedView}
+              productQuantities={productQuantities}
+              onIncrease={handleIncreaseQuantity}
+              onDecrease={handleDecreaseQuantity}
             />
           </div>
           {/* Modificar el footer para centrar los elementos */}
@@ -255,6 +274,34 @@ export default function UserPage({ params }) {
           <h2 className="text-2xl font-bold mb-2">{selectedProduct.nombre}</h2>
           <p className="text-gray-600 mb-2">{selectedProduct.categorias[0]}</p>
           <p className="font-bold text-lg mb-4">${selectedProduct.precio.toFixed(2)}</p>
+          
+          {/* Selector de cantidad */}
+          <div className="flex items-center mb-4">
+            <div className="flex items-center h-8 border border-gray-200 rounded-lg overflow-hidden">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDecreaseQuantity(selectedProduct._id);
+                }}
+                className="w-8 h-full flex items-center justify-center bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
+              >
+                -
+              </button>
+              <div className="w-12 h-full flex items-center justify-center bg-white text-sm">
+                {productQuantities[selectedProduct._id] || 0}
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleIncreaseQuantity(selectedProduct._id);
+                }}
+                className="w-8 h-full flex items-center justify-center bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
+              >
+                +
+              </button>
+            </div>
+          </div>
+
           {selectedProduct.descripcion && (
             <p className="text-gray-700 mb-4">{selectedProduct.descripcion}</p>
           )}
