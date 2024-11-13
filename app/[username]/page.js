@@ -192,7 +192,7 @@ function UserPageContent({ params }) {
   };
 
   const addToCart = (product, quantity, selectedType, selectedExtras) => {
-    let totalPrice = product.precio;
+    let totalPrice = product.precioPromocion > 0 ? product.precioPromocion : product.precio;
     
     if (selectedType && product.tipos) {
       const selectedTypeOption = product.tipos.opciones.find(opt => opt.nombre === selectedType);
@@ -398,7 +398,16 @@ function UserPageContent({ params }) {
               </div>
 
               <h2 className="text-2xl font-bold mb-2">{selectedProduct.nombre}</h2>
-              <p className="font-bold text-lg mb-4">${selectedProduct.precio.toFixed(2)}</p>
+              <div className="flex items-center gap-2 mb-4">
+                {selectedProduct.precioPromocion > 0 ? (
+                  <>
+                    <p className="font-bold text-lg text-black">${selectedProduct.precioPromocion.toFixed(2)}</p>
+                    <p className="text-gray-500 line-through text-sm">${selectedProduct.precio.toFixed(2)}</p>
+                  </>
+                ) : (
+                  <p className="font-bold text-lg">${selectedProduct.precio.toFixed(2)}</p>
+                )}
+              </div>
               
               {selectedProduct.descripcion && (
                 <p className="text-gray-700 mb-4">{selectedProduct.descripcion}</p>

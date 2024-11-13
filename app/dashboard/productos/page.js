@@ -15,6 +15,7 @@ export default function ProductDashboard() {
     descripcion: "",
     imagen: "",
     precio: 0,
+    precioPromocion: 0,
     categorias: [],
     availability: true,
     extras: [],
@@ -142,6 +143,7 @@ export default function ProductDashboard() {
       descripcion: "",
       imagen: "",
       precio: 0,
+      precioPromocion: 0,
       categorias: [],
       availability: true,
       extras: [],
@@ -475,7 +477,16 @@ export default function ProductDashboard() {
                     )}
                     <div className="flex-grow">
                       <h3 className="font-bold text-xl text-gray-800 mb-2">{product.nombre}</h3>
-                      <p className="text-gray-800 font-bold text-lg">${product.precio}</p>
+                      <div className="flex items-center gap-2">
+                        {product.precioPromocion > 0 ? (
+                          <>
+                            <p className="text-gray-800 font-bold text-lg">${product.precioPromocion}</p>
+                            <p className="text-gray-500 line-through text-sm">${product.precio}</p>
+                          </>
+                        ) : (
+                          <p className="text-gray-800 font-bold text-lg">${product.precio}</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <p className="text-gray-600 text-sm mb-2">{product.descripcion}</p>
@@ -601,22 +612,53 @@ export default function ProductDashboard() {
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Precio y Disponibilidad</h3>
                   <div className="space-y-4">
-                    <div>
-                      <label htmlFor="precio" className="block text-sm font-medium text-gray-700">Precio</label>
-                      <div className="mt-1 relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <span className="text-gray-500 sm:text-sm">$</span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="precio" className="block text-sm font-medium text-gray-700">Precio Regular</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span className="text-gray-500 sm:text-sm">$</span>
+                          </div>
+                          <input
+                            type="number"
+                            id="precio"
+                            value={newProduct.precio}
+                            onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) })}
+                            className="block w-full pl-7 pr-12 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
+                            placeholder="0.00"
+                          />
                         </div>
-                        <input
-                          type="number"
-                          id="precio"
-                          value={newProduct.precio}
-                          onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) })}
-                          className="block w-full pl-7 pr-12 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
-                          placeholder="0.00"
-                        />
+                      </div>
+                      
+                      <div>
+                        <label htmlFor="precioPromocion" className="block text-sm font-medium text-gray-700">
+                          Precio Promoción
+                          <span className="ml-1 text-xs text-gray-500">(Opcional)</span>
+                        </label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span className="text-gray-500 sm:text-sm">$</span>
+                          </div>
+                          <input
+                            type="number"
+                            id="precioPromocion"
+                            value={newProduct.precioPromocion || ''}
+                            onChange={(e) => {
+                              const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                              setNewProduct({ ...newProduct, precioPromocion: value });
+                            }}
+                            className="block w-full pl-7 pr-12 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] sm:text-sm"
+                            placeholder="0.00"
+                          />
+                        </div>
+                        {newProduct.precioPromocion > newProduct.precio && (
+                          <p className="mt-1 text-sm text-red-600">
+                            El precio de promoción no puede ser mayor al precio regular
+                          </p>
+                        )}
                       </div>
                     </div>
+                    
                     <div className="flex items-center justify-between">
                       <label htmlFor="availability" className="block text-sm font-medium text-gray-700">Disponible</label>
                       <label className="relative inline-flex items-center cursor-pointer">

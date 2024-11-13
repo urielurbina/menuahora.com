@@ -18,6 +18,11 @@ export default function ProductList({ products, cardInfoSettings, appearance, ac
           <div className="p-3">
             {cardInfoSettings.imagen && (
               <div className="aspect-square md:aspect-[3/4] relative overflow-hidden rounded-sm">
+                {product.precioPromocion > 0 && (
+                  <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-md text-xs font-semibold z-10">
+                    ¡En promoción!
+                  </div>
+                )}
                 <Image
                   src={product.imagen}
                   alt={product.nombre}
@@ -44,11 +49,16 @@ export default function ProductList({ products, cardInfoSettings, appearance, ac
                 {product.nombre}
               </h3>
             )}
-            {cardInfoSettings.precio && (
-              <span className="font-regular text-md mt-1 block" style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}>
-                ${product.precio.toFixed(2)}
-              </span>
-            )}
+            <div className="flex items-center gap-2">
+              {product.precioPromocion > 0 ? (
+                <>
+                  <p className="text-lg font-bold">${product.precioPromocion.toFixed(2)}</p>
+                  <p className="text-gray-500 line-through text-sm">${product.precio.toFixed(2)}</p>
+                </>
+              ) : (
+                <p className="text-lg font-bold">${product.precio.toFixed(2)}</p>
+              )}
+            </div>
             {cardInfoSettings.descripcion && (
               <p className="text-gray-600 text-sm mt-1" style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}>
                 {product.descripcion}

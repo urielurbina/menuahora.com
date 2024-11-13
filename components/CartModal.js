@@ -55,11 +55,8 @@ export default function CartModal({
       message += `Domicilio de entrega: *${orderDetails.direccion}*`;
     }
 
-    const whatsappNumber = appearance?.['basic-info']?.contact?.whatsappNumber || '526142406894';
-    console.log('WhatsApp Number:', whatsappNumber);
-    console.log('Full appearance:', appearance);
-    
-    const whatsappUrl = `https://api.whatsapp.com/send/?phone=${whatsappNumber}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
+    const whatsappNumber = appearance?.['basic-info']?.whatsapp || '';
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
     
     return whatsappUrl;
   };
@@ -95,49 +92,60 @@ export default function CartModal({
               ) : (
                 <div className="space-y-4">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="flex items-start space-x-4 border-b pb-4">
-                      <div className="w-20 h-20 relative rounded-lg overflow-hidden">
-                        <Image
-                          src={item.imagen}
-                          alt={item.nombre}
-                          layout="fill"
-                          objectFit="cover"
-                        />
-                      </div>
+                    <div key={item.id} className="flex items-center py-4 border-b border-gray-200">
+                      {item.imagen && (
+                        <div className="w-16 h-16 mr-4 flex-shrink-0 rounded-lg overflow-hidden">
+                          <Image
+                            src={item.imagen}
+                            alt={item.nombre}
+                            width={64}
+                            height={64}
+                            className="object-cover w-full h-full"
+                          />
+                        </div>
+                      )}
                       <div className="flex-1">
-                        <h3 className="font-medium">{item.nombre}</h3>
-                        {item.tipo && <p className="text-sm text-gray-500">Tipo: {item.tipo}</p>}
-                        {item.extras?.length > 0 && (
-                          <p className="text-sm text-gray-500">
-                            Extras: {item.extras.join(', ')}
+                        <h3 className="text-base font-medium text-gray-900">{item.nombre}</h3>
+                        <div className="mt-1 text-sm text-gray-500">
+                          {item.tipo && <p>Tipo: {item.tipo}</p>}
+                          {item.extras && item.extras.length > 0 && (
+                            <p>Extras: {item.extras.join(', ')}</p>
+                          )}
+                        </div>
+                        <div className="mt-1 flex items-center gap-2">
+                          <p className="text-sm font-medium text-gray-900">
+                            ${(item.price).toFixed(2)}
                           </p>
-                        )}
-                        <div className="mt-2 flex items-center space-x-4">
-                          <div className="flex items-center border rounded-lg">
-                            <button
-                              onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                              className="px-3 py-1"
-                            >
-                              -
-                            </button>
-                            <span className="px-3 py-1 border-x">{item.quantity}</span>
-                            <button
-                              onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                              className="px-3 py-1"
-                            >
-                              +
-                            </button>
-                          </div>
-                          <button
-                            onClick={() => onRemoveItem(item.id)}
-                            className="text-red-500"
-                          >
-                            Eliminar
-                          </button>
+                          <p className="text-sm text-gray-500">
+                            x {item.quantity}
+                          </p>
+                          <p className="text-sm font-medium text-gray-900">
+                            = ${(item.price * item.quantity).toFixed(2)}
+                          </p>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center border rounded-lg">
+                          <button
+                            onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                            className="px-3 py-1"
+                          >
+                            -
+                          </button>
+                          <span className="px-3 py-1 border-x">{item.quantity}</span>
+                          <button
+                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                            className="px-3 py-1"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <button
+                          onClick={() => onRemoveItem(item.id)}
+                          className="text-red-500"
+                        >
+                          Eliminar
+                        </button>
                       </div>
                     </div>
                   ))}
