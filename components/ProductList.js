@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 
-export default function ProductList({ products, cardInfoSettings, appearance, activeCategory, onProductClick, detailedView, productQuantities, onIncrease, onDecrease }) {
+export default function ProductList({ products, cardInfoSettings, appearance, activeCategory, onProductClick, detailedView }) {
   const filteredProducts = activeCategory === 'Todo'
     ? products
     : products.filter(product => product.categorias.includes(activeCategory))
@@ -54,32 +54,6 @@ export default function ProductList({ products, cardInfoSettings, appearance, ac
                 {product.descripcion}
               </p>
             )}
-            
-            <div className="flex items-center mt-3 mb-2">
-              <div className="flex items-center h-8 border border-gray-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDecrease(product._id);
-                  }}
-                  className="w-8 h-full flex items-center justify-center bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
-                >
-                  -
-                </button>
-                <div className="w-12 h-full flex items-center justify-center bg-white text-sm">
-                  {productQuantities[product._id] || 0}
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onIncrease(product._id);
-                  }}
-                  className="w-8 h-full flex items-center justify-center bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
-                >
-                  +
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       ))}

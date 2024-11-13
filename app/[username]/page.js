@@ -33,6 +33,23 @@ export default function UserPage({ params }) {
 
   const [productQuantities, setProductQuantities] = useState({});
 
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedExtras, setSelectedExtras] = useState([]);
+
+  const handleIncreaseQuantity = (productId) => {
+    setProductQuantities(prev => ({
+      ...prev,
+      [productId]: (prev[productId] || 0) + 1
+    }));
+  };
+
+  const handleDecreaseQuantity = (productId) => {
+    setProductQuantities(prev => ({
+      ...prev,
+      [productId]: Math.max((prev[productId] || 0) - 1, 0)
+    }));
+  };
+
   useEffect(() => {
     async function fetchData() {
       setIsLoading(true)
@@ -74,11 +91,30 @@ export default function UserPage({ params }) {
   useEffect(() => {
     setToggleProductDetails(() => (product) => {
       if (cardInfoSettings.detailedView) {
-        console.log('Toggling product details:', product);
-        setSelectedProduct(prevProduct => prevProduct?._id === product._id ? null : product);
+        if (selectedProduct?._id === product._id) {
+          setSelectedProduct(null);
+          setSelectedType('');
+          setSelectedExtras([]);
+          document.body.style.overflow = 'auto';
+          document.body.style.position = 'static';
+          document.body.style.width = 'auto';
+        } else {
+          setSelectedProduct(product);
+          setSelectedType('');
+          setSelectedExtras([]);
+          document.body.style.overflow = 'hidden';
+          document.body.style.position = 'fixed';
+          document.body.style.width = '100%';
+        }
       }
     });
-  }, [cardInfoSettings.detailedView]);
+
+    return () => {
+      document.body.style.overflow = 'auto';
+      document.body.style.position = 'static';
+      document.body.style.width = 'auto';
+    };
+  }, [cardInfoSettings.detailedView, selectedProduct]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,20 +130,6 @@ export default function UserPage({ params }) {
       top: 0,
       behavior: 'smooth'
     });
-  };
-
-  const handleIncreaseQuantity = (productId) => {
-    setProductQuantities(prev => ({
-      ...prev,
-      [productId]: (prev[productId] || 0) + 1
-    }));
-  };
-
-  const handleDecreaseQuantity = (productId) => {
-    setProductQuantities(prev => ({
-      ...prev,
-      [productId]: Math.max((prev[productId] || 0) - 1, 0)
-    }));
   };
 
   if (isLoading) return (
@@ -251,78 +273,223 @@ export default function UserPage({ params }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-        onClick={() => toggleProductDetails(selectedProduct)}
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50"
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleProductDetails(selectedProduct);
+        }}
       >
         <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 50, opacity: 0 }}
-          className="bg-white rounded-lg p-6 max-w-md w-full relative"
+          initial={{ y: '100%' }}
+          animate={{ y: 0 }}
+          exit={{ y: '100%' }}
+          className="bg-white w-full h-[100vh] sm:h-[85vh] sm:max-w-lg sm:rounded-xl relative flex flex-col overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Imagen del producto */}
-          <div className="aspect-[3/2] w-full mb-4 relative overflow-hidden rounded-lg">
-            <Image
-              src={selectedProduct.imagen}
-              alt={selectedProduct.nombre}
-              layout="fill"
-              objectFit="cover"
-            />
-          </div>
-
-          <h2 className="text-2xl font-bold mb-2">{selectedProduct.nombre}</h2>
-          <p className="text-gray-600 mb-2">{selectedProduct.categorias[0]}</p>
-          <p className="font-bold text-lg mb-4">${selectedProduct.precio.toFixed(2)}</p>
-          
-          {/* Selector de cantidad */}
-          <div className="flex items-center mb-4">
-            <div className="flex items-center h-8 border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDecreaseQuantity(selectedProduct._id);
-                }}
-                className="w-8 h-full flex items-center justify-center bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
-              >
-                -
-              </button>
-              <div className="w-12 h-full flex items-center justify-center bg-white text-sm">
-                {productQuantities[selectedProduct._id] || 0}
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleIncreaseQuantity(selectedProduct._id);
-                }}
-                className="w-8 h-full flex items-center justify-center bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
-              >
-                +
-              </button>
-            </div>
-          </div>
-
-          {selectedProduct.descripcion && (
-            <p className="text-gray-700 mb-4">{selectedProduct.descripcion}</p>
-          )}
-          {selectedProduct.extras && selectedProduct.extras.length > 0 && (
-            <div>
-              <h4 className="font-semibold mb-2">Extras:</h4>
-              <ul className="list-disc list-inside text-sm">
-                {selectedProduct.extras.map((extra, index) => (
-                  <li key={index}>{extra.name} - ${extra.price.toFixed(2)}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {/* Botón de cerrar en la esquina inferior derecha */}
+          {/* Botón de cerrar (X) */}
           <button
-            className={`absolute bottom-4 right-4 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-800 ${bodyFont}`}
-            onClick={() => toggleProductDetails(selectedProduct)}
+            className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleProductDetails(selectedProduct);
+            }}
           >
-            Cerrar
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
           </button>
+
+          {/* Contenedor con scroll */}
+          <div className="flex-1 overflow-y-auto pb-[100px]">
+            {/* Imagen del producto con padding */}
+            <div className="p-4 sm:p-6">
+              <div className="w-full aspect-[4/3] sm:aspect-[3/2] relative rounded-xl overflow-hidden">
+                <Image
+                  src={selectedProduct.imagen}
+                  alt={selectedProduct.nombre}
+                  layout="fill"
+                  objectFit="cover"
+                  priority
+                />
+              </div>
+            </div>
+
+            {/* Contenido del producto */}
+            <div className="px-4 sm:px-6">
+              {/* Categoría con estilo redondeado */}
+              <div className="mb-2">
+                <span 
+                  className="text-sm bg-gray-100 px-3 py-1 rounded-full inline-block"
+                  style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}
+                >
+                  {selectedProduct.categorias[0]}
+                </span>
+              </div>
+
+              <h2 className="text-2xl font-bold mb-2">{selectedProduct.nombre}</h2>
+              <p className="font-bold text-lg mb-4">${selectedProduct.precio.toFixed(2)}</p>
+              
+              {selectedProduct.descripcion && (
+                <p className="text-gray-700 mb-4">{selectedProduct.descripcion}</p>
+              )}
+
+              {/* Tipos */}
+              {selectedProduct.tipos && (
+                <div className="mb-6">
+                  <h4 className="font-semibold mb-3 text-gray-800 flex items-center">
+                    {selectedProduct.tipos.titulo}
+                    <span className="text-red-500 ml-1">*</span>
+                  </h4>
+                  <div className="space-y-2">
+                    {selectedProduct.tipos.opciones.map((opcion, index) => (
+                      <div key={index} className="relative">
+                        <input
+                          type="radio"
+                          id={`tipo-${index}`}
+                          name="tipo"
+                          value={opcion.nombre}
+                          checked={selectedType === opcion.nombre}
+                          onChange={(e) => setSelectedType(e.target.value)}
+                          className="peer hidden"
+                          required
+                        />
+                        <label
+                          htmlFor={`tipo-${index}`}
+                          className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-gray-600 peer-checked:bg-gray-50 hover:bg-gray-50 transition-all"
+                        >
+                          <div className="flex items-center">
+                            <div className="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center mr-3 peer-checked:border-gray-600">
+                              <div className={`w-2.5 h-2.5 bg-gray-600 rounded-full ${selectedType === opcion.nombre ? 'block' : 'hidden'}`}></div>
+                            </div>
+                            <div>
+                              <div className="text-sm font-medium text-gray-700">
+                                {opcion.nombre}
+                              </div>
+                              {opcion.precio && (
+                                <div className="text-xs text-gray-500">
+                                  +${opcion.precio.toFixed(2)}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Extras */}
+              {selectedProduct.extras && selectedProduct.extras.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="font-semibold mb-3 text-gray-800">Extras</h4>
+                  <div className="space-y-2">
+                    {selectedProduct.extras.map((extra, index) => (
+                      <div key={index} className="relative">
+                        <input
+                          type="checkbox"
+                          id={`extra-${index}`}
+                          checked={selectedExtras.includes(extra.name)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedExtras(prev => [...prev, extra.name]);
+                            } else {
+                              setSelectedExtras(prev => prev.filter(name => name !== extra.name));
+                            }
+                          }}
+                          className="peer hidden"
+                        />
+                        <label
+                          htmlFor={`extra-${index}`}
+                          className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-gray-600 peer-checked:bg-gray-50 hover:bg-gray-50 transition-all"
+                        >
+                          <div className="flex items-center">
+                            <div className="w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center mr-3 peer-checked:border-gray-600">
+                              <svg 
+                                className={`w-3 h-3 text-gray-600 ${selectedExtras.includes(extra.name) ? 'block' : 'hidden'}`}
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24"
+                              >
+                                <path 
+                                  strokeLinecap="round" 
+                                  strokeLinejoin="round" 
+                                  strokeWidth="2" 
+                                  d="M5 13l4 4L19 7"
+                                />
+                              </svg>
+                            </div>
+                            <div className="flex items-center justify-between w-full">
+                              <span className="text-sm font-medium text-gray-700">
+                                {extra.name}
+                              </span>
+                              <span className="text-sm text-gray-500 ml-2">
+                                +${typeof extra.price === 'number' ? extra.price.toFixed(2) : extra.price}
+                              </span>
+                            </div>
+                          </div>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Footer fijo con selector de cantidad y botón de agregar */}
+          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 p-4 bg-white">
+            <div className="flex items-center justify-between gap-4 max-w-lg mx-auto">
+              <div className="flex items-center h-12 border border-gray-200 rounded-lg overflow-hidden">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDecreaseQuantity(selectedProduct._id);
+                  }}
+                  className="w-12 h-full flex items-center justify-center bg-gray-100 text-gray-700 text-lg font-medium hover:bg-gray-200"
+                >
+                  -
+                </button>
+                <div className="w-16 h-full flex items-center justify-center bg-white text-lg">
+                  {productQuantities[selectedProduct._id] || 0}
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleIncreaseQuantity(selectedProduct._id);
+                  }}
+                  className="w-12 h-full flex items-center justify-center bg-gray-100 text-gray-700 text-lg font-medium hover:bg-gray-200"
+                >
+                  +
+                </button>
+              </div>
+
+              {/* Botón de Agregar al Carrito */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Aquí irá la funcionalidad del carrito en el futuro
+                }}
+                className="flex-1 h-12 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+              >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-5 w-5" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M9 20a1 1 0 1 0 0 2 1 1 0 1 0 0-2z" />
+                  <path d="M20 20a1 1 0 1 0 0 2 1 1 0 1 0 0-2z" />
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+                </svg>
+                <span>Agregar al carrito</span>
+              </button>
+            </div>
+          </div>
         </motion.div>
       </motion.div>
     )}
