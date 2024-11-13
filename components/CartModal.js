@@ -55,8 +55,8 @@ export default function CartModal({
       message += `Domicilio de entrega: *${orderDetails.direccion}*`;
     }
 
-    const whatsappNumber = appearance?.['basic-info']?.whatsapp || '';
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+    const whatsappNumber = appearance?.['basic-info']?.contact?.whatsappNumber || '';
+    const whatsappUrl = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(message)}`;
     
     return whatsappUrl;
   };
