@@ -1,8 +1,14 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useCart } from 'react-use-cart'
 
-export default function CartPreview({ onClick, itemCount = 0, total = 0 }) {
+export default function CartPreview({ onClick }) {
+  const { items, cartTotal } = useCart();
+  
+  // Calcular el total de items
+  const itemCount = items.reduce((count, item) => count + item.quantity, 0);
+
   return (
     <div className="fixed bottom-4 left-0 right-0 flex justify-center items-center z-50 px-4">
       <motion.button
@@ -23,8 +29,8 @@ export default function CartPreview({ onClick, itemCount = 0, total = 0 }) {
           )}
         </div>
         <span className="font-medium whitespace-nowrap">Ver carrito</span>
-        {total > 0 && (
-          <span className="font-bold whitespace-nowrap">${total.toFixed(2)}</span>
+        {cartTotal > 0 && (
+          <span className="font-bold whitespace-nowrap">${cartTotal.toFixed(2)}</span>
         )}
       </motion.button>
     </div>

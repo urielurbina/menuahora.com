@@ -7,80 +7,93 @@ import { useState } from 'react'
 export default function CartModal({ 
   isOpen, 
   onClose, 
-  cartItems = [], 
+  cartItems, 
   onUpdateQuantity, 
-  onRemoveItem,
-  appearance = {}
+  onRemoveItem, 
+  appearance,
+  total,
+  onCreateOrder
 }) {
-  const [step, setStep] = useState(1)
-  const [formData, setFormData] = useState({
+  const [step, setStep] = useState(1);
+  const [orderDetails, setOrderDetails] = useState({
     nombre: '',
     whatsapp: '',
-    metodoPago: 'efectivo',
-    metodoEntrega: 'recoleccion',
+    metodoPago: '',
+    tipoEntrega: '',
     direccion: ''
-  })
+  });
 
-  const calculateTotal = () => {
-    return cartItems.reduce((total, item) => {
-      return total + (item.precio * item.quantity)
-    }, 0)
-  }
+  if (!isOpen) return null;
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
+    const { name, value } = e.target;
+    setOrderDetails(prev => ({
       ...prev,
       [name]: value
-    }))
-  }
+    }));
+  };
 
-  const handleSubmit = () => {
-    // Aquí iría la lógica para enviar el pedido por WhatsApp
-    console.log('Enviando pedido...', formData)
-  }
+  const createWhatsAppMessage = () => {
+    const orderId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    
+    let message = `*${appearance?.['basic-info']?.businessName || 'Nuevo pedido'}*\n\n`;
+    
+    cartItems.forEach(item => {
+      message += `— (${item.quantity}x) ${item.nombre}`;
+      if (item.tipo) message += ` _Tipo: ${item.tipo}_`;
+      if (item.extras?.length > 0) {
+        message += ` _Extras: ${item.extras.join(', ')}_`;
+      }
+      message += ` > *$ ${(item.price * item.quantity).toFixed(2)}*\n`;
+    });
+
+    message += `\n*Total: $ ${total.toFixed(2)}*\n\n`;
+    message += `Nombre: *${orderDetails.nombre}*\n`;
+    message += `Método de pago: *${orderDetails.metodoPago === 'efectivo' ? 'Efectivo' : 'Transferencia bancaria'}*\n`;
+    message += `Entrega: *${orderDetails.tipoEntrega === 'recoleccion' ? 'Recolección en tienda' : 'Entrega a domicilio'}*\n`;
+    
+    if (orderDetails.tipoEntrega === 'domicilio' && orderDetails.direccion) {
+      message += `Domicilio de entrega: *${orderDetails.direccion}*`;
+    }
+
+    const businessPhone = appearance?.['basic-info']?.whatsapp || '526143348253';
+    const whatsappUrl = `https://api.whatsapp.com/send/?phone=${businessPhone}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
+    
+    return whatsappUrl;
+  };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50"
-          onClick={onClose}
-        >
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            className="bg-white w-full h-[90vh] sm:h-[85vh] sm:max-w-lg sm:rounded-xl relative flex flex-col overflow-hidden"
-            onClick={e => e.stopPropagation()}
-          >
-            {/* Botón de cerrar */}
-            <button
-              className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md"
-              onClick={onClose}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose}></div>
+      
+      <div className="absolute right-0 top-0 bottom-0 w-full bg-white shadow-xl flex flex-col md:max-w-md">
+        {/* Header */}
+        <div className="p-4 border-b">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold">
+              {step === 1 ? 'Tu Pedido' : 'Completa tu pedido'}
+            </h2>
+            <button onClick={onClose} className="p-2">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+          </div>
+        </div>
 
-            {/* Header */}
-            <div className="p-4 border-b border-gray-200">
-              <h2 className="text-xl font-bold">
-                {step === 1 ? 'Tu pedido' : 'Completa tu pedido'}
-              </h2>
-            </div>
-
-            {/* Contenido con scroll */}
-            <div className="flex-1 overflow-y-auto">
-              {step === 1 ? (
-                // Paso 1: Lista de productos
-                <div className="p-4 space-y-4">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto">
+          {step === 1 ? (
+            // Paso 1: Lista de productos
+            <div className="p-4">
+              {cartItems.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  Tu carrito está vacío
+                </div>
+              ) : (
+                <div className="space-y-4">
                   {cartItems.map((item) => (
-                    <div key={item._id} className="flex items-center gap-4 p-3 bg-white border border-gray-200 rounded-lg">
+                    <div key={item.id} className="flex items-start space-x-4 border-b pb-4">
                       <div className="w-20 h-20 relative rounded-lg overflow-hidden">
                         <Image
                           src={item.imagen}
@@ -91,151 +104,176 @@ export default function CartModal({
                       </div>
                       <div className="flex-1">
                         <h3 className="font-medium">{item.nombre}</h3>
-                        <p className="text-sm text-gray-500">${item.precio}</p>
-                        
-                        {/* Controles de cantidad */}
-                        <div className="flex items-center gap-2 mt-2">
+                        {item.tipo && <p className="text-sm text-gray-500">Tipo: {item.tipo}</p>}
+                        {item.extras?.length > 0 && (
+                          <p className="text-sm text-gray-500">
+                            Extras: {item.extras.join(', ')}
+                          </p>
+                        )}
+                        <div className="mt-2 flex items-center space-x-4">
+                          <div className="flex items-center border rounded-lg">
+                            <button
+                              onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                              className="px-3 py-1"
+                            >
+                              -
+                            </button>
+                            <span className="px-3 py-1 border-x">{item.quantity}</span>
+                            <button
+                              onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                              className="px-3 py-1"
+                            >
+                              +
+                            </button>
+                          </div>
                           <button
-                            onClick={() => onUpdateQuantity(item._id, item.quantity - 1)}
-                            className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-lg"
+                            onClick={() => onRemoveItem(item.id)}
+                            className="text-red-500"
                           >
-                            -
-                          </button>
-                          <span>{item.quantity}</span>
-                          <button
-                            onClick={() => onUpdateQuantity(item._id, item.quantity + 1)}
-                            className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-lg"
-                          >
-                            +
+                            Eliminar
                           </button>
                         </div>
                       </div>
-                      
-                      {/* Botón eliminar */}
-                      <button
-                        onClick={() => onRemoveItem(item._id)}
-                        className="text-red-500 p-2"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                        </svg>
-                      </button>
+                      <div className="text-right">
+                        <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
-              ) : (
-                // Paso 2: Formulario de pedido
-                <div className="p-4 space-y-4">
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Nombre
-                      </label>
-                      <input
-                        type="text"
-                        name="nombre"
-                        value={formData.nombre}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border border-gray-300 rounded-lg"
-                        placeholder="Tu nombre"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        WhatsApp
-                      </label>
-                      <input
-                        type="tel"
-                        name="whatsapp"
-                        value={formData.whatsapp}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border border-gray-300 rounded-lg"
-                        placeholder="Tu número de WhatsApp"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Método de pago
-                      </label>
-                      <select
-                        name="metodoPago"
-                        value={formData.metodoPago}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border border-gray-300 rounded-lg"
-                      >
-                        <option value="efectivo">Efectivo</option>
-                        <option value="transferencia">Transferencia bancaria</option>
-                      </select>
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Método de entrega
-                      </label>
-                      <select
-                        name="metodoEntrega"
-                        value={formData.metodoEntrega}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border border-gray-300 rounded-lg"
-                      >
-                        <option value="recoleccion">Recolección</option>
-                        <option value="domicilio">Entrega a domicilio</option>
-                      </select>
-                    </div>
-
-                    {formData.metodoEntrega === 'domicilio' && (
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Dirección de entrega
-                        </label>
-                        <textarea
-                          name="direccion"
-                          value={formData.direccion}
-                          onChange={handleInputChange}
-                          className="w-full p-2 border border-gray-300 rounded-lg"
-                          placeholder="Tu dirección completa"
-                          rows="3"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
               )}
             </div>
-
-            {/* Footer fijo */}
-            <div className="border-t border-gray-200 p-4 bg-white">
-              <div className="mb-4">
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">Total estimado:</span>
-                  <span className="font-bold">${calculateTotal().toFixed(2)}</span>
-                </div>
+          ) : (
+            // Paso 2: Formulario de datos
+            <div className="p-4 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nombre
+                </label>
+                <input
+                  type="text"
+                  name="nombre"
+                  value={orderDetails.nombre}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded-lg"
+                  placeholder="Tu nombre"
+                  required
+                />
               </div>
-              
-              {step === 1 ? (
-                <button
-                  onClick={() => setStep(2)}
-                  className="w-full h-12 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  WhatsApp
+                </label>
+                <input
+                  type="tel"
+                  name="whatsapp"
+                  value={orderDetails.whatsapp}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded-lg"
+                  placeholder="Tu número de WhatsApp"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Método de pago
+                </label>
+                <select
+                  name="metodoPago"
+                  value={orderDetails.metodoPago}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded-lg"
+                  required
                 >
-                  Iniciar compra
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubmit}
-                  className="w-full h-12 bg-[#25D366] text-white rounded-lg font-medium hover:bg-[#128C7E] transition-colors flex items-center justify-center gap-2"
+                  <option value="">Selecciona un método</option>
+                  <option value="efectivo">Efectivo</option>
+                  <option value="transferencia">Transferencia bancaria</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Tipo de entrega
+                </label>
+                <select
+                  name="tipoEntrega"
+                  value={orderDetails.tipoEntrega}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border rounded-lg"
+                  required
                 >
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                  </svg>
-                  Completar pedido en WhatsApp
-                </button>
+                  <option value="">Selecciona tipo de entrega</option>
+                  <option value="recoleccion">Recolección</option>
+                  <option value="domicilio">Entrega a domicilio</option>
+                </select>
+              </div>
+
+              {orderDetails.tipoEntrega === 'domicilio' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Dirección de entrega
+                  </label>
+                  <textarea
+                    name="direccion"
+                    value={orderDetails.direccion}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border rounded-lg"
+                    rows="3"
+                    placeholder="Tu dirección completa"
+                    required
+                  />
+                </div>
               )}
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-  )
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="border-t p-4 space-y-4">
+          <div className="flex items-center justify-between font-semibold text-lg">
+            <span>Total estimado</span>
+            <span>${total.toFixed(2)}</span>
+          </div>
+          
+          {step === 1 ? (
+            <button
+              onClick={() => setStep(2)}
+              disabled={cartItems.length === 0}
+              className={`w-full py-3 px-4 rounded-lg text-white font-medium ${
+                cartItems.length === 0 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-black hover:bg-gray-800'
+              }`}
+            >
+              Continuar
+            </button>
+          ) : (
+            <div className="space-y-3">
+              <button
+                onClick={() => setStep(1)}
+                className="w-full py-3 px-4 rounded-lg font-medium border border-gray-300 hover:bg-gray-50"
+              >
+                Volver a mi pedido
+              </button>
+              <button
+                onClick={() => {
+                  const whatsappUrl = createWhatsAppMessage();
+                  window.open(whatsappUrl, '_blank');
+                }}
+                disabled={!orderDetails.nombre || !orderDetails.whatsapp || !orderDetails.metodoPago || !orderDetails.tipoEntrega}
+                className={`w-full py-3 px-4 rounded-lg text-white font-medium ${
+                  !orderDetails.nombre || !orderDetails.whatsapp || !orderDetails.metodoPago || !orderDetails.tipoEntrega
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-green-600 hover:bg-green-700'
+                }`}
+              >
+                Completar pedido en WhatsApp
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 } 

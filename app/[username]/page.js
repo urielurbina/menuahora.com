@@ -12,10 +12,19 @@ import { Inter } from 'next/font/google'
 import Link from 'next/link'
 import CartPreview from '@/components/CartPreview'
 import CartModal from '@/components/CartModal'
+import { CartProvider, useCart } from 'react-use-cart'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export default function UserPage({ params }) {
+function UserPageContent({ params }) {
+  const { 
+    addItem, 
+    updateItemQuantity, 
+    removeItem, 
+    items, 
+    cartTotal 
+  } = useCart();
+
   const [businessData, setBusinessData] = useState(null)
   const [activeCategory, setActiveCategory] = useState('Todo')
   const [isLoading, setIsLoading] = useState(true)
@@ -188,11 +197,60 @@ export default function UserPage({ params }) {
 
   // Agregar estas funciones para calcular el total y la cantidad de items
   const calculateCartTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.precio * item.quantity), 0);
+    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
   const calculateCartItemCount = () => {
     return cartItems.reduce((count, item) => count + item.quantity, 0);
+  };
+
+  const addToCart = (product, quantity, selectedType, selectedExtras) => {
+    // Calcular precio total con extras y tipo seleccionado
+    let totalPrice = product.precio;
+    
+    // Agregar precio del tipo seleccionado si existe
+    if (selectedType && product.tipos) {
+      const selectedTypeOption = product.tipos.opciones.find(opt => opt.nombre === selectedType);
+      if (selectedTypeOption && selectedTypeOption.precio) {
+        totalPrice += selectedTypeOption.precio;
+      }
+    }
+
+    // Agregar precio de extras seleccionados
+    if (selectedExtras.length > 0 && product.extras) {
+      selectedExtras.forEach(extraName => {
+        const extra = product.extras.find(e => e.name === extraName);
+        if (extra && extra.price) {
+          totalPrice += extra.price;
+        }
+      });
+    }
+
+    // Crear item para el carrito
+    const cartItem = {
+      id: `${product._id}-${selectedType}-${selectedExtras.join('-')}`, // ID único para combinación
+      _id: product._id,
+      nombre: product.nombre,
+      price: totalPrice,
+      quantity: quantity,
+      tipo: selectedType,
+      extras: selectedExtras,
+      imagen: product.imagen
+    };
+
+    addItem(cartItem);
+    setSelectedProduct(null); // Cerrar modal
+    setIsCartOpen(true); // Abrir carrito
+  };
+
+  const createWhatsAppOrder = (message) => {
+    const businessPhone = businessData['basic-info']?.whatsapp || '';
+    if (!businessPhone) return;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${businessPhone}?text=${encodedMessage}`;
+    
+    window.open(whatsappUrl, '_blank');
   };
 
   return (
@@ -273,11 +331,8 @@ export default function UserPage({ params }) {
     </div>
   </div>
 
-  {/* Modificar el CartPreview para pasar las props necesarias */}
   <CartPreview 
     onClick={() => setIsCartOpen(true)}
-    itemCount={calculateCartItemCount()}
-    total={calculateCartTotal()}
   />
 
   {/* Botón Volver Arriba */}
@@ -499,20 +554,20 @@ export default function UserPage({ params }) {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  // Aquí irá la funcionalidad del carrito en el futuro
+                  if (selectedProduct.tipos && !selectedType) {
+                    alert('Por favor selecciona un tipo');
+                    return;
+                  }
+                  addToCart(
+                    selectedProduct, 
+                    productQuantities[selectedProduct._id] || 1,
+                    selectedType,
+                    selectedExtras
+                  );
                 }}
                 className="flex-1 h-12 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
               >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  className="h-5 w-5" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 20a1 1 0 1 0 0 2 1 1 0 1 0 0-2z" />
                   <path d="M20 20a1 1 0 1 0 0 2 1 1 0 1 0 0-2z" />
                   <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
@@ -529,12 +584,21 @@ export default function UserPage({ params }) {
   <CartModal
     isOpen={isCartOpen}
     onClose={() => setIsCartOpen(false)}
-    cartItems={cartItems}
-    onUpdateQuantity={handleUpdateCartQuantity}
-    onRemoveItem={handleRemoveFromCart}
-    appearance={appearance}
+    cartItems={items}
+    onUpdateQuantity={updateItemQuantity}
+    onRemoveItem={removeItem}
+    appearance={businessData}
+    total={cartTotal}
   />
 </div>
 
+  )
+}
+
+export default function UserPage({ params }) {
+  return (
+    <CartProvider>
+      <UserPageContent params={params} />
+    </CartProvider>
   )
 }
