@@ -10,6 +10,8 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Inter } from 'next/font/google'
 import Link from 'next/link'
+import CartPreview from '@/components/CartPreview'
+import CartModal from '@/components/CartModal'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -36,6 +38,9 @@ export default function UserPage({ params }) {
   const [selectedType, setSelectedType] = useState('');
   const [selectedExtras, setSelectedExtras] = useState([]);
 
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [cartItems, setCartItems] = useState([])
+
   const handleIncreaseQuantity = (productId) => {
     setProductQuantities(prev => ({
       ...prev,
@@ -49,6 +54,18 @@ export default function UserPage({ params }) {
       [productId]: Math.max((prev[productId] || 0) - 1, 0)
     }));
   };
+
+  const handleUpdateCartQuantity = (productId, newQuantity) => {
+    setCartItems(prev => prev.map(item => 
+      item._id === productId 
+        ? { ...item, quantity: Math.max(0, newQuantity) }
+        : item
+    ).filter(item => item.quantity > 0))
+  }
+
+  const handleRemoveFromCart = (productId) => {
+    setCartItems(prev => prev.filter(item => item._id !== productId))
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -169,6 +186,15 @@ export default function UserPage({ params }) {
   const headingFont = appearance.headingFont || inter.className
   const bodyFont = appearance.bodyFont || inter.className
 
+  // Agregar estas funciones para calcular el total y la cantidad de items
+  const calculateCartTotal = () => {
+    return cartItems.reduce((total, item) => total + (item.precio * item.quantity), 0);
+  };
+
+  const calculateCartItemCount = () => {
+    return cartItems.reduce((count, item) => count + item.quantity, 0);
+  };
+
   return (
     <div className={`w-full mx-auto bg-gray-100 relative ${bodyFont}`}>
       <div className="lg:flex">
@@ -247,7 +273,12 @@ export default function UserPage({ params }) {
     </div>
   </div>
 
-  
+  {/* Modificar el CartPreview para pasar las props necesarias */}
+  <CartPreview 
+    onClick={() => setIsCartOpen(true)}
+    itemCount={calculateCartItemCount()}
+    total={calculateCartTotal()}
+  />
 
   {/* Botón Volver Arriba */}
   <AnimatePresence>
@@ -494,6 +525,15 @@ export default function UserPage({ params }) {
       </motion.div>
     )}
   </AnimatePresence>
+
+  <CartModal
+    isOpen={isCartOpen}
+    onClose={() => setIsCartOpen(false)}
+    cartItems={cartItems}
+    onUpdateQuantity={handleUpdateCartQuantity}
+    onRemoveItem={handleRemoveFromCart}
+    appearance={appearance}
+  />
 </div>
 
   )
