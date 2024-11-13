@@ -15,12 +15,17 @@ export default function ProductDashboard() {
     descripcion: "",
     imagen: "",
     precio: 0,
-    categorias: [], // Cambiado de categoria a categorias como array
+    categorias: [],
     availability: true,
     extras: [],
+    tipos: {
+      titulo: "",
+      opciones: []
+    }
   })
   const [newCategory, setNewCategory] = useState("")
   const [newExtra, setNewExtra] = useState({ name: "", price: 0 })
+  const [newTipo, setNewTipo] = useState("")
   const [cardInfoSettings, setCardInfoSettings] = useState({
     nombre: true,
     descripcion: true,
@@ -33,6 +38,8 @@ export default function ProductDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [dataLoaded, setDataLoaded] = useState(false)
+  const [editingExtra, setEditingExtra] = useState(null)
+  const [editingTipo, setEditingTipo] = useState(null)
 
   useEffect(() => {
     fetchProducts()
@@ -135,10 +142,18 @@ export default function ProductDashboard() {
       descripcion: "",
       imagen: "",
       precio: 0,
-      categorias: [], // Cambiado de categoria a categorias como array
+      categorias: [],
       availability: true,
       extras: [],
+      tipos: {
+        titulo: "",
+        opciones: []
+      }
     })
+    setNewExtra({ name: "", price: 0 })
+    setNewTipo("")
+    setEditingExtra(null)
+    setEditingTipo(null)
   }
 
   const handleAddCategory = async () => {
@@ -202,7 +217,15 @@ export default function ProductDashboard() {
 
   const handleEditProduct = (product) => {
     setEditingProduct(product)
-    setNewProduct(product)
+    const productWithTipos = {
+      ...product,
+      tipos: {
+        titulo: product.tipos?.titulo || "Tipos",
+        placeholder: product.tipos?.placeholder || "Tipo",
+        opciones: product.tipos?.opciones || []
+      }
+    }
+    setNewProduct(productWithTipos)
     setIsAddingProduct(true)
   }
 
@@ -240,6 +263,92 @@ export default function ProductDashboard() {
   }
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+
+  const handleAddTipo = () => {
+    if (newTipo.trim()) {
+      setNewProduct({
+        ...newProduct,
+        tipos: {
+          ...newProduct.tipos,
+          opciones: [...newProduct.tipos.opciones, { id: Date.now(), nombre: newTipo.trim() }]
+        }
+      })
+      setNewTipo("")
+    }
+  }
+
+  const handleDeleteTipo = (id) => {
+    setNewProduct({
+      ...newProduct,
+      tipos: {
+        ...newProduct.tipos,
+        opciones: newProduct.tipos.opciones.filter(tipo => tipo.id !== id)
+      }
+    })
+  }
+
+  const handleTiposTituloChange = (nuevoTitulo) => {
+    setNewProduct({
+      ...newProduct,
+      tipos: {
+        ...newProduct.tipos,
+        titulo: nuevoTitulo
+      }
+    })
+  }
+
+  const handleTiposPlaceholderChange = (nuevoPlaceholder) => {
+    setNewProduct({
+      ...newProduct,
+      tipos: {
+        ...newProduct.tipos,
+        placeholder: nuevoPlaceholder
+      }
+    })
+  }
+
+  const handleEditExtra = (extra) => {
+    setEditingExtra(extra)
+    setNewExtra({ name: extra.name, price: extra.price })
+  }
+
+  const handleUpdateExtra = () => {
+    if (newExtra.name && newExtra.price) {
+      setNewProduct({
+        ...newProduct,
+        extras: newProduct.extras.map(extra => 
+          extra.id === editingExtra.id 
+            ? { ...newExtra, id: extra.id }
+            : extra
+        ),
+      })
+      setNewExtra({ name: "", price: 0 })
+      setEditingExtra(null)
+    }
+  }
+
+  const handleEditTipo = (tipo) => {
+    setEditingTipo(tipo)
+    setNewTipo(tipo.nombre)
+  }
+
+  const handleUpdateTipo = () => {
+    if (newTipo.trim()) {
+      setNewProduct({
+        ...newProduct,
+        tipos: {
+          ...newProduct.tipos,
+          opciones: newProduct.tipos.opciones.map(tipo =>
+            tipo.id === editingTipo.id
+              ? { ...tipo, nombre: newTipo.trim() }
+              : tipo
+          )
+        }
+      })
+      setNewTipo("")
+      setEditingTipo(null)
+    }
+  }
 
   // if (isLoading) return <LoadingScreen />
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>
@@ -392,6 +501,18 @@ export default function ProductDashboard() {
                       </ul>
                     </div>
                   )}
+                  {product.tipos?.opciones?.length > 0 && (
+                    <div className="mt-2">
+                      <h4 className="font-semibold text-sm mb-1 text-gray-700">{product.tipos.titulo}:</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {product.tipos.opciones.map((tipo) => (
+                          <span key={tipo.id} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-700">
+                            {tipo.nombre}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="mt-4 flex justify-between">
                     <button
                       onClick={() => handleEditProduct(product)}
@@ -485,7 +606,117 @@ export default function ProductDashboard() {
                     />
                   </div>
                 </div>
+                
                 <div>
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Variantes</label>
+                    <input
+                      type="text"
+                      value={newProduct.tipos?.titulo || ""}
+                      onChange={(e) => handleTiposTituloChange(e.target.value)}
+                      placeholder="Ej: Tallas, Sabores, Tortillas, Temperaturas, etc."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                    />
+                  </div>
+                  <div className="bg-gray-50 rounded-md p-4 mb-4">
+                    {newProduct.tipos?.opciones?.length > 0 ? (
+                      <div className="space-y-2">
+                        {newProduct.tipos.opciones.map((tipo) => (
+                          <div key={tipo.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
+                            <span className="text-sm font-medium text-gray-700">{tipo.nombre}</span>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => handleEditTipo(tipo)}
+                                className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
+                              >
+                                <Edit2 className="h-5 w-5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteTipo(tipo.id)}
+                                className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
+                              >
+                                <X className="h-5 w-5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500 text-center">No hay {newProduct.tipos?.titulo?.toLowerCase() || 'variantes'} agregadas</p>
+                    )}
+                  </div>
+                  <div className="mt-2 flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={newTipo}
+                      onChange={(e) => setNewTipo(e.target.value)}
+                      placeholder={`Nueva ${newProduct.tipos?.titulo?.toLowerCase() || 'variante'}`}
+                      className="w-full sm:flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                    />
+                    <button
+                      onClick={editingTipo ? handleUpdateTipo : handleAddTipo}
+                      className="w-full sm:w-auto px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 text-sm transition-colors duration-200"
+                    >
+                      {editingTipo ? "Actualizar" : "Agregar"}
+                    </button>
+                  </div>
+                </div>
+                <div> {/* Extras */}
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Extras</label>
+                  <div className="bg-gray-50 rounded-md p-4 mb-4">
+                    {newProduct.extras.length > 0 ? (
+                      <div className="space-y-2">
+                        {newProduct.extras.map((extra) => (
+                          <div key={extra.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-sm font-medium text-gray-700">{extra.name}</span>
+                              <span className="text-sm text-gray-500">${extra.price.toFixed(2)}</span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => handleEditExtra(extra)}
+                                className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
+                              >
+                                <Edit2 className="h-5 w-5" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteExtra(extra.id)}
+                                className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
+                              >
+                                <X className="h-5 w-5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500 text-center">No hay extras agregados</p>
+                    )}
+                  </div>
+                  <div className="mt-2 flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="text"
+                      value={newExtra.name}
+                      onChange={(e) => setNewExtra({ ...newExtra, name: e.target.value })}
+                      placeholder="Nombre del extra"
+                      className="w-full sm:flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                    />
+                    <input
+                      type="number"
+                      value={newExtra.price}
+                      onChange={(e) => setNewExtra({ ...newExtra, price: parseFloat(e.target.value) })}
+                      placeholder="Precio"
+                      className="w-full sm:w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                    />
+                    <button
+                      onClick={editingExtra ? handleUpdateExtra : handleAddExtra}
+                      className="w-full sm:w-auto px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200"
+                    >
+                      {editingExtra ? "Actualizar" : "Agregar"}
+                    </button>
+                  </div>
+                </div>
+                <div> {/* Categorías */}
                   <label className="block text-sm font-medium text-gray-700">Categorías (máximo 2)</label>
                   <div className="mt-2 grid grid-cols-2 gap-2">
                     {categories.map((category) => (
@@ -536,53 +767,7 @@ export default function ProductDashboard() {
                     </label>
                   </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Extras</label>
-                  <div className="bg-gray-50 rounded-md p-4 mb-4">
-                    {newProduct.extras.length > 0 ? (
-                      <div className="space-y-2">
-                        {newProduct.extras.map((extra) => (
-                          <div key={extra.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
-                            <div className="flex items-center space-x-2">
-                              <span className="text-sm font-medium text-gray-700">{extra.name}</span>
-                              <span className="text-sm text-gray-500">${extra.price.toFixed(2)}</span>
-                            </div>
-                            <button
-                              onClick={() => handleDeleteExtra(extra.id)}
-                              className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
-                            >
-                              <X className="h-5 w-5" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500 text-center">No hay extras agregados</p>
-                    )}
-                  </div>
-                  <div className="mt-2 flex flex-col sm:flex-row gap-2">
-                    <input
-                      type="text"
-                      value={newExtra.name}
-                      onChange={(e) => setNewExtra({ ...newExtra, name: e.target.value })}
-                      placeholder="Nombre del extra"
-                      className="w-full sm:flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                    />
-                    <input
-                      type="number"
-                      value={newExtra.price}
-                      onChange={(e) => setNewExtra({ ...newExtra, price: parseFloat(e.target.value) })}
-                      placeholder="Precio"
-                      className="w-full sm:w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                    />
-                    <button
-                      onClick={handleAddExtra}
-                      className="w-full sm:w-auto px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 text-sm transition-colors duration-200"
-                    >
-                      Agregar
-                    </button>
-                  </div>
-                </div>
+                
               </div>
             </div>
             <div className="bg-white py-3 px-4 sm:px-6 border-t flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
