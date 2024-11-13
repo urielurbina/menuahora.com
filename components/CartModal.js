@@ -17,7 +17,6 @@ export default function CartModal({
   const [step, setStep] = useState(1);
   const [orderDetails, setOrderDetails] = useState({
     nombre: '',
-    whatsapp: '',
     metodoPago: '',
     tipoEntrega: '',
     direccion: ''
@@ -56,8 +55,11 @@ export default function CartModal({
       message += `Domicilio de entrega: *${orderDetails.direccion}*`;
     }
 
-    const businessPhone = appearance?.['basic-info']?.whatsapp || '526143348253';
-    const whatsappUrl = `https://api.whatsapp.com/send/?phone=${businessPhone}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
+    const whatsappNumber = appearance?.['basic-info']?.contact?.whatsappNumber || '526142406894';
+    console.log('WhatsApp Number:', whatsappNumber);
+    console.log('Full appearance:', appearance);
+    
+    const whatsappUrl = `https://api.whatsapp.com/send/?phone=${whatsappNumber}&text=${encodeURIComponent(message)}&type=phone_number&app_absent=0`;
     
     return whatsappUrl;
   };
@@ -162,21 +164,6 @@ export default function CartModal({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  WhatsApp
-                </label>
-                <input
-                  type="tel"
-                  name="whatsapp"
-                  value={orderDetails.whatsapp}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded-lg"
-                  placeholder="Tu número de WhatsApp"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Método de pago
                 </label>
                 <select
@@ -254,16 +241,16 @@ export default function CartModal({
                 onClick={() => setStep(1)}
                 className="w-full py-3 px-4 rounded-lg font-medium border border-gray-300 hover:bg-gray-50"
               >
-                Volver a mi pedido
+                Volver a mi carrito
               </button>
               <button
                 onClick={() => {
                   const whatsappUrl = createWhatsAppMessage();
                   window.open(whatsappUrl, '_blank');
                 }}
-                disabled={!orderDetails.nombre || !orderDetails.whatsapp || !orderDetails.metodoPago || !orderDetails.tipoEntrega}
+                disabled={!orderDetails.nombre || !orderDetails.metodoPago || !orderDetails.tipoEntrega}
                 className={`w-full py-3 px-4 rounded-lg text-white font-medium ${
-                  !orderDetails.nombre || !orderDetails.whatsapp || !orderDetails.metodoPago || !orderDetails.tipoEntrega
+                  !orderDetails.nombre || !orderDetails.metodoPago || !orderDetails.tipoEntrega
                     ? 'bg-gray-400 cursor-not-allowed' 
                     : 'bg-green-600 hover:bg-green-700'
                 }`}

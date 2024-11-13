@@ -12,18 +12,18 @@ import { Inter } from 'next/font/google'
 import Link from 'next/link'
 import CartPreview from '@/components/CartPreview'
 import CartModal from '@/components/CartModal'
-import { CartProvider, useCart } from 'react-use-cart'
+import { usePersistedCart } from '@/hooks/usePersistedCart'
 
 const inter = Inter({ subsets: ['latin'] })
 
 function UserPageContent({ params }) {
   const { 
-    addItem, 
-    updateItemQuantity, 
+    cart, 
+    addToCart: addToPersistedCart, 
+    updateQuantity, 
     removeItem, 
-    items, 
-    cartTotal 
-  } = useCart();
+    clearCart 
+  } = usePersistedCart(params.username);
 
   const [businessData, setBusinessData] = useState(null)
   const [activeCategory, setActiveCategory] = useState('Todo')
@@ -48,7 +48,6 @@ function UserPageContent({ params }) {
   const [selectedExtras, setSelectedExtras] = useState([]);
 
   const [isCartOpen, setIsCartOpen] = useState(false)
-  const [cartItems, setCartItems] = useState([])
 
   const handleIncreaseQuantity = (productId) => {
     setProductQuantities(prev => ({
@@ -63,18 +62,6 @@ function UserPageContent({ params }) {
       [productId]: Math.max((prev[productId] || 0) - 1, 0)
     }));
   };
-
-  const handleUpdateCartQuantity = (productId, newQuantity) => {
-    setCartItems(prev => prev.map(item => 
-      item._id === productId 
-        ? { ...item, quantity: Math.max(0, newQuantity) }
-        : item
-    ).filter(item => item.quantity > 0))
-  }
-
-  const handleRemoveFromCart = (productId) => {
-    setCartItems(prev => prev.filter(item => item._id !== productId))
-  }
 
   useEffect(() => {
     async function fetchData() {
@@ -197,18 +184,16 @@ function UserPageContent({ params }) {
 
   // Agregar estas funciones para calcular el total y la cantidad de items
   const calculateCartTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return cart.items.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
   const calculateCartItemCount = () => {
-    return cartItems.reduce((count, item) => count + item.quantity, 0);
+    return cart.items.reduce((count, item) => count + item.quantity, 0);
   };
 
   const addToCart = (product, quantity, selectedType, selectedExtras) => {
-    // Calcular precio total con extras y tipo seleccionado
     let totalPrice = product.precio;
     
-    // Agregar precio del tipo seleccionado si existe
     if (selectedType && product.tipos) {
       const selectedTypeOption = product.tipos.opciones.find(opt => opt.nombre === selectedType);
       if (selectedTypeOption && selectedTypeOption.precio) {
@@ -216,7 +201,6 @@ function UserPageContent({ params }) {
       }
     }
 
-    // Agregar precio de extras seleccionados
     if (selectedExtras.length > 0 && product.extras) {
       selectedExtras.forEach(extraName => {
         const extra = product.extras.find(e => e.name === extraName);
@@ -226,21 +210,21 @@ function UserPageContent({ params }) {
       });
     }
 
-    // Crear item para el carrito
     const cartItem = {
-      id: `${product._id}-${selectedType}-${selectedExtras.join('-')}`, // ID único para combinación
+      id: `${product._id}-${selectedType}-${selectedExtras.join('-')}`,
       _id: product._id,
       nombre: product.nombre,
       price: totalPrice,
       quantity: quantity,
       tipo: selectedType,
       extras: selectedExtras,
-      imagen: product.imagen
+      imagen: product.imagen,
+      businessId: params.username
     };
 
-    addItem(cartItem);
-    setSelectedProduct(null); // Cerrar modal
-    setIsCartOpen(true); // Abrir carrito
+    addToPersistedCart(cartItem);
+    setSelectedProduct(null);
+    setIsCartOpen(true);
   };
 
   const createWhatsAppOrder = (message) => {
@@ -333,6 +317,7 @@ function UserPageContent({ params }) {
 
   <CartPreview 
     onClick={() => setIsCartOpen(true)}
+    cart={cart}
   />
 
   {/* Botón Volver Arriba */}
@@ -584,11 +569,11 @@ function UserPageContent({ params }) {
   <CartModal
     isOpen={isCartOpen}
     onClose={() => setIsCartOpen(false)}
-    cartItems={items}
-    onUpdateQuantity={updateItemQuantity}
+    cartItems={cart.items}
+    onUpdateQuantity={updateQuantity}
     onRemoveItem={removeItem}
     appearance={businessData}
-    total={cartTotal}
+    total={cart.total}
   />
 </div>
 
@@ -596,9 +581,5 @@ function UserPageContent({ params }) {
 }
 
 export default function UserPage({ params }) {
-  return (
-    <CartProvider>
-      <UserPageContent params={params} />
-    </CartProvider>
-  )
+  return <UserPageContent params={params} />;
 }

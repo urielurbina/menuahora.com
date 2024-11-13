@@ -23,7 +23,7 @@ export default function InformacionBasica() {
     coverPhotoUrl: '',
     contact: {
       phoneNumber: '',
-      whatsappLink: '',
+      whatsappNumber: '',
       facebookLink: '',
       address: '',
     },
@@ -100,6 +100,25 @@ export default function InformacionBasica() {
     if (type === 'file') {
       handleFiles(files, name === 'logoFile' ? 'logo' : 'cover');
     } else {
+      // Validación especial para el número de WhatsApp
+      if (name === 'contact.whatsappNumber') {
+        // Eliminar cualquier caracter que no sea número o '+'
+        let cleanNumber = value.replace(/[^\d+]/g, '');
+        // Asegurar que comience con '+'
+        if (!cleanNumber.startsWith('+')) {
+          cleanNumber = '+' + cleanNumber;
+        }
+        // Actualizar el estado con el número limpio
+        setFormData(prevData => ({
+          ...prevData,
+          contact: {
+            ...prevData.contact,
+            whatsappNumber: cleanNumber
+          }
+        }));
+        return;
+      }
+
       setFormData(prevData => {
         const newData = { ...prevData };
         if (name.includes('.')) {
@@ -156,6 +175,14 @@ export default function InformacionBasica() {
     setIsLoading(true);
     setMessage('');
 
+    // Validar el formato del número de WhatsApp
+    const whatsappRegex = /^\+\d{10,15}$/;
+    if (!whatsappRegex.test(formData.contact.whatsappNumber)) {
+      setMessage('El número de WhatsApp debe incluir el código de país (ejemplo: +521234567890)');
+      setIsLoading(false);
+      return;
+    }
+
     if (!session || !session.user) {
       setMessage('No estás autenticado');
       setIsLoading(false);
@@ -176,7 +203,7 @@ export default function InformacionBasica() {
         coverPhotoUrl: previewImage.cover || formData.coverPhotoUrl,
         contact: {
           phoneNumber: formData.contact.phoneNumber,
-          whatsappLink: formData.contact.whatsappLink,
+          whatsappNumber: formData.contact.whatsappNumber,
           facebookLink: formData.contact.facebookLink,
           address: formData.contact.address,
         },
@@ -454,20 +481,23 @@ export default function InformacionBasica() {
           </div>
 
           <div className="sm:col-span-3">
-            <label htmlFor="contact.whatsappLink" className="block text-sm font-medium leading-6 text-gray-900">
-              Enlace de WhatsApp
+            <label htmlFor="contact.whatsappNumber" className="block text-sm font-medium leading-6 text-gray-900">
+              Número de WhatsApp para pedidos
             </label>
             <div className="mt-2">
               <input
-                type="url"
-                id="contact.whatsappLink"
-                name="contact.whatsappLink"
-                value={formData.contact.whatsappLink}
+                type="tel"
+                id="contact.whatsappNumber"
+                name="contact.whatsappNumber"
+                value={formData.contact.whatsappNumber}
                 onChange={handleChange}
                 className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
-                placeholder="https://wa.me/1234567890"
+                placeholder="Ejemplo: +525512345678"
               />
             </div>
+            <p className="mt-1 text-sm text-gray-500">
+              Ingresa el número con código de país (ejemplo: +52 para México)
+            </p>
           </div>
 
           <div className="sm:col-span-3">
