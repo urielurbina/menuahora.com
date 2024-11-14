@@ -1,43 +1,113 @@
 import Link from "next/link";
 import Image from "next/image";
 import config from "@/config";
-import logo from "@/app/icon.png";
+import { FaWhatsapp, FaInstagram, FaFacebook } from 'react-icons/fa';
 
-// Add the Footer to the bottom of your landing page and more.
-// The support link is connected to the config.js file. If there's no config.mailgun.supportEmail, the link won't be displayed.
+const navigation = {
+  main: [
+    { name: 'Beneficios', href: '/#beneficios' },
+    { name: 'Cómo funciona', href: '/#como-funciona' },
+    { name: 'Precios', href: '/#precios' },
+    { name: 'FAQ', href: '/#faq' },
+  ],
+  legal: [
+    { name: 'Términos de Servicio', href: '/tos' },
+    { name: 'Política de Privacidad', href: '/privacy-policy' },
+  ],
+  social: [
+    {
+      name: 'WhatsApp',
+      href: 'https://api.whatsapp.com/send?phone=526143348253&text=Hola,%20tengo%20una%20pregunta%20sobre%20MenúAhora',
+      icon: FaWhatsapp
+    },
+    {
+      name: 'Instagram',
+      href: 'https://instagram.com/menuahora',
+      icon: FaInstagram
+    },
+    {
+      name: 'Facebook',
+      href: 'https://facebook.com/menuahora',
+      icon: FaFacebook
+    },
+  ],
+};
 
 const Footer = () => {
   return (
-    <footer className="bg-white border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-12 md:py-16 lg:px-8">
-        <div className="flex flex-col items-center text-center">
-          <Link href="/#" className="flex items-center mb-8">
-            <Image
-              alt="Logo MenúAhora"
-              src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
-              className="h-6 w-auto"
-              width={200}
-              height={50}
-            />
-            {/* <span className="ml-3 text-xl font-bold text-gray-900">{config.appName}</span> */}
-          </Link>
-          <p className="text-gray-500 text-base max-w-md mb-8">
-            {config.appDescription}
-          </p>
-          <nav className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-8">
-            <Link href="/#pricing" className="text-base text-gray-500 hover:text-gray-900">
-              Precios
+    <footer className="bg-gradient-to-br from-white via-gray-50 to-white" aria-labelledby="footer-heading">
+      <h2 id="footer-heading" className="sr-only">Footer</h2>
+      
+      <div className="mx-auto max-w-7xl px-6 pb-8 pt-16 sm:pt-24 lg:px-8">
+        <div className="xl:grid xl:grid-cols-3 xl:gap-8">
+          {/* Logo y descripción */}
+          <div className="space-y-8">
+            <Link href="/#" className="flex items-center">
+              <Image
+                alt="Logo MenúAhora"
+                src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
+                className="h-6 w-auto"
+                width={200}
+                height={50}
+              />
             </Link>
-            <Link href="/tos" className="text-base text-gray-500 hover:text-gray-900">
-              Términos de Servicio
-            </Link>
-            <Link href="/privacy-policy" className="text-base text-gray-500 hover:text-gray-900">
-              Política de Privacidad
-            </Link>
-          </nav>
+            <p className="text-sm leading-6 text-gray-600 max-w-md">
+              {config.appDescription}
+            </p>
+            <div className="flex space-x-6">
+              {navigation.social.map((item) => (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-500 hover:text-[#0D654A] transition-colors duration-200"
+                >
+                  <span className="sr-only">{item.name}</span>
+                  <item.icon className="h-6 w-6" aria-hidden="true" />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Enlaces de navegación */}
+          <div className="mt-16 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
+            <div>
+              <h3 className="text-sm font-semibold leading-6 text-gray-900">Navegación</h3>
+              <ul role="list" className="mt-6 space-y-4">
+                {navigation.main.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className="text-sm leading-6 text-gray-600 hover:text-[#0D654A] transition-colors duration-200"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold leading-6 text-gray-900">Legal</h3>
+              <ul role="list" className="mt-6 space-y-4">
+                {navigation.legal.map((item) => (
+                  <li key={item.name}>
+                    <Link
+                      href={item.href}
+                      className="text-sm leading-6 text-gray-600 hover:text-[#0D654A] transition-colors duration-200"
+                    >
+                      {item.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
-        <div className="mt-8 border-t border-gray-200 pt-8">
-          <p className="text-base text-gray-400 text-center">
+
+        {/* Línea divisoria y copyright */}
+        <div className="mt-16 border-t border-gray-900/10 pt-8 sm:mt-20 lg:mt-24">
+          <p className="text-xs leading-5 text-gray-500">
             &copy; {new Date().getFullYear()} {config.appName}. Todos los derechos reservados.
           </p>
         </div>
