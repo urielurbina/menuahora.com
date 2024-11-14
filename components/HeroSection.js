@@ -8,6 +8,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import { ChevronRightIcon } from '@heroicons/react/20/solid'
 import ButtonSignIn from '@/components/ButtonSignin'
 import TestimonialsAvatars from './TestimonialsAvatars'
+import { FaWhatsapp } from 'react-icons/fa'
 
 const navigation = [
   { name: 'Beneficios', href: '#beneficios' },
@@ -20,14 +21,14 @@ export default function Example() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <div className="bg-white">
+    <div className="bg-gradient-to-br from-white via-gray-50 to-white">
       <header className="absolute inset-x-0 top-0 z-50">
-        <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8">
+        <nav aria-label="Global" className="flex items-center justify-between p-6 lg:px-8 backdrop-blur-sm bg-white/70">
           <div className="flex lg:flex-1">
             <a href="#" className="-m-1.5 p-1.5">
-              <span className="sr-only">MenúAhora</span>
+              <span className="sr-only">MenúAhora - Tu catálogo digital para restaurantes</span>
               <img
-                alt="Logo MenúAhora"
+                alt="MenúAhora - Tu catálogo digital para restaurantes"
                 src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
                 className="h-6 w-auto"
               />
@@ -39,7 +40,7 @@ export default function Example() {
               onClick={() => setMobileMenuOpen(true)}
               className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
             >
-              <span className="sr-only">Open main menu</span>
+              <span className="sr-only">Abrir menú principal</span>
               <Bars3Icon aria-hidden="true" className="h-6 w-6" />
             </button>
           </div>
@@ -62,9 +63,9 @@ export default function Example() {
           <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
             <div className="flex items-center justify-between">
               <a href="#" className="-m-1.5 p-1.5">
-                <span className="sr-only">MenúAhora</span>
+                <span className="sr-only">MenúAhora - Tu catálogo digital para restaurantes</span>
                 <img
-                  alt="MenúAhora"
+                  alt="MenúAhora - Tu catálogo digital para restaurantes"
                   src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
                   className="h-6 w-auto"
                 />
@@ -107,55 +108,36 @@ export default function Example() {
       </header>
 
       <div className="relative isolate pt-14 sm:pt-16 lg:pt-20">
-        <svg
-          aria-hidden="true"
-          className="absolute inset-0 -z-10 h-full w-full stroke-gray-200 [mask-image:radial-gradient(100%_100%_at_top_right,white,transparent)]"
-        >
-          <defs>
-            <pattern
-              x="50%"
-              y={-1}
-              id="83fd4e5a-9d52-42fc-97b6-718e5d7ee527"
-              width={200}
-              height={200}
-              patternUnits="userSpaceOnUse"
-            >
-              <path d="M100 200V.5M.5 .5H200" fill="none" />
-            </pattern>
-          </defs>
-          <svg x="50%" y={-1} className="overflow-visible fill-gray-50">
-            <path
-              d="M-100.5 0h201v201h-201Z M699.5 0h201v201h-201Z M499.5 400h201v201h-201Z M-300.5 600h201v201h-201Z"
-              strokeWidth={0}
-            />
-          </svg>
-          <rect fill="url(#83fd4e5a-9d52-42fc-97b6-718e5d7ee527)" width="100%" height="100%" strokeWidth={0} />
-        </svg>
+        <div className="absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80">
+          <div className="relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#0D654A] to-[#9BD9C7] opacity-10 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]" />
+        </div>
+
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
           <div className="lg:flex lg:items-center lg:gap-x-10">
             <div className="mx-auto max-w-2xl lg:mx-0 lg:flex-auto lg:w-1/2">
               <h1 className="max-w-lg text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl text-center lg:text-left mx-auto lg:mx-0">
-                Recibe tu menú digital en minutos{' '}
-                <span className="inline-block bg-[#0D654A] text-white px-4 py-2 rounded-md mt-2 sm:mt-4">
-                  no semanas.
+                Crea tu Catálogo Digital y{' '}
+                <span className="text-[#0D654A]">
+                  Recibe Pedidos por WhatsApp{' '}
+                  <FaWhatsapp className="inline-block mb-2 h-8 w-8 sm:h-12 sm:w-12" />
                 </span>
               </h1>
               <p className="mt-6 text-lg leading-8 text-gray-600 text-center lg:text-left">
-                Elige los detalles, sube tus productos y gestiona tu menú al instante.
-                Fácil de compartir y actualizar en cualquier momento.
+                Diseña un catálogo profesional y recibe pedidos automáticamente por WhatsApp. 
+                Sin comisiones, sin apps, actualización en tiempo real.
               </p>
               <div className="mt-8 sm:mt-10 flex items-center justify-center lg:justify-start gap-x-6">
                 <a
                   href="/#pricing"
-                  className="rounded-md bg-[#0D654A] px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
+                  className="rounded-md bg-[#0D654A] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#0D654A]/20 hover:shadow-xl hover:shadow-[#0D654A]/20 hover:-translate-y-0.5 transition-all duration-200"
                 >
-                  Empieza ya
+                  Crear Mi Catálogo Digital
                 </a>
                 <a
                   href="https://www.menuahora.com/tacosuriel"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-[#0D654A] shadow-sm ring-1 ring-inset ring-[#0D654A] hover:bg-indigo-50"
+                  className="rounded-md bg-white/80 backdrop-blur-sm px-5 py-3 text-sm font-semibold text-[#0D654A] shadow-md ring-1 ring-[#0D654A]/20 hover:bg-white hover:shadow-lg transition-all duration-200"
                 >
                   Ver Demo
                 </a>
@@ -165,12 +147,18 @@ export default function Example() {
               </div>
             </div>
             <div className="mt-12 sm:mt-16 lg:mt-0 lg:flex-shrink-0 lg:flex-grow lg:w-1/2">
-              <div className="flex justify-center space-x-4 sm:space-x-8">
+              <div className="flex justify-center space-x-4 sm:space-x-8 relative">
+                <div className="absolute -inset-4 bg-gradient-to-r from-[#0D654A]/5 to-transparent blur-2xl rounded-3xl" />
+                
                 <AppScreenshot imageUrl="/images/screenshot-menuahora-1.webp" />
                 <AppScreenshot imageUrl="/images/screenshot-menuahora-2.webp" />
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="absolute inset-x-0 top-[calc(100%-13rem)] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[calc(100%-30rem)]">
+          <div className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-[#0D654A] to-[#9BD9C7] opacity-10 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]" />
         </div>
       </div>
     </div>
@@ -179,8 +167,8 @@ export default function Example() {
 
 function AppScreenshot({ imageUrl }) {
   return (
-    <svg role="img" viewBox="0 0 366 729" className="w-[18rem] max-w-full drop-shadow-xl">
-      <title>App screenshot</title>
+    <svg role="img" viewBox="0 0 366 729" className="w-[18rem] max-w-full drop-shadow-xl" aria-hidden="true">
+      <title>Vista previa de la aplicación MenúAhora</title>
       <defs>
         <clipPath id="2ade4387-9c63-4fc4-b754-10e687a0d332">
           <rect rx={36} width={316} height={684} />
@@ -200,7 +188,12 @@ function AppScreenshot({ imageUrl }) {
         clipPath="url(#2ade4387-9c63-4fc4-b754-10e687a0d332)"
         transform="translate(24 24)"
       >
-        <img alt="" src={imageUrl} />
+        <img 
+          alt="Captura de pantalla de la aplicación MenúAhora mostrando el catálogo digital" 
+          src={imageUrl}
+          loading="eager"
+          decoding="async"
+        />
       </foreignObject>
     </svg>
   )

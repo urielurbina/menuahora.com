@@ -26,7 +26,7 @@ const config = {
         //  REQUIRED - Name of the plan, displayed on the pricing page
         name: "Plan Esencial",
         // A friendly description of the plan, displayed on the pricing page. Tip: explain why this plan and not others
-        description: "Perfecto para comenzar con una presencia en línea",
+        description: "Perfecto para empezar a recibir pedidos por WhatsApp hoy mismo",
         // The price you want to display, the one user will be charged on Stripe.
         price: {
           monthly: 199,
@@ -38,12 +38,12 @@ const config = {
           // yearly: 399
         },
         features: [
-          { name: "Plantilla con Personalización Básica " },
-          { name: "Link personalizado" },
-          { name: "Productos ilimitados" },
-          { name: "Categorías ilimitadas" },
-          { name: "Sistema fácil para subir productos" },
-          { name: "Disponible inmediatamente" },
+          { name: "Sitio web digital con diseño personalizable" },
+          { name: "Link y código QR para compartir" },
+          { name: "Productos y platillos ilimitados" },
+          { name: "Categorías de menú ilimitadas" },
+          { name: "Sistema de pedidos por WhatsApp" },
+          { name: "Activación inmediata del menú" }
         ],
 
 
