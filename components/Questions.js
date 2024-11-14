@@ -122,15 +122,13 @@ export default function Questions() {
 
           <dl className="mt-12 space-y-6 divide-y divide-gray-200">
             {faqs.map((faq) => (
-              <Disclosure 
-                as="div" 
-                key={faq.question} 
-                className="pt-6"
-                itemScope
-                itemType="https://schema.org/Question"
-              >
+              <Disclosure key={faq.question}>
                 {({ open }) => (
-                  <>
+                  <div 
+                    className="pt-6"
+                    itemScope
+                    itemType="https://schema.org/Question"
+                  >
                     <dt>
                       <DisclosureButton className="flex w-full items-start justify-between text-left">
                         <span 
@@ -150,7 +148,6 @@ export default function Questions() {
                       </DisclosureButton>
                     </dt>
                     <DisclosurePanel 
-                      as="dd" 
                       className="mt-2 pr-12"
                       itemScope
                       itemType="https://schema.org/Answer"
@@ -162,7 +159,7 @@ export default function Questions() {
                         {faq.answer}
                       </p>
                     </DisclosurePanel>
-                  </>
+                  </div>
                 )}
               </Disclosure>
             ))}
