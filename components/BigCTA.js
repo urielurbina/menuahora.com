@@ -37,13 +37,15 @@ export default function BigCTA() {
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <a
-                  href="#"
+                  href="/#pricing"
                   className="rounded-md bg-[#0D654A] px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-[#0D654A]/20 hover:shadow-xl hover:shadow-[#0D654A]/20 hover:-translate-y-0.5 transition-all duration-200"
                 >
                   ¡Quiero mi catálogo digital!
                 </a>
                 <a
-                  href="#"
+                  href="https://www.menuahora.com/tacosuriel"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="rounded-md bg-white/80 backdrop-blur-sm px-5 py-3 text-sm font-semibold text-[#0D654A] shadow-md ring-1 ring-[#0D654A]/20 hover:bg-white hover:shadow-lg transition-all duration-200"
                 >
                   Ver demo
