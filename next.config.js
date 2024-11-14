@@ -1,5 +1,6 @@
+/** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  staticPageGenerationTimeout: 120,
   images: {
     remotePatterns: [
       {
@@ -11,6 +12,7 @@ const nextConfig = {
         hostname: '**',
       },
     ],
+    domains: ['res.cloudinary.com'],
   },
 };
 
