@@ -20,19 +20,8 @@ const ButtonAccount = () => {
     signOut({ callbackUrl: "/" });
   };
   const handleBilling = async () => {
-    setIsLoading(true);
-
-    try {
-      const { url } = await apiClient.post("/stripe/create-portal", {
-        returnUrl: window.location.href,
-      });
-
-      window.location.href = url;
-    } catch (e) {
-      console.error(e);
-    }
-
-    setIsLoading(false);
+    // Direct link to Stripe billing portal
+    window.location.href = "https://billing.stripe.com/p/login/3cI14oaUv4HwatIfa41wY00";
   };
 
   // Don't show anything if not authenticated (we don't have any info about the user)
