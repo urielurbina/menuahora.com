@@ -54,25 +54,39 @@ export default function InformacionBasica() {
 
   const fetchBasicInfo = async () => {
     try {
+      console.log('Iniciando fetch de información básica...');
       const response = await fetch('/api/get-basic-info');
+      console.log('Respuesta recibida:', response.status, response.ok);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('Datos recibidos:', data);
+        
+        // Verificar que los datos existan antes de usarlos
+        const basicInfo = data['basic-info'] || {};
+        
         setFormData(prevData => ({
           ...prevData,
-          ...data['basic-info'],
-          contact: { ...prevData.contact, ...data['basic-info'].contact },
-          schedule: { ...prevData.schedule, ...data['basic-info'].schedule }
+          ...basicInfo,
+          contact: { ...prevData.contact, ...(basicInfo.contact || {}) },
+          schedule: { ...prevData.schedule, ...(basicInfo.schedule || {}) }
         }));
+        
         // Actualizar previewImage si es necesario
-        if (data['basic-info'].logoUrl) {
-          setPreviewImage(prev => ({ ...prev, logo: data['basic-info'].logoUrl }));
+        if (basicInfo.logoUrl) {
+          setPreviewImage(prev => ({ ...prev, logo: basicInfo.logoUrl }));
         }
-        if (data['basic-info'].coverPhotoUrl) {
-          setPreviewImage(prev => ({ ...prev, cover: data['basic-info'].coverPhotoUrl }));
+        if (basicInfo.coverPhotoUrl) {
+          setPreviewImage(prev => ({ ...prev, cover: basicInfo.coverPhotoUrl }));
         }
+      } else {
+        const errorData = await response.json();
+        console.error('Error en la respuesta:', errorData);
+        setMessage(`Error al cargar la información: ${errorData.error || 'Error desconocido'}`);
       }
     } catch (error) {
       console.error('Error fetching basic info:', error);
+      setMessage(`No se pudo cargar la información: ${error.message}`);
     }
   };
 

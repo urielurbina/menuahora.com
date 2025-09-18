@@ -29,12 +29,12 @@ export async function GET(req) {
     }
 
     // Obtener las categorías válidas
-    const validCategories = business.categories.map(cat => cat.name);
+    const validCategories = business.categories ? business.categories.map(cat => cat.name) : [];
 
     // Filtrar las categorías de los productos
     const updatedProducts = business.products.map(product => ({
       ...product,
-      categorias: product.categorias.filter(cat => validCategories.includes(cat))
+      categorias: product.categorias ? product.categorias.filter(cat => validCategories.includes(cat)) : []
     }));
 
     console.log('Productos encontrados:', updatedProducts);
