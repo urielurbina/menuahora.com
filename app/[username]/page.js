@@ -156,7 +156,14 @@ function UserPageContent({ params }) {
         const extra = product.extras.find(e => e.name === extraName);
         if (extra && extra.price && !isNaN(parseFloat(extra.price))) {
           const extraPrice = parseFloat(extra.price);
-          price += extraPrice;
+          if (extra.priceType === "per_piece") {
+            // Si el extra es por pieza, multiplicar por las piezas totales
+            const totalPieces = calculateRealPiecesQuantity(product);
+            price += extraPrice * totalPieces;
+          } else {
+            // Si el extra es por paquete, agregar solo una vez
+            price += extraPrice;
+          }
         }
       });
     }
@@ -598,7 +605,15 @@ function UserPageContent({ params }) {
                 const extra = product.extras?.find(e => e.name === extraName);
                 if (extra && extra.price && !isNaN(parseFloat(extra.price))) {
                   const extraPrice = parseFloat(extra.price);
-                  pricePerUnit += extraPrice;
+                  if (extra.priceType === "per_piece") {
+                    // Si el extra es por pieza, multiplicar por las piezas de esta variante
+                    const option = variant.options.find(o => o.id === optionId);
+                    const piecesInThisVariant = option?.quantityMultiplier || 1;
+                    pricePerUnit += extraPrice * piecesInThisVariant;
+                  } else {
+                    // Si el extra es por paquete, agregar solo una vez
+                    pricePerUnit += extraPrice;
+                  }
                 }
               });
               
@@ -676,7 +691,14 @@ function UserPageContent({ params }) {
         const extra = product.extras?.find(e => e.name === extraName);
         if (extra && extra.price && !isNaN(parseFloat(extra.price))) {
           const extraPrice = parseFloat(extra.price);
-          pricePerUnit += extraPrice;
+          if (extra.priceType === "per_piece") {
+            // Si el extra es por pieza, multiplicar por las piezas totales
+            const totalPieces = calculateRealPiecesQuantity(product);
+            pricePerUnit += extraPrice * totalPieces;
+          } else {
+            // Si el extra es por paquete, agregar solo una vez
+            pricePerUnit += extraPrice;
+          }
         }
       });
       
@@ -805,7 +827,7 @@ function UserPageContent({ params }) {
           {/* Modificar el footer para centrar los elementos */}
   <footer className="w-full bg-gray-100 py-4 px-4 text-center text-sm text-gray-600 mt-8">
     <Link href="https://menuahora.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center">
-      <span className="mr-2">Sitio creado en:</span>
+      <span className="mr-2">Crea tu cátalogo digital en:</span>
       <Image
         src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
         alt="Logo MenúAhora"

@@ -24,7 +24,7 @@ export default function ProductDashboard() {
     priceType: "per_package" // "per_piece" o "per_package"
   })
   const [newCategory, setNewCategory] = useState("")
-  const [newExtra, setNewExtra] = useState({ name: "", price: 0 })
+  const [newExtra, setNewExtra] = useState({ name: "", price: 0, priceType: "per_package" })
   const [newVariantCategory, setNewVariantCategory] = useState("")
   const [newVariantOption, setNewVariantOption] = useState({ name: "", price: 0, quantityMultiplier: 1 })
   const [editingVariantCategory, setEditingVariantCategory] = useState(null)
@@ -151,7 +151,7 @@ export default function ProductDashboard() {
       wholesalePricing: [],
       priceType: "per_package"
     })
-    setNewExtra({ name: "", price: 0 })
+    setNewExtra({ name: "", price: 0, priceType: "per_package" })
     setNewVariantCategory("")
     setNewVariantOption({ name: "", price: 0, quantityMultiplier: 1 })
     setEditingExtra(null)
@@ -208,9 +208,14 @@ export default function ProductDashboard() {
     if (newExtra.name && newExtra.price) {
       setNewProduct({
         ...newProduct,
-        extras: [...newProduct.extras, { ...newExtra, id: Date.now(), price: parseFloat(newExtra.price) }],
+        extras: [...newProduct.extras, { 
+          ...newExtra, 
+          id: Date.now(), 
+          price: parseFloat(newExtra.price),
+          priceType: newExtra.priceType || "per_package"
+        }],
       })
-      setNewExtra({ name: "", price: 0 })
+      setNewExtra({ name: "", price: 0, priceType: "per_package" })
     }
   }
 
@@ -330,8 +335,8 @@ export default function ProductDashboard() {
 
   const handleUpdateVariantCategory = () => {
     if (newVariantCategory.trim()) {
-      setNewProduct({
-        ...newProduct,
+    setNewProduct({
+      ...newProduct,
         variants: newProduct.variants.map(variant =>
           variant.id === editingVariantCategory.id
             ? { ...variant, name: newVariantCategory.trim() }
@@ -364,8 +369,8 @@ export default function ProductDashboard() {
         quantityMultiplier: parseInt(newVariantOption.quantityMultiplier) || 1
       }
       
-      setNewProduct({
-        ...newProduct,
+    setNewProduct({
+      ...newProduct,
         variants: newProduct.variants.map(variant =>
           variant.id === selectedVariantCategoryId
             ? { ...variant, options: [...variant.options, newOption] }
@@ -399,8 +404,8 @@ export default function ProductDashboard() {
 
   const handleUpdateVariantOption = () => {
     if (newVariantOption.name.trim()) {
-      setNewProduct({
-        ...newProduct,
+    setNewProduct({
+      ...newProduct,
         variants: newProduct.variants.map(variant =>
           variant.id === editingVariantOption.categoryId
             ? {
@@ -426,7 +431,11 @@ export default function ProductDashboard() {
 
   const handleEditExtra = (extra) => {
     setEditingExtra(extra)
-    setNewExtra({ name: extra.name, price: extra.price })
+    setNewExtra({ 
+      name: extra.name, 
+      price: extra.price,
+      priceType: extra.priceType || "per_package"
+    })
   }
 
   const handleUpdateExtra = () => {
@@ -435,11 +444,16 @@ export default function ProductDashboard() {
         ...newProduct,
         extras: newProduct.extras.map(extra => 
           extra.id === editingExtra.id 
-            ? { ...newExtra, id: extra.id, price: parseFloat(newExtra.price) }
+            ? { 
+                ...newExtra, 
+                id: extra.id, 
+                price: parseFloat(newExtra.price),
+                priceType: newExtra.priceType || "per_package"
+              }
             : extra
         ),
       })
-      setNewExtra({ name: "", price: 0 })
+      setNewExtra({ name: "", price: 0, priceType: "per_package" })
       setEditingExtra(null)
     }
   }
@@ -726,7 +740,7 @@ export default function ProductDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-white">
-                    {editingProduct ? "✏️ Editar Producto" : "➕ Nuevo Producto"}
+                    {editingProduct ? "Editar Producto" : "Nuevo Producto"}
                   </h2>
                   <p className="text-green-100 text-sm mt-1">
                     {editingProduct ? "Modifica la información de tu producto" : "Crea un nuevo producto para tu negocio"}
@@ -755,35 +769,35 @@ export default function ProductDashboard() {
                       </div>
                       <h3 className="text-lg font-semibold text-gray-900">Información Básica</h3>
                     </div>
-                    <div className="space-y-4">
-                      <div>
+                  <div className="space-y-4">
+                    <div>
                         <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-2">
-                          📝 Nombre del producto
+                          Nombre del producto
                         </label>
-                        <input
-                          type="text"
-                          id="nombre"
-                          value={newProduct.nombre}
-                          onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
+                      <input
+                        type="text"
+                        id="nombre"
+                        value={newProduct.nombre}
+                        onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
                           placeholder="Ej: Playera Personalizada, Stickers Pack 25"
                           className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm"
-                        />
-                      </div>
-                      <div>
+                      />
+                    </div>
+                    <div>
                         <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-2">
-                          📄 Descripción
+                          Descripción
                         </label>
-                        <textarea
-                          id="descripcion"
-                          value={newProduct.descripcion}
-                          onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
+                      <textarea
+                        id="descripcion"
+                        value={newProduct.descripcion}
+                        onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
                           rows={4}
                           placeholder="Describe tu producto, materiales, características especiales..."
                           className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm resize-none"
-                        />
-                      </div>
+                      />
                     </div>
                   </div>
+                </div>
 
                   {/* Imagen del Producto */}
                   <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
@@ -795,7 +809,7 @@ export default function ProductDashboard() {
                     </div>
                     <div {...getRootProps()} className="relative group cursor-pointer">
                       <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-[#0D654A] hover:bg-gray-100 transition-all duration-300 group-hover:shadow-md">
-                        {newProduct.imagen ? (
+                      {newProduct.imagen ? (
                           <div className="relative">
                             <Image 
                               src={newProduct.imagen} 
@@ -806,18 +820,18 @@ export default function ProductDashboard() {
                             />
                             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-300 flex items-center justify-center">
                               <span className="text-white opacity-0 group-hover:opacity-100 font-medium">
-                                🔄 Cambiar imagen
+                                Cambiar imagen
                               </span>
                             </div>
-                          </div>
-                        ) : (
+                        </div>
+                      ) : (
                           <div className="py-8">
                             <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-[#0D654A] transition-colors duration-300">
                               <svg className="w-8 h-8 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                              </svg>
+                        </svg>
                             </div>
-                            <p className="text-gray-600 font-medium mb-2">📸 Agregar imagen del producto</p>
+                            <p className="text-gray-600 font-medium mb-2">Agregar imagen del producto</p>
                             <p className="text-sm text-gray-500">Arrastra una imagen o haz click para seleccionar</p>
                           </div>
                         )}
@@ -840,7 +854,6 @@ export default function ProductDashboard() {
                       {/* Tipo de precio */}
                       <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg border border-yellow-200">
                         <div className="flex items-center mb-3">
-                          <span className="text-lg mr-2">💰</span>
                           <label className="text-sm font-semibold text-gray-800">Tipo de precio</label>
                         </div>
                         <div className="grid grid-cols-1 gap-3">
@@ -854,13 +867,13 @@ export default function ProductDashboard() {
                               className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 mt-1"
                             />
                             <div className="ml-3">
-                              <div className="text-sm font-medium text-gray-900">📦 Precio por paquete/item</div>
+                              <div className="text-sm font-medium text-gray-900">Precio por paquete/item</div>
                               <div className="text-xs text-gray-600 mt-1">El precio es fijo por cada unidad completa</div>
                               <div className="text-xs text-blue-600 mt-1">
-                                <strong>Ej:</strong> Paquete de 25 stickers = $100 (sin importar las 25 piezas)
+                                <strong>Ejemplo:</strong> Paquete de 25 stickers = $100 (sin importar las 25 piezas)
                               </div>
                             </div>
-                          </label>
+                        </label>
                           <label className="flex items-start p-3 bg-white rounded-lg border-2 border-gray-200 cursor-pointer hover:border-[#0D654A] transition-colors duration-200">
                             <input
                               type="radio"
@@ -871,21 +884,21 @@ export default function ProductDashboard() {
                               className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 mt-1"
                             />
                             <div className="ml-3">
-                              <div className="text-sm font-medium text-gray-900">🔢 Precio por pieza individual</div>
+                              <div className="text-sm font-medium text-gray-900">Precio por pieza individual</div>
                               <div className="text-xs text-gray-600 mt-1">El precio se multiplica por la cantidad de piezas</div>
                               <div className="text-xs text-blue-600 mt-1">
-                                <strong>Ej:</strong> $4 por sticker × 25 stickers = $100 total
+                                <strong>Ejemplo:</strong> $4 por sticker × 25 stickers = $100 total
                               </div>
                             </div>
                           </label>
-                        </div>
-                      </div>
-                    
+                  </div>
+                </div>
+
                       {/* Campos de precio */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
                           <label htmlFor="precio" className="block text-sm font-medium text-gray-700 mb-2">
-                            💵 Precio Regular
+                            Precio Regular
                             {newProduct.priceType === "per_piece" && (
                               <span className="text-xs text-blue-600 ml-2">(por pieza individual)</span>
                             )}
@@ -893,58 +906,66 @@ export default function ProductDashboard() {
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                               <span className="text-gray-500 text-sm font-medium">$</span>
-                            </div>
-                            <input
-                              type="number"
-                              id="precio"
+                          </div>
+                          <input
+                            type="number"
+                            id="precio"
                               value={newProduct.precio || ''}
                               onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) || 0 })}
                               className="block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm font-medium"
-                              placeholder="0.00"
+                            placeholder="0.00"
                               step="0.01"
                               min="0"
-                            />
-                          </div>
+                          />
                         </div>
-                        
-                        <div>
+                      </div>
+                      
+                      <div>
                           <label htmlFor="precioPromocion" className="block text-sm font-medium text-gray-700 mb-2">
-                            🏷️ Precio Promoción
+                            Precio Promoción
                             <span className="ml-1 text-xs text-gray-500">(Opcional)</span>
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                               <span className="text-gray-500 text-sm font-medium">$</span>
-                            </div>
-                            <input
-                              type="number"
-                              id="precioPromocion"
-                              value={newProduct.precioPromocion || ''}
-                              onChange={(e) => {
-                                const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
-                                setNewProduct({ ...newProduct, precioPromocion: value });
-                              }}
+                          </div>
+                          <input
+                            type="number"
+                            id="precioPromocion"
+                            value={newProduct.precioPromocion || ''}
+                            onChange={(e) => {
+                              const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
+                              setNewProduct({ ...newProduct, precioPromocion: value });
+                            }}
                               className="block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm font-medium"
-                              placeholder="0.00"
+                            placeholder="0.00"
                               step="0.01"
                               min="0"
-                            />
-                          </div>
-                          {newProduct.precioPromocion > newProduct.precio && (
+                          />
+                        </div>
+                        {newProduct.precioPromocion > newProduct.precio && (
                             <div className="mt-2 flex items-center text-red-600 text-xs">
-                              <span className="mr-1">⚠️</span>
+                              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                              </svg>
                               El precio de promoción no puede ser mayor al precio regular
                             </div>
-                          )}
-                        </div>
+                        )}
                       </div>
+                    </div>
                       {/* Disponibilidad */}
                       <div className="bg-white p-4 rounded-lg border border-gray-200">
-                        <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between">
                           <div className="flex items-center">
-                            <span className="text-lg mr-3">
-                              {newProduct.availability ? "✅" : "❌"}
-                            </span>
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3" style={{backgroundColor: newProduct.availability ? '#10B981' : '#EF4444'}}>
+                              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                {newProduct.availability ? (
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                ) : (
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                )}
+                              </svg>
+                            </div>
                             <div>
                               <label htmlFor="availability" className="text-sm font-medium text-gray-900">
                                 Estado del producto
@@ -954,16 +975,16 @@ export default function ProductDashboard() {
                               </p>
                             </div>
                           </div>
-                          <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                              type="checkbox"
-                              id="availability"
-                              className="sr-only peer"
-                              checked={newProduct.availability}
-                              onChange={(e) => setNewProduct({ ...newProduct, availability: e.target.checked })}
-                            />
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          id="availability"
+                          className="sr-only peer"
+                          checked={newProduct.availability}
+                          onChange={(e) => setNewProduct({ ...newProduct, availability: e.target.checked })}
+                        />
                             <div className="w-12 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
-                          </label>
+                      </label>
                         </div>
                       </div>
                     </div>
@@ -1077,14 +1098,14 @@ export default function ProductDashboard() {
                   <div className="space-y-6">
                     
                     {/* Agregar nueva categoría de variantes */}
-                    <div>
+                <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Nueva Categoría de Variantes</label>
                       <div className="flex gap-2">
-                        <input
-                          type="text"
+                      <input
+                        type="text"
                           value={newVariantCategory}
                           onChange={(e) => setNewVariantCategory(e.target.value)}
-                          placeholder="Ej: Tallas, Sabores, Tortillas, Temperaturas, etc."
+                        placeholder="Ej: Tallas, Sabores, Tortillas, Temperaturas, etc."
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
                         />
                         <button
@@ -1093,7 +1114,7 @@ export default function ProductDashboard() {
                         >
                           {editingVariantCategory ? "Actualizar" : "Agregar"}
                         </button>
-                      </div>
+                    </div>
                     </div>
 
                     {/* Lista de categorías de variantes */}
@@ -1131,7 +1152,7 @@ export default function ProductDashboard() {
                             </div>
 
                             {/* Opciones de la categoría */}
-                            <div className="space-y-2">
+                        <div className="space-y-2">
                               {variant.options.map((option) => (
                                 <div key={option.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
                                   <div className="flex items-center gap-3">
@@ -1148,29 +1169,29 @@ export default function ProductDashboard() {
                                       <span className="text-xs text-gray-500">Cantidad seleccionable</span>
                                     )}
                                   </div>
-                                  <div className="flex items-center space-x-2">
-                                    <button
+                              <div className="flex items-center space-x-2">
+                                <button
                                       onClick={() => handleEditVariantOption(variant.id, option)}
-                                      className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
-                                    >
+                                  className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
+                                >
                                       <Edit2 className="h-4 w-4" />
-                                    </button>
-                                    <button
+                                </button>
+                                <button
                                       onClick={() => handleDeleteVariantOption(variant.id, option.id)}
-                                      className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
-                                    >
+                                  className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
+                                >
                                       <X className="h-4 w-4" />
-                                    </button>
-                                  </div>
-                                </div>
-                              ))}
+                                </button>
+                              </div>
                             </div>
+                          ))}
+                        </div>
 
                             {/* Agregar nueva opción */}
                             <div className="mt-3 pt-3 border-t border-gray-200">
                               <div className="flex gap-2 mb-2">
-                                <input
-                                  type="text"
+                      <input
+                        type="text"
                                   value={selectedVariantCategoryId === variant.id ? newVariantOption.name : ""}
                                   onChange={(e) => setNewVariantOption({ ...newVariantOption, name: e.target.value })}
                                   placeholder={`Nueva ${variant.name.toLowerCase()}`}
@@ -1192,7 +1213,7 @@ export default function ProductDashboard() {
                                     onClick={() => setSelectedVariantCategoryId(variant.id)}
                                   />
                                 </div>
-                                <button
+                      <button
                                   onClick={() => {
                                     setSelectedVariantCategoryId(variant.id)
                                     editingVariantOption ? handleUpdateVariantOption() : handleAddVariantOption()
@@ -1200,8 +1221,8 @@ export default function ProductDashboard() {
                                   className="px-3 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200"
                                 >
                                   {editingVariantOption ? "Actualizar" : "Agregar"}
-                                </button>
-                              </div>
+                      </button>
+                    </div>
                               
                               {/* Campo para multiplicador de cantidad */}
                               <div className="bg-blue-50 p-3 rounded-md">
@@ -1219,7 +1240,7 @@ export default function ProductDashboard() {
                                     className="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-xs"
                                     onFocus={() => setSelectedVariantCategoryId(variant.id)}
                                   />
-                                </div>
+                  </div>
                                 <div className="text-xs text-gray-600">
                                   <p className="mb-1"><strong>¿Qué es esto?</strong></p>
                                   <p className="mb-1">• <strong>Para productos individuales</strong> (playeras, tacos): Dejar en 1</p>
@@ -1228,7 +1249,7 @@ export default function ProductDashboard() {
                                     <strong>Ejemplo:</strong> Si vendes &quot;Paquete 25 stickers&quot;, pon 25. 
                                     Así 2 paquetes = 50 stickers para descuentos por mayoreo.
                                   </p>
-                                </div>
+                </div>
                               </div>
                             </div>
                           </div>
@@ -1257,10 +1278,13 @@ export default function ProductDashboard() {
                     {newProduct.extras.length > 0 ? (
                       <div className="space-y-2">
                         {newProduct.extras.map((extra) => (
-                          <div key={extra.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
-                            <div className="flex items-center space-x-2">
+                          <div key={extra.id} className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm border border-gray-100">
+                            <div className="flex items-center space-x-3">
                               <span className="text-sm font-medium text-gray-700">{extra.name}</span>
-                              <span className="text-sm text-gray-500">${extra.price.toFixed(2)}</span>
+                              <span className="text-sm text-green-600 font-medium">${extra.price.toFixed(2)}</span>
+                              <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+                                {extra.priceType === "per_piece" ? "por pieza" : "por paquete"}
+                              </span>
                             </div>
                             <div className="flex items-center space-x-2">
                               <button
@@ -1283,26 +1307,87 @@ export default function ProductDashboard() {
                       <p className="text-sm text-gray-500 text-center">No hay extras agregados</p>
                     )}
                   </div>
-                  <div className="mt-2 flex flex-col sm:flex-row gap-2">
+                  <div className="space-y-4">
+                    {/* Campos de entrada para extras */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Nombre del extra</label>
                     <input
                       type="text"
                       value={newExtra.name}
                       onChange={(e) => setNewExtra({ ...newExtra, name: e.target.value })}
-                      placeholder="Nombre del extra"
-                      className="w-full sm:flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                    />
+                          placeholder="Ej: Impresión personalizada, Queso extra"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Precio</label>
+                        <div className="relative">
+                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <span className="text-gray-500 text-sm font-medium">$</span>
+                          </div>
                     <input
                       type="number"
-                      value={newExtra.price}
-                      onChange={(e) => setNewExtra({ ...newExtra, price: parseFloat(e.target.value) })}
-                      placeholder="Precio"
-                      className="w-full sm:w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                    />
+                            value={newExtra.price || ''}
+                            onChange={(e) => setNewExtra({ ...newExtra, price: parseFloat(e.target.value) || 0 })}
+                            placeholder="0.00"
+                            step="0.01"
+                            min="0"
+                            className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm font-medium"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Tipo de precio para extras */}
+                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Tipo de precio del extra
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <label className="flex items-center p-2 bg-white rounded-md border border-gray-200 cursor-pointer hover:border-[#0D654A] transition-colors duration-200">
+                          <input
+                            type="radio"
+                            name="extraPriceType"
+                            value="per_package"
+                            checked={newExtra.priceType === "per_package"}
+                            onChange={(e) => setNewExtra({ ...newExtra, priceType: e.target.value })}
+                            className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300"
+                          />
+                          <div className="ml-2">
+                            <div className="text-sm font-medium text-gray-900">Por paquete/total</div>
+                            <div className="text-xs text-gray-600">Precio fijo por pedido</div>
+                          </div>
+                        </label>
+                        <label className="flex items-center p-2 bg-white rounded-md border border-gray-200 cursor-pointer hover:border-[#0D654A] transition-colors duration-200">
+                          <input
+                            type="radio"
+                            name="extraPriceType"
+                            value="per_piece"
+                            checked={newExtra.priceType === "per_piece"}
+                            onChange={(e) => setNewExtra({ ...newExtra, priceType: e.target.value })}
+                            className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300"
+                          />
+                          <div className="ml-2">
+                            <div className="text-sm font-medium text-gray-900">Por pieza</div>
+                            <div className="text-xs text-gray-600">Se multiplica por cantidad</div>
+                          </div>
+                        </label>
+                      </div>
+                      <div className="mt-2 text-xs text-gray-600">
+                        {newExtra.priceType === "per_package" ? (
+                          <p><strong>Ejemplo:</strong> Impresión $10 por todo el pedido</p>
+                        ) : (
+                          <p><strong>Ejemplo:</strong> Impresión $2 por cada sticker</p>
+                        )}
+                      </div>
+                    </div>
+                    
                     <button
                       onClick={editingExtra ? handleUpdateExtra : handleAddExtra}
-                      className="w-full sm:w-auto px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200"
+                      className="w-full px-4 py-3 bg-[#0D654A] text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
                     >
-                      {editingExtra ? "Actualizar" : "Agregar"}
+                      {editingExtra ? "Actualizar Extra" : "Agregar Extra"}
                     </button>
                   </div>
                 </div>
@@ -1347,35 +1432,40 @@ export default function ProductDashboard() {
                   </div>
                   {newProduct.categorias && newProduct.categorias.length === 2 && (
                     <div className="mt-3 flex items-center text-[#0D654A] text-sm">
-                      <span className="mr-2">ℹ️</span>
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
                       Máximo de categorías seleccionadas (2/2)
                     </div>
                   )}
+                </div>
               </div>
-            </div>
             {/* Footer mejorado */}
             <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-xl">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="text-sm text-gray-600">
-                  <span className="font-medium">💡 Tip:</span> Asegúrate de configurar las variantes y precios antes de guardar
+                <div className="text-sm text-gray-600 flex items-center">
+                  <svg className="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                  <span className="font-medium">Tip:</span> Asegúrate de configurar las variantes y precios antes de guardar
                 </div>
                 <div className="flex gap-3 w-full sm:w-auto">
-                  <button
-                    onClick={() => {
-                      setIsAddingProduct(false)
-                      resetNewProduct()
-                      setEditingProduct(null)
-                    }}
+              <button
+                onClick={() => {
+                  setIsAddingProduct(false)
+                  resetNewProduct()
+                  setEditingProduct(null)
+                }}
                     className="flex-1 sm:flex-none px-6 py-3 bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
-                  >
-                    ❌ Cancelar
-                  </button>
-                  <button
-                    onClick={handleAddProduct}
+              >
+                    Cancelar
+              </button>
+              <button
+                onClick={handleAddProduct}
                     className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-r from-[#0D654A] to-[#0a5a42] text-white rounded-lg hover:from-[#0a5a42] hover:to-[#084c3a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                  >
-                    {editingProduct ? "💾 Guardar cambios" : "✨ Crear producto"}
-                  </button>
+              >
+                    {editingProduct ? "Guardar cambios" : "Crear producto"}
+              </button>
                 </div>
               </div>
             </div>
