@@ -143,6 +143,11 @@ export default function CartModal({
                               Base: ${item.basePrice.toFixed(2)} + ${item.variantPrice.toFixed(2)}
                             </p>
                           )}
+                          {item.wholesaleDiscount && (
+                            <p className="text-xs text-green-600">
+                              Descuento mayoreo: -{item.wholesaleDiscount.discountPercentage}%
+                            </p>
+                          )}
                         </div>
                       </div>
                       

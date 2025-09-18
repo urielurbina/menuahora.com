@@ -19,7 +19,8 @@ export default function ProductDashboard() {
     categorias: [],
     availability: true,
     extras: [],
-    variants: []
+    variants: [],
+    wholesalePricing: []
   })
   const [newCategory, setNewCategory] = useState("")
   const [newExtra, setNewExtra] = useState({ name: "", price: 0 })
@@ -39,6 +40,8 @@ export default function ProductDashboard() {
   const [error, setError] = useState(null)
   const [dataLoaded, setDataLoaded] = useState(false)
   const [editingExtra, setEditingExtra] = useState(null)
+  const [newWholesalePrice, setNewWholesalePrice] = useState({ minQuantity: 0, discount: 0 })
+  const [editingWholesalePrice, setEditingWholesalePrice] = useState(null)
 
   useEffect(() => {
     fetchProducts()
@@ -143,7 +146,8 @@ export default function ProductDashboard() {
       categorias: [],
       availability: true,
       extras: [],
-      variants: []
+      variants: [],
+      wholesalePricing: []
     })
     setNewExtra({ name: "", price: 0 })
     setNewVariantCategory("")
@@ -152,6 +156,8 @@ export default function ProductDashboard() {
     setEditingVariantCategory(null)
     setEditingVariantOption(null)
     setSelectedVariantCategoryId(null)
+    setNewWholesalePrice({ minQuantity: 0, discount: 0 })
+    setEditingWholesalePrice(null)
   }
 
   const handleAddCategory = async () => {
@@ -200,7 +206,7 @@ export default function ProductDashboard() {
     if (newExtra.name && newExtra.price) {
       setNewProduct({
         ...newProduct,
-        extras: [...newProduct.extras, { ...newExtra, id: Date.now() }],
+        extras: [...newProduct.extras, { ...newExtra, id: Date.now(), price: parseFloat(newExtra.price) }],
       })
       setNewExtra({ name: "", price: 0 })
     }
@@ -237,6 +243,11 @@ export default function ProductDashboard() {
       }
     } else if (!product.variants) {
       productWithVariants.variants = []
+    }
+    
+    // Asegurar que wholesalePricing sea un array
+    if (!productWithVariants.wholesalePricing) {
+      productWithVariants.wholesalePricing = []
     }
     
     setNewProduct(productWithVariants)
@@ -407,12 +418,56 @@ export default function ProductDashboard() {
         ...newProduct,
         extras: newProduct.extras.map(extra => 
           extra.id === editingExtra.id 
-            ? { ...newExtra, id: extra.id }
+            ? { ...newExtra, id: extra.id, price: parseFloat(newExtra.price) }
             : extra
         ),
       })
       setNewExtra({ name: "", price: 0 })
       setEditingExtra(null)
+    }
+  }
+
+  // Funciones para manejar precios mayoreo
+  const handleAddWholesalePrice = () => {
+    if (newWholesalePrice.minQuantity > 0 && newWholesalePrice.discount > 0) {
+      const newWholesale = {
+        id: Date.now().toString() + Math.random().toString(36),
+        minQuantity: parseInt(newWholesalePrice.minQuantity),
+        discount: parseFloat(newWholesalePrice.discount)
+      }
+      
+      setNewProduct({
+        ...newProduct,
+        wholesalePricing: [...(newProduct.wholesalePricing || []), newWholesale].sort((a, b) => a.minQuantity - b.minQuantity)
+      })
+      setNewWholesalePrice({ minQuantity: 0, discount: 0 })
+    }
+  }
+
+  const handleDeleteWholesalePrice = (id) => {
+    setNewProduct({
+      ...newProduct,
+      wholesalePricing: (newProduct.wholesalePricing || []).filter(wholesale => wholesale.id !== id)
+    })
+  }
+
+  const handleEditWholesalePrice = (wholesale) => {
+    setEditingWholesalePrice(wholesale)
+    setNewWholesalePrice({ minQuantity: wholesale.minQuantity, discount: wholesale.discount })
+  }
+
+  const handleUpdateWholesalePrice = () => {
+    if (newWholesalePrice.minQuantity > 0 && newWholesalePrice.discount > 0) {
+      setNewProduct({
+        ...newProduct,
+        wholesalePricing: (newProduct.wholesalePricing || []).map(wholesale =>
+          wholesale.id === editingWholesalePrice.id
+            ? { ...wholesale, minQuantity: parseInt(newWholesalePrice.minQuantity), discount: parseFloat(newWholesalePrice.discount) }
+            : wholesale
+        ).sort((a, b) => a.minQuantity - b.minQuantity)
+      })
+      setNewWholesalePrice({ minQuantity: 0, discount: 0 })
+      setEditingWholesalePrice(null)
     }
   }
 
@@ -599,6 +654,18 @@ export default function ProductDashboard() {
                       ))}
                     </div>
                   )}
+                  {(product.wholesalePricing && product.wholesalePricing.length > 0) && (
+                    <div className="mt-2">
+                      <h4 className="font-semibold text-sm mb-1 text-gray-700">Precios Mayoreo:</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {product.wholesalePricing.map((wholesale) => (
+                          <span key={wholesale.id} className="inline-block bg-green-100 rounded-full px-2 py-1 text-xs font-semibold text-green-700">
+                            {wholesale.minQuantity}+ = {wholesale.discount}% desc.
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   {/* Compatibilidad con estructura antigua */}
                   {product.tipos?.opciones?.length > 0 && !product.variants && (
                     <div className="mt-2">
@@ -761,6 +828,98 @@ export default function ProductDashboard() {
                       </label>
                     </div>
                   </div>
+                </div>
+
+                <div className="border-t border-gray-200" />
+
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">Precios por Mayoreo</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Configura descuentos automáticos basados en la cantidad comprada.
+                  </p>
+                  
+                  <div className="bg-gray-50 rounded-md p-4 mb-4">
+                    {newProduct.wholesalePricing && newProduct.wholesalePricing.length > 0 ? (
+                      <div className="space-y-2">
+                        {newProduct.wholesalePricing.map((wholesale) => (
+                          <div key={wholesale.id} className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm">
+                            <div className="flex items-center space-x-4">
+                              <span className="text-sm font-medium text-gray-700">
+                                {wholesale.minQuantity}+ unidades
+                              </span>
+                              <span className="text-sm text-green-600 font-medium">
+                                {wholesale.discount}% descuento
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                (${((newProduct.precio * (100 - wholesale.discount)) / 100).toFixed(2)} c/u)
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => handleEditWholesalePrice(wholesale)}
+                                className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteWholesalePrice(wholesale.id)}
+                                className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
+                              >
+                                <X className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500 text-center">No hay precios mayoreo configurados</p>
+                    )}
+                  </div>
+                  
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad mínima</label>
+                      <input
+                        type="number"
+                        value={newWholesalePrice.minQuantity || ''}
+                        onChange={(e) => setNewWholesalePrice({ ...newWholesalePrice, minQuantity: parseInt(e.target.value) || 0 })}
+                        placeholder="Ej: 10"
+                        min="2"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Descuento (%)</label>
+                      <input
+                        type="number"
+                        value={newWholesalePrice.discount || ''}
+                        onChange={(e) => setNewWholesalePrice({ ...newWholesalePrice, discount: parseFloat(e.target.value) || 0 })}
+                        placeholder="Ej: 15"
+                        min="1"
+                        max="50"
+                        step="0.1"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        onClick={editingWholesalePrice ? handleUpdateWholesalePrice : handleAddWholesalePrice}
+                        className="w-full sm:w-auto px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200"
+                      >
+                        {editingWholesalePrice ? "Actualizar" : "Agregar"}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {newWholesalePrice.minQuantity > 0 && newWholesalePrice.discount > 0 && (
+                    <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                      <p className="text-sm text-blue-800">
+                        <strong>Vista previa:</strong> {newWholesalePrice.minQuantity}+ unidades = 
+                        ${((newProduct.precio * (100 - newWholesalePrice.discount)) / 100).toFixed(2)} c/u 
+                        ({newWholesalePrice.discount}% descuento)
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="border-t border-gray-200" />
