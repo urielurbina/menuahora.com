@@ -122,7 +122,14 @@ function UserPageContent({ params }) {
 
   // Función para calcular el precio total dinámico
   const calculateDynamicPrice = (product) => {
-    let price = product.precioPromocion > 0 ? product.precioPromocion : product.precio;
+    let basePrice = product.precioPromocion > 0 ? product.precioPromocion : product.precio;
+    let price = basePrice;
+    
+    // Si el precio es por pieza individual, multiplicar por las piezas reales
+    if (product.priceType === "per_piece") {
+      const realPieces = calculateRealPiecesQuantity(product);
+      price = basePrice * realPieces;
+    }
     
     // Agregar precios de variantes seleccionadas
     Object.entries(selectedVariants).forEach(([variantId, options]) => {
@@ -155,9 +162,7 @@ function UserPageContent({ params }) {
     }
 
     // Aplicar descuento por mayoreo si aplica
-    const totalQuantity = hasVariantsWithQuantity(product) 
-      ? calculateTotalVariantQuantity(product)
-      : (productQuantities[product._id] || 1);
+    const totalQuantity = calculateRealPiecesQuantity(product);
       
     const wholesaleDiscount = calculateWholesaleDiscount(product, totalQuantity, price);
     if (wholesaleDiscount.discount > 0) {
@@ -173,9 +178,7 @@ function UserPageContent({ params }) {
       return null;
     }
 
-    const totalQuantity = hasVariantsWithQuantity(product) 
-      ? calculateTotalVariantQuantity(product)
-      : (productQuantities[product._id] || 1);
+    const totalQuantity = calculateRealPiecesQuantity(product);
 
     // Calcular el precio base + variantes + extras (sin descuento)
     let priceBeforeDiscount = product.precioPromocion > 0 ? product.precioPromocion : product.precio;
@@ -237,6 +240,59 @@ function UserPageContent({ params }) {
       }
     });
     return totalQuantity;
+  };
+
+  // Función para calcular la cantidad real de piezas (considerando multiplicadores)
+  const calculateRealPiecesQuantity = (product) => {
+    let totalPieces = 0;
+    let baseQuantity = 1;
+    
+    // Calcular multiplicador base de variantes estáticas (como paquetes de stickers)
+    let staticMultiplier = 1;
+    Object.entries(selectedVariants).forEach(([variantId, options]) => {
+      const variant = product.variants?.find(v => v.id === variantId);
+      if (variant && !variant.enableStock) {
+        Object.entries(options).forEach(([optionId, optionQuantity]) => {
+          if (optionQuantity > 0) {
+            const option = variant.options.find(o => o.id === optionId);
+            if (option && option.quantityMultiplier) {
+              staticMultiplier *= option.quantityMultiplier;
+            }
+          }
+        });
+      }
+    });
+    
+    if (hasVariantsWithQuantity(product)) {
+      // Para productos con variantes con cantidad seleccionable
+      Object.entries(selectedVariants).forEach(([variantId, options]) => {
+        const variant = product.variants?.find(v => v.id === variantId);
+        if (variant && variant.enableStock) {
+          Object.entries(options).forEach(([optionId, quantity]) => {
+            if (quantity > 0) {
+              const option = variant.options.find(o => o.id === optionId);
+              if (option) {
+                const multiplier = option.quantityMultiplier || 1;
+                totalPieces += (quantity * multiplier * staticMultiplier);
+              }
+            }
+          });
+        }
+      });
+    } else {
+      // Para productos simples, usar la cantidad del selector principal
+      baseQuantity = productQuantities[product._id] || 1;
+      totalPieces = baseQuantity * staticMultiplier;
+    }
+    
+    console.log('Real pieces calculation:', {
+      baseQuantity,
+      staticMultiplier,
+      totalPieces,
+      selectedVariants
+    });
+    
+    return totalPieces;
   };
 
   // Función para editar un item del carrito
@@ -453,7 +509,27 @@ function UserPageContent({ params }) {
   };
 
   const addToCart = (product, quantity, selectedVariants, selectedExtras) => {
-    const basePrice = product.precioPromocion > 0 ? product.precioPromocion : product.precio;
+    let basePrice = product.precioPromocion > 0 ? product.precioPromocion : product.precio;
+    
+    // Si el precio es por pieza individual, calcular el precio base por el multiplicador
+    if (product.priceType === "per_piece") {
+      // Calcular cuántas piezas representa la selección base
+      let basePieces = 1;
+      Object.entries(selectedVariants).forEach(([variantId, options]) => {
+        const variant = product.variants?.find(v => v.id === variantId);
+        if (variant && !variant.enableStock) {
+          Object.entries(options).forEach(([optionId, optionQuantity]) => {
+            if (optionQuantity > 0) {
+              const option = variant.options.find(o => o.id === optionId);
+              if (option && option.quantityMultiplier) {
+                basePieces = option.quantityMultiplier;
+              }
+            }
+          });
+        }
+      });
+      basePrice = basePrice * basePieces;
+    }
     
     // Obtener variantes sin cantidad seleccionable (como color, sabor, etc.)
     const staticVariants = [];
@@ -495,10 +571,8 @@ function UserPageContent({ params }) {
     const itemsToAdd = [];
     let hasQuantityVariants = false;
     
-    // Calcular cantidad total para el descuento por mayoreo
-    const totalQuantityForDiscount = hasVariantsWithQuantity(product) 
-      ? calculateTotalVariantQuantity(product)
-      : quantity;
+    // Calcular cantidad total para el descuento por mayoreo (considerando multiplicadores)
+    const totalQuantityForDiscount = calculateRealPiecesQuantity(product);
     
     // Calcular descuento por mayoreo una sola vez para todo el producto
     const wholesaleDiscount = calculateWholesaleDiscount(product, totalQuantityForDiscount);
