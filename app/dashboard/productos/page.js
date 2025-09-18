@@ -272,6 +272,7 @@ export default function ProductDashboard() {
           id: Date.now().toString() + Math.random().toString(36),
           name: product.tipos.titulo,
           enableStock: false,
+          isRequired: true, // Por defecto obligatoria al migrar
           options: product.tipos.opciones.map(opcion => ({
             id: opcion.id || Date.now().toString() + Math.random().toString(36),
             name: opcion.nombre,
@@ -293,6 +294,14 @@ export default function ProductDashboard() {
     // Asegurar que priceType esté definido
     if (!productWithVariants.priceType) {
       productWithVariants.priceType = "per_package"
+    }
+    
+    // Asegurar que todas las variantes tengan isRequired definido
+    if (productWithVariants.variants && productWithVariants.variants.length > 0) {
+      productWithVariants.variants = productWithVariants.variants.map(variant => ({
+        ...variant,
+        isRequired: variant.isRequired !== undefined ? variant.isRequired : true
+      }));
     }
     
     setNewProduct(productWithVariants)
@@ -341,6 +350,7 @@ export default function ProductDashboard() {
         id: Date.now().toString() + Math.random().toString(36),
         name: newVariantCategory.trim(),
         enableStock: false,
+        isRequired: true, // Por defecto las variantes son obligatorias
         options: []
       }
       setNewProduct({
@@ -387,6 +397,17 @@ export default function ProductDashboard() {
       variants: newProduct.variants.map(variant =>
         variant.id === categoryId
           ? { ...variant, enableStock: !variant.enableStock }
+          : variant
+      )
+    })
+  }
+
+  const handleToggleVariantRequired = (categoryId) => {
+    setNewProduct({
+      ...newProduct,
+      variants: newProduct.variants.map(variant =>
+        variant.id === categoryId
+          ? { ...variant, isRequired: !variant.isRequired }
           : variant
       )
     })
@@ -1187,17 +1208,30 @@ export default function ProductDashboard() {
                         {newProduct.variants.map((variant) => (
                           <div key={variant.id} className="bg-gray-50 rounded-lg p-4 border">
                             <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-3">
+                              <div className="flex flex-col gap-2">
                                 <h4 className="font-medium text-gray-900">{variant.name}</h4>
-                                <label className="flex items-center gap-2 text-sm text-gray-600">
-                                  <input
-                                    type="checkbox"
-                                    checked={variant.enableStock}
-                                    onChange={() => handleToggleVariantStock(variant.id)}
-                                    className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 rounded"
-                                  />
-                                  Permitir seleccionar cantidad
-                                </label>
+                                <div className="flex items-center gap-4">
+                                  <label className="flex items-center gap-2 text-sm text-gray-600">
+                                    <input
+                                      type="checkbox"
+                                      checked={variant.enableStock}
+                                      onChange={() => handleToggleVariantStock(variant.id)}
+                                      className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 rounded"
+                                    />
+                                    Permitir seleccionar cantidad
+                                  </label>
+                                  <label className="flex items-center gap-2 text-sm text-gray-600">
+                                    <input
+                                      type="checkbox"
+                                      checked={variant.isRequired !== false} // Por defecto true
+                                      onChange={() => handleToggleVariantRequired(variant.id)}
+                                      className="h-4 w-4 text-orange-500 focus:ring-orange-500 border-gray-300 rounded"
+                                    />
+                                    <span className={variant.isRequired !== false ? "text-orange-600 font-medium" : ""}>
+                                      Selección obligatoria
+                                    </span>
+                                  </label>
+                                </div>
                               </div>
                               <div className="flex items-center gap-2">
                                 <button

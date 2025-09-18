@@ -74,8 +74,16 @@ function UserPageContent({ params }) {
       const variant = product?.variants?.find(v => v.id === variantId);
       
       if (variant && !variant.enableStock) {
-        // Para variantes sin cantidad seleccionable (radio buttons), limpiar otras opciones
-        newVariants[variantId] = { [optionId]: quantity };
+        // Para variantes sin cantidad seleccionable (radio buttons)
+        const currentSelection = prev[variantId]?.[optionId];
+        
+        if (variant.isRequired === false && currentSelection > 0) {
+          // Si la variante es opcional y ya está seleccionada, deseleccionar
+          newVariants[variantId] = { [optionId]: 0 };
+        } else {
+          // Seleccionar la opción y limpiar otras opciones
+          newVariants[variantId] = { [optionId]: quantity };
+        }
       } else {
         // Para variantes con cantidad seleccionable, mantener las otras opciones
         newVariants[variantId] = {
@@ -985,7 +993,11 @@ function UserPageContent({ params }) {
                     <div key={variant.id} className="mb-4">
                       <h4 className="font-semibold mb-3 text-gray-800 flex items-center">
                         {variant.name}
-                        <span className="text-red-500 ml-1">*</span>
+                        {variant.isRequired !== false ? (
+                          <span className="text-red-500 ml-1">*</span>
+                        ) : (
+                          <span className="text-gray-400 ml-2 text-sm font-normal">(opcional)</span>
+                        )}
                       </h4>
                       <div className="space-y-2">
                         {variant.options.map((option) => (
@@ -1226,14 +1238,18 @@ function UserPageContent({ params }) {
                   
                   // Validar que se hayan seleccionado las variantes requeridas
                   if (selectedProduct.variants && selectedProduct.variants.length > 0) {
-                    const hasRequiredVariants = selectedProduct.variants.every(variant => {
+                    const unselectedRequiredVariants = selectedProduct.variants.filter(variant => {
+                      // Solo verificar variantes que son obligatorias
+                      if (variant.isRequired === false) return false;
+                      
                       const hasSelection = Object.keys(selectedVariants).includes(variant.id) && 
                         Object.values(selectedVariants[variant.id] || {}).some(qty => qty > 0);
-                      return hasSelection;
+                      return !hasSelection; // Si no hay selección en variante obligatoria
                     });
                     
-                    if (!hasRequiredVariants) {
-                      alert('Por favor selecciona las opciones requeridas');
+                    if (unselectedRequiredVariants.length > 0) {
+                      const variantNames = unselectedRequiredVariants.map(v => v.name).join(', ');
+                      alert(`Por favor selecciona las siguientes variantes obligatorias: ${variantNames}`);
                       return;
                     }
                   }
