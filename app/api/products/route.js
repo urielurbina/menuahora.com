@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/libs/next-auth";
 import { ObjectId } from 'mongodb';
 
-export async function GET(req) {
+export async function GET() {
   try {
     console.log('Iniciando GET request para productos');
     const session = await getServerSession(authOptions);
@@ -31,11 +31,37 @@ export async function GET(req) {
     // Obtener las categorías válidas
     const validCategories = business.categories ? business.categories.map(cat => cat.name) : [];
 
-    // Filtrar las categorías de los productos
-    const updatedProducts = business.products.map(product => ({
-      ...product,
-      categorias: product.categorias ? product.categorias.filter(cat => validCategories.includes(cat)) : []
-    }));
+    // Filtrar las categorías de los productos y migrar tipos a variants si es necesario
+    const updatedProducts = business.products.map(product => {
+      let updatedProduct = {
+        ...product,
+        categorias: product.categorias ? product.categorias.filter(cat => validCategories.includes(cat)) : []
+      };
+
+      // Migrar de tipos a variants si es necesario
+      if (product.tipos && !product.variants) {
+        if (product.tipos.titulo && product.tipos.opciones && product.tipos.opciones.length > 0) {
+          updatedProduct.variants = [{
+            id: Date.now().toString() + Math.random().toString(36),
+            name: product.tipos.titulo,
+            enableStock: false,
+            options: product.tipos.opciones.map(opcion => ({
+              id: opcion.id || Date.now().toString() + Math.random().toString(36),
+              name: opcion.nombre,
+            price: opcion.precio || 0
+            }))
+          }];
+        } else {
+          updatedProduct.variants = [];
+        }
+        // Mantener tipos para compatibilidad hacia atrás, pero marcar como migrado
+        updatedProduct._migratedFromTipos = true;
+      } else if (!product.variants) {
+        updatedProduct.variants = [];
+      }
+
+      return updatedProduct;
+    });
 
     console.log('Productos encontrados:', updatedProducts);
     return NextResponse.json(updatedProducts);
@@ -60,6 +86,29 @@ export async function POST(req) {
       product.categorias = product.categorias ? [product.categorias] : [];
     }
     product.categorias = product.categorias.slice(0, 2);
+
+    // Procesar variantes - migrar de tipos a variants si es necesario
+    if (product.tipos && !product.variants) {
+      // Migración de la estructura antigua (tipos) a la nueva (variants)
+      if (product.tipos.titulo && product.tipos.opciones && product.tipos.opciones.length > 0) {
+        product.variants = [{
+          id: Date.now().toString(),
+          name: product.tipos.titulo,
+          enableStock: false,
+          options: product.tipos.opciones.map(opcion => ({
+            id: opcion.id || Date.now().toString() + Math.random().toString(36),
+            name: opcion.nombre,
+            price: opcion.precio || 0
+          }))
+        }];
+      } else {
+        product.variants = [];
+      }
+      // Eliminar el campo tipos ya que ahora usamos variants
+      delete product.tipos;
+    } else if (!product.variants) {
+      product.variants = [];
+    }
 
     const result = await db.collection('businesses').updateOne(
       { userId: session.user.id },
@@ -97,8 +146,32 @@ export async function PUT(req) {
     }
     product.categorias = product.categorias.slice(0, 2);
 
+    // Procesar variantes - migrar de tipos a variants si es necesario
+    if (product.tipos && !product.variants) {
+      // Migración de la estructura antigua (tipos) a la nueva (variants)
+      if (product.tipos.titulo && product.tipos.opciones && product.tipos.opciones.length > 0) {
+        product.variants = [{
+          id: Date.now().toString(),
+          name: product.tipos.titulo,
+          enableStock: false,
+          options: product.tipos.opciones.map(opcion => ({
+            id: opcion.id || Date.now().toString() + Math.random().toString(36),
+            name: opcion.nombre,
+            price: opcion.precio || 0
+          }))
+        }];
+      } else {
+        product.variants = [];
+      }
+      // Eliminar el campo tipos ya que ahora usamos variants
+      delete product.tipos;
+    } else if (!product.variants) {
+      product.variants = [];
+    }
+
     // Eliminar el campo _id del objeto product para evitar errores de MongoDB
-    const { _id, ...updateData } = product;
+    // eslint-disable-next-line no-unused-vars
+    const { _id: _, ...updateData } = product;
 
     const result = await db.collection('businesses').updateOne(
       { 

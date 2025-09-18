@@ -10,6 +10,7 @@ export default function CartModal({
   cartItems, 
   onUpdateQuantity, 
   onRemoveItem, 
+  onEditItem,
   appearance,
   total,
   onCreateOrder
@@ -39,7 +40,11 @@ export default function CartModal({
     
     cartItems.forEach(item => {
       message += `— (${item.quantity}x) ${item.nombre}`;
-      if (item.tipo) message += ` _Tipo: ${item.tipo}_`;
+      if (item.variantsSummary && item.variantsSummary.length > 0) {
+        message += ` _Variantes: ${item.variantsSummary.join(', ')}_`;
+      } else if (item.tipo) {
+        message += ` _Tipo: ${item.tipo}_`;
+      }
       if (item.extras?.length > 0) {
         message += ` _Extras: ${item.extras.join(', ')}_`;
       }
@@ -93,60 +98,86 @@ export default function CartModal({
               ) : (
                 <div className="space-y-4">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="flex items-center py-4 border-b border-gray-200">
-                      {item.imagen && (
-                        <div className="w-16 h-16 mr-4 flex-shrink-0 rounded-lg overflow-hidden">
-                          <Image
-                            src={item.imagen}
-                            alt={item.nombre}
-                            width={64}
-                            height={64}
-                            className="object-cover w-full h-full"
-                          />
+                    <div key={item.id} className="py-4 border-b border-gray-200 last:border-b-0">
+                      {/* Información del producto */}
+                      <div className="flex items-start space-x-3 mb-3">
+                        {item.imagen && (
+                          <div className="w-12 h-12 flex-shrink-0 rounded-lg overflow-hidden">
+                            <Image
+                              src={item.imagen}
+                              alt={item.nombre}
+                              width={48}
+                              height={48}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-medium text-gray-900 truncate">{item.nombre}</h3>
+                          <div className="mt-1 text-xs text-gray-500 space-y-1">
+                          {item.variantsSummary && item.variantsSummary.length > 0 && (
+                            <div className="space-y-1">
+                              {item.variantsSummary.map((variant, index) => (
+                                <p key={index} className="text-xs text-gray-600">
+                                  {variant}
+                                </p>
+                              ))}
+                            </div>
+                          )}
+                            {/* Compatibilidad con estructura antigua */}
+                            {item.tipo && !item.variantsSummary && <p>Tipo: {item.tipo}</p>}
+                            {item.extras && item.extras.length > 0 && (
+                              <p>Extras: {item.extras.join(', ')}</p>
+                            )}
+                          </div>
                         </div>
-                      )}
-                      <div className="flex-1">
-                        <h3 className="text-base font-medium text-gray-900">{item.nombre}</h3>
-                        <div className="mt-1 text-sm text-gray-500">
-                          {item.tipo && <p>Tipo: {item.tipo}</p>}
-                          {item.extras && item.extras.length > 0 && (
-                            <p>Extras: {item.extras.join(', ')}</p>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-gray-900">
+                            ${(item.price * item.quantity).toFixed(2)}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            ${item.price.toFixed(2)} x {item.quantity}
+                          </p>
+                          {item.basePrice && item.variantPrice > 0 && (
+                            <p className="text-xs text-gray-400">
+                              Base: ${item.basePrice.toFixed(2)} + ${item.variantPrice.toFixed(2)}
+                            </p>
                           )}
                         </div>
-                        <div className="mt-1 flex items-center gap-2">
-                          <p className="text-sm font-medium text-gray-900">
-                            ${(item.price).toFixed(2)}
-                          </p>
-                          <p className="text-sm text-gray-500">
-                            x {item.quantity}
-                          </p>
-                          <p className="text-sm font-medium text-gray-900">
-                            = ${(item.price * item.quantity).toFixed(2)}
-                          </p>
-                        </div>
                       </div>
-                      <div className="flex items-center space-x-4">
+                      
+                      {/* Controles del item */}
+                      <div className="flex items-center justify-between">
                         <div className="flex items-center border rounded-lg">
                           <button
                             onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
-                            className="px-3 py-1"
+                            className="px-3 py-2 text-base hover:bg-gray-100 transition-colors"
                           >
                             -
                           </button>
-                          <span className="px-3 py-1 border-x">{item.quantity}</span>
+                          <span className="px-4 py-2 border-x text-base font-medium">{item.quantity}</span>
                           <button
                             onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
-                            className="px-3 py-1"
+                            className="px-3 py-2 text-base hover:bg-gray-100 transition-colors"
                           >
                             +
                           </button>
                         </div>
-                        <button
-                          onClick={() => onRemoveItem(item.id)}
-                          className="text-red-500"
-                        >
-                          Eliminar
-                        </button>
+                        
+                        <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => onEditItem && onEditItem(item)}
+                            className="px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition-colors border border-blue-200"
+                          >
+                            Editar
+                          </button>
+                          <button
+                            onClick={() => onRemoveItem(item.id)}
+                            className="px-4 py-2 text-sm font-medium text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors border border-red-200"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}

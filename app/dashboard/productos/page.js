@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, X, Edit2, ChevronDown, ChevronUp } from "lucide-react"
+import { Plus, X, Edit2 } from "lucide-react"
 import { useDropzone } from 'react-dropzone'
 import Image from 'next/image'
 
@@ -19,14 +19,15 @@ export default function ProductDashboard() {
     categorias: [],
     availability: true,
     extras: [],
-    tipos: {
-      titulo: "",
-      opciones: []
-    }
+    variants: []
   })
   const [newCategory, setNewCategory] = useState("")
   const [newExtra, setNewExtra] = useState({ name: "", price: 0 })
-  const [newTipo, setNewTipo] = useState("")
+  const [newVariantCategory, setNewVariantCategory] = useState("")
+  const [newVariantOption, setNewVariantOption] = useState({ name: "", price: 0 })
+  const [editingVariantCategory, setEditingVariantCategory] = useState(null)
+  const [editingVariantOption, setEditingVariantOption] = useState(null)
+  const [selectedVariantCategoryId, setSelectedVariantCategoryId] = useState(null)
   const [cardInfoSettings, setCardInfoSettings] = useState({
     nombre: true,
     descripcion: true,
@@ -35,12 +36,9 @@ export default function ProductDashboard() {
     imagen: true,
     detailedView: true,
   })
-  const [expandedProduct, setExpandedProduct] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [dataLoaded, setDataLoaded] = useState(false)
   const [editingExtra, setEditingExtra] = useState(null)
-  const [editingTipo, setEditingTipo] = useState(null)
 
   useEffect(() => {
     fetchProducts()
@@ -61,8 +59,6 @@ export default function ProductDashboard() {
     } catch (error) {
       console.error('Error fetching products:', error)
       setError(`No se pudieron cargar los productos: ${error.message}`);
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -147,15 +143,15 @@ export default function ProductDashboard() {
       categorias: [],
       availability: true,
       extras: [],
-      tipos: {
-        titulo: "",
-        opciones: []
-      }
+      variants: []
     })
     setNewExtra({ name: "", price: 0 })
-    setNewTipo("")
+    setNewVariantCategory("")
+    setNewVariantOption({ name: "", price: 0 })
     setEditingExtra(null)
-    setEditingTipo(null)
+    setEditingVariantCategory(null)
+    setEditingVariantOption(null)
+    setSelectedVariantCategoryId(null)
   }
 
   const handleAddCategory = async () => {
@@ -219,15 +215,31 @@ export default function ProductDashboard() {
 
   const handleEditProduct = (product) => {
     setEditingProduct(product)
-    const productWithTipos = {
-      ...product,
-      tipos: {
-        titulo: product.tipos?.titulo || "Tipos",
-        placeholder: product.tipos?.placeholder || "Tipo",
-        opciones: product.tipos?.opciones || []
+    
+    // Migrar de tipos a variants si es necesario
+    let productWithVariants = { ...product }
+    
+    if (product.tipos && !product.variants) {
+      // Migrar de la estructura antigua
+      if (product.tipos.titulo && product.tipos.opciones && product.tipos.opciones.length > 0) {
+        productWithVariants.variants = [{
+          id: Date.now().toString() + Math.random().toString(36),
+          name: product.tipos.titulo,
+          enableStock: false,
+          options: product.tipos.opciones.map(opcion => ({
+            id: opcion.id || Date.now().toString() + Math.random().toString(36),
+            name: opcion.nombre,
+            stock: 0
+          }))
+        }]
+      } else {
+        productWithVariants.variants = []
       }
+    } else if (!product.variants) {
+      productWithVariants.variants = []
     }
-    setNewProduct(productWithTipos)
+    
+    setNewProduct(productWithVariants)
     setIsAddingProduct(true)
   }
 
@@ -264,49 +276,124 @@ export default function ProductDashboard() {
     }
   }
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
+  const { getRootProps, getInputProps } = useDropzone({ onDrop })
 
-  const handleAddTipo = () => {
-    if (newTipo.trim()) {
+  // Funciones para manejar categorías de variantes
+  const handleAddVariantCategory = () => {
+    if (newVariantCategory.trim()) {
+      const newCategory = {
+        id: Date.now().toString() + Math.random().toString(36),
+        name: newVariantCategory.trim(),
+        enableStock: false,
+        options: []
+      }
       setNewProduct({
         ...newProduct,
-        tipos: {
-          ...newProduct.tipos,
-          opciones: [...newProduct.tipos.opciones, { id: Date.now(), nombre: newTipo.trim() }]
-        }
+        variants: [...newProduct.variants, newCategory]
       })
-      setNewTipo("")
+      setNewVariantCategory("")
     }
   }
 
-  const handleDeleteTipo = (id) => {
+  const handleDeleteVariantCategory = (categoryId) => {
     setNewProduct({
       ...newProduct,
-      tipos: {
-        ...newProduct.tipos,
-        opciones: newProduct.tipos.opciones.filter(tipo => tipo.id !== id)
-      }
+      variants: newProduct.variants.filter(variant => variant.id !== categoryId)
+    })
+    if (selectedVariantCategoryId === categoryId) {
+      setSelectedVariantCategoryId(null)
+    }
+  }
+
+  const handleEditVariantCategory = (category) => {
+    setEditingVariantCategory(category)
+    setNewVariantCategory(category.name)
+  }
+
+  const handleUpdateVariantCategory = () => {
+    if (newVariantCategory.trim()) {
+      setNewProduct({
+        ...newProduct,
+        variants: newProduct.variants.map(variant =>
+          variant.id === editingVariantCategory.id
+            ? { ...variant, name: newVariantCategory.trim() }
+            : variant
+        )
+      })
+      setNewVariantCategory("")
+      setEditingVariantCategory(null)
+    }
+  }
+
+  const handleToggleVariantStock = (categoryId) => {
+    setNewProduct({
+      ...newProduct,
+      variants: newProduct.variants.map(variant =>
+        variant.id === categoryId
+          ? { ...variant, enableStock: !variant.enableStock }
+          : variant
+      )
     })
   }
 
-  const handleTiposTituloChange = (nuevoTitulo) => {
+  // Funciones para manejar opciones de variantes
+  const handleAddVariantOption = () => {
+    if (newVariantOption.name.trim() && selectedVariantCategoryId) {
+      const newOption = {
+        id: Date.now().toString() + Math.random().toString(36),
+        name: newVariantOption.name.trim(),
+        price: parseFloat(newVariantOption.price) || 0
+      }
+      
+      setNewProduct({
+        ...newProduct,
+        variants: newProduct.variants.map(variant =>
+          variant.id === selectedVariantCategoryId
+            ? { ...variant, options: [...variant.options, newOption] }
+            : variant
+        )
+      })
+      setNewVariantOption({ name: "", price: 0 })
+    }
+  }
+
+  const handleDeleteVariantOption = (categoryId, optionId) => {
     setNewProduct({
       ...newProduct,
-      tipos: {
-        ...newProduct.tipos,
-        titulo: nuevoTitulo
-      }
+      variants: newProduct.variants.map(variant =>
+        variant.id === categoryId
+          ? { ...variant, options: variant.options.filter(option => option.id !== optionId) }
+          : variant
+      )
     })
   }
 
-  const handleTiposPlaceholderChange = (nuevoPlaceholder) => {
-    setNewProduct({
-      ...newProduct,
-      tipos: {
-        ...newProduct.tipos,
-        placeholder: nuevoPlaceholder
-      }
-    })
+  const handleEditVariantOption = (categoryId, option) => {
+    setEditingVariantOption({ categoryId, ...option })
+    setNewVariantOption({ name: option.name, price: option.price || 0 })
+    setSelectedVariantCategoryId(categoryId)
+  }
+
+  const handleUpdateVariantOption = () => {
+    if (newVariantOption.name.trim()) {
+      setNewProduct({
+        ...newProduct,
+        variants: newProduct.variants.map(variant =>
+          variant.id === editingVariantOption.categoryId
+            ? {
+                ...variant,
+                options: variant.options.map(option =>
+                  option.id === editingVariantOption.id
+                    ? { ...option, name: newVariantOption.name.trim(), price: parseFloat(newVariantOption.price) || 0 }
+                    : option
+                )
+              }
+            : variant
+        )
+      })
+      setNewVariantOption({ name: "", price: 0 })
+      setEditingVariantOption(null)
+    }
   }
 
   const handleEditExtra = (extra) => {
@@ -329,30 +416,7 @@ export default function ProductDashboard() {
     }
   }
 
-  const handleEditTipo = (tipo) => {
-    setEditingTipo(tipo)
-    setNewTipo(tipo.nombre)
-  }
 
-  const handleUpdateTipo = () => {
-    if (newTipo.trim()) {
-      setNewProduct({
-        ...newProduct,
-        tipos: {
-          ...newProduct.tipos,
-          opciones: newProduct.tipos.opciones.map(tipo =>
-            tipo.id === editingTipo.id
-              ? { ...tipo, nombre: newTipo.trim() }
-              : tipo
-          )
-        }
-      })
-      setNewTipo("")
-      setEditingTipo(null)
-    }
-  }
-
-  // if (isLoading) return <LoadingScreen />
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>
 
   return (
@@ -512,7 +576,31 @@ export default function ProductDashboard() {
                       </ul>
                     </div>
                   )}
-                  {product.tipos?.opciones?.length > 0 && (
+                  {(product.variants && product.variants.length > 0) && (
+                    <div className="mt-2">
+                      <h4 className="font-semibold text-sm mb-1 text-gray-700">Variantes:</h4>
+                      {product.variants.map((variant) => (
+                        <div key={variant.id} className="mb-2">
+                          <span className="text-xs font-medium text-gray-600">{variant.name}:</span>
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {variant.options.map((option) => (
+                              <span key={option.id} className="inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700">
+                                {option.name}
+                                {option.price > 0 && (
+                                  <span className="ml-1 text-xs text-green-600">+${option.price.toFixed(2)}</span>
+                                )}
+                                {variant.enableStock && (
+                                  <span className="ml-1 text-xs text-gray-500">(cantidad)</span>
+                                )}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {/* Compatibilidad con estructura antigua */}
+                  {product.tipos?.opciones?.length > 0 && !product.variants && (
                     <div className="mt-2">
                       <h4 className="font-semibold text-sm mb-1 text-gray-700">{product.tipos.titulo}:</h4>
                       <div className="flex flex-wrap gap-1">
@@ -679,59 +767,143 @@ export default function ProductDashboard() {
 
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Variantes del Producto</h3>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
+                    
+                    {/* Agregar nueva categoría de variantes */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Variantes</label>
-                      <input
-                        type="text"
-                        value={newProduct.tipos?.titulo || ""}
-                        onChange={(e) => handleTiposTituloChange(e.target.value)}
-                        placeholder="Ej: Tallas, Sabores, Tortillas, Temperaturas, etc."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                      />
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Nueva Categoría de Variantes</label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={newVariantCategory}
+                          onChange={(e) => setNewVariantCategory(e.target.value)}
+                          placeholder="Ej: Tallas, Sabores, Tortillas, Temperaturas, etc."
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                        />
+                        <button
+                          onClick={editingVariantCategory ? handleUpdateVariantCategory : handleAddVariantCategory}
+                          className="px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200"
+                        >
+                          {editingVariantCategory ? "Actualizar" : "Agregar"}
+                        </button>
+                      </div>
                     </div>
-                    <div className="bg-gray-50 rounded-md p-4 mb-4">
-                      {newProduct.tipos?.opciones?.length > 0 ? (
-                        <div className="space-y-2">
-                          {newProduct.tipos.opciones.map((tipo) => (
-                            <div key={tipo.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
-                              <span className="text-sm font-medium text-gray-700">{tipo.nombre}</span>
-                              <div className="flex items-center space-x-2">
+
+                    {/* Lista de categorías de variantes */}
+                    {newProduct.variants.length > 0 && (
+                      <div className="space-y-4">
+                        {newProduct.variants.map((variant) => (
+                          <div key={variant.id} className="bg-gray-50 rounded-lg p-4 border">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-3">
+                                <h4 className="font-medium text-gray-900">{variant.name}</h4>
+                                <label className="flex items-center gap-2 text-sm text-gray-600">
+                                  <input
+                                    type="checkbox"
+                                    checked={variant.enableStock}
+                                    onChange={() => handleToggleVariantStock(variant.id)}
+                                    className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 rounded"
+                                  />
+                                  Permitir seleccionar cantidad
+                                </label>
+                              </div>
+                              <div className="flex items-center gap-2">
                                 <button
-                                  onClick={() => handleEditTipo(tipo)}
+                                  onClick={() => handleEditVariantCategory(variant)}
                                   className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
                                 >
-                                  <Edit2 className="h-5 w-5" />
+                                  <Edit2 className="h-4 w-4" />
                                 </button>
                                 <button
-                                  onClick={() => handleDeleteTipo(tipo.id)}
+                                  onClick={() => handleDeleteVariantCategory(variant.id)}
                                   className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
                                 >
-                                  <X className="h-5 w-5" />
+                                  <X className="h-4 w-4" />
                                 </button>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-gray-500 text-center">No hay {newProduct.tipos?.titulo?.toLowerCase() || 'variantes'} agregadas</p>
-                      )}
-                    </div>
-                    <div className="mt-2 flex flex-col sm:flex-row gap-2">
-                      <input
-                        type="text"
-                        value={newTipo}
-                        onChange={(e) => setNewTipo(e.target.value)}
-                        placeholder={`Nueva ${newProduct.tipos?.titulo?.toLowerCase() || 'variante'}`}
-                        className="w-full sm:flex-grow px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                      />
-                      <button
-                        onClick={editingTipo ? handleUpdateTipo : handleAddTipo}
-                        className="w-full sm:w-auto px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200"
-                      >
-                        {editingTipo ? "Actualizar" : "Agregar"}
-                      </button>
-                    </div>
+
+                            {/* Opciones de la categoría */}
+                            <div className="space-y-2">
+                              {variant.options.map((option) => (
+                                <div key={option.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
+                                  <div className="flex items-center gap-3">
+                                    <div>
+                                      <span className="text-sm font-medium text-gray-700">{option.name}</span>
+                                      {option.price > 0 && (
+                                        <span className="text-xs text-green-600 ml-2">+${option.price.toFixed(2)}</span>
+                                      )}
+                                    </div>
+                                    {variant.enableStock && (
+                                      <span className="text-xs text-gray-500">Cantidad seleccionable</span>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    <button
+                                      onClick={() => handleEditVariantOption(variant.id, option)}
+                                      className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
+                                    >
+                                      <Edit2 className="h-4 w-4" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteVariantOption(variant.id, option.id)}
+                                      className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Agregar nueva opción */}
+                            <div className="mt-3 pt-3 border-t border-gray-200">
+                              <div className="flex gap-2">
+                                <input
+                                  type="text"
+                                  value={selectedVariantCategoryId === variant.id ? newVariantOption.name : ""}
+                                  onChange={(e) => setNewVariantOption({ ...newVariantOption, name: e.target.value })}
+                                  placeholder={`Nueva ${variant.name.toLowerCase()}`}
+                                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                                  onClick={() => setSelectedVariantCategoryId(variant.id)}
+                                />
+                                <div className="relative">
+                                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <span className="text-gray-500 text-sm">+$</span>
+                                  </div>
+                                  <input
+                                    type="number"
+                                    value={selectedVariantCategoryId === variant.id && newVariantOption.price > 0 ? newVariantOption.price : ""}
+                                    onChange={(e) => setNewVariantOption({ ...newVariantOption, price: parseFloat(e.target.value) || 0 })}
+                                    placeholder="0.00"
+                                    step="0.01"
+                                    min="0"
+                                    className="w-32 pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                                    onClick={() => setSelectedVariantCategoryId(variant.id)}
+                                  />
+                                </div>
+                                <button
+                                  onClick={() => {
+                                    setSelectedVariantCategoryId(variant.id)
+                                    editingVariantOption ? handleUpdateVariantOption() : handleAddVariantOption()
+                                  }}
+                                  className="px-3 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200"
+                                >
+                                  {editingVariantOption ? "Actualizar" : "Agregar"}
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {newProduct.variants.length === 0 && (
+                      <div className="text-center py-8 text-gray-500">
+                        <p className="text-sm">No hay categorías de variantes agregadas</p>
+                        <p className="text-xs mt-1">Agrega una categoría para empezar (ej: Tallas, Sabores, etc.)</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -857,3 +1029,4 @@ export default function ProductDashboard() {
     </div>
   )
 }
+
