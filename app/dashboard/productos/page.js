@@ -24,6 +24,7 @@ export default function ProductDashboard() {
     priceType: "per_package" // "per_piece" o "per_package"
   })
   const [newCategory, setNewCategory] = useState("")
+  const [editingCategory, setEditingCategory] = useState(null)
   const [newExtra, setNewExtra] = useState({ name: "", price: 0, priceType: "per_package" })
   const [newVariantCategory, setNewVariantCategory] = useState("")
   const [newVariantOption, setNewVariantOption] = useState({ name: "", price: 0, quantityMultiplier: 1 })
@@ -183,6 +184,38 @@ export default function ProductDashboard() {
         setError(error.message);
       }
     }
+  };
+
+  const handleEditCategory = (category) => {
+    setEditingCategory(category);
+    setNewCategory(category.name);
+  };
+
+  const handleUpdateCategory = async () => {
+    if (newCategory.trim() && editingCategory) {
+      try {
+        const response = await fetch(`/api/categories/${editingCategory._id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: newCategory.trim() }),
+        });
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Error al actualizar la categoría');
+        }
+        await fetchCategories();
+        setNewCategory("");
+        setEditingCategory(null);
+      } catch (error) {
+        console.error('Error updating category:', error);
+        setError(error.message);
+      }
+    }
+  };
+
+  const handleCancelEditCategory = () => {
+    setEditingCategory(null);
+    setNewCategory("");
   };
 
   const handleDeleteCategory = async (id) => {
@@ -522,15 +555,32 @@ export default function ProductDashboard() {
               type="text"
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
-              placeholder="Nueva categoría"
+              placeholder={editingCategory ? "Editar categoría" : "Nueva categoría"}
               className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
             />
-            <button
-              onClick={handleAddCategory}
-              className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
-            >
-              Agregar
-            </button>
+            {editingCategory ? (
+              <>
+                <button
+                  onClick={handleUpdateCategory}
+                  className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
+                >
+                  Actualizar
+                </button>
+                <button
+                  onClick={handleCancelEditCategory}
+                  className="rounded-md bg-gray-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500"
+                >
+                  Cancelar
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={handleAddCategory}
+                className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
+              >
+                Agregar
+              </button>
+            )}
           </div>
           <div>
             {categories.length === 0 && dataLoaded ? (
@@ -538,14 +588,28 @@ export default function ProductDashboard() {
             ) : (
               <div className="flex flex-wrap gap-2">
                 {categories.map((category) => (
-                  <div key={category._id} className="inline-flex items-center bg-gray-200 rounded-full px-3 py-1">
-                    <span className="text-sm font-medium text-gray-700 mr-1">{category.name}</span>
-                    <button
-                      onClick={() => handleDeleteCategory(category._id)}
-                      className="ml-1 text-gray-500 hover:text-red-500 focus:outline-none"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
+                  <div key={category._id} className={`inline-flex items-center rounded-full px-3 py-1 ${
+                    editingCategory?._id === category._id 
+                      ? 'bg-blue-100 border-2 border-blue-300' 
+                      : 'bg-gray-200'
+                  }`}>
+                    <span className="text-sm font-medium text-gray-700 mr-2">{category.name}</span>
+                    <div className="flex items-center space-x-1">
+                      <button
+                        onClick={() => handleEditCategory(category)}
+                        className="text-gray-500 hover:text-blue-600 focus:outline-none transition-colors duration-200"
+                        title="Editar categoría"
+                      >
+                        <Edit2 className="h-3 w-3" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCategory(category._id)}
+                        className="text-gray-500 hover:text-red-500 focus:outline-none transition-colors duration-200"
+                        title="Eliminar categoría"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
