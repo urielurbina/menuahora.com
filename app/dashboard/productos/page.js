@@ -99,6 +99,192 @@ function SortableVariant({ variant, onEdit, onDelete, onToggleStock, onToggleReq
   )
 }
 
+// Componente sortable para tarjetas de productos
+function SortableProductCard({ product, onEdit, onDuplicate, onDelete }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: product._id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className="bg-gray-50 shadow rounded-lg overflow-hidden">
+      <div className="p-3 sm:p-4">
+        {/* Layout móvil - vertical */}
+        <div className="block sm:hidden">
+          <div className="flex items-start gap-3 mb-3">
+            {/* Drag Handle */}
+            <div
+              {...attributes}
+              {...listeners}
+              className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0 mt-1"
+              title="Arrastrar para reordenar"
+            >
+              <GripVertical className="h-4 w-4 text-gray-500" />
+            </div>
+
+            {/* Imagen */}
+            {product.imagen && (
+              <div className="w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
+                <Image
+                  src={product.imagen}
+                  alt={product.nombre}
+                  width={64}
+                  height={64}
+                  objectFit="cover"
+                />
+              </div>
+            )}
+
+            {/* Información principal */}
+            <div className="flex-grow min-w-0">
+              <h3 className="font-bold text-base text-gray-800 mb-1 truncate">{product.nombre}</h3>
+              <div className="flex items-center gap-2 mb-2">
+                {product.precioPromocion > 0 ? (
+                  <>
+                    <p className="text-gray-800 font-bold text-base">${product.precioPromocion}</p>
+                    <p className="text-gray-500 line-through text-sm">${product.precio}</p>
+                  </>
+                ) : (
+                  <p className="text-gray-800 font-bold text-base">${product.precio}</p>
+                )}
+              </div>
+              <p className={`text-xs ${product.availability ? 'text-green-600' : 'text-red-600'} mb-2`}>
+                {product.availability ? 'Disponible' : 'No disponible'}
+              </p>
+            </div>
+          </div>
+
+          {/* Descripción */}
+          <p className="text-gray-600 text-sm mb-2 line-clamp-2">{product.descripcion}</p>
+
+          {/* Categorías */}
+          {product.categorias && product.categorias.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-3">
+              {product.categorias.map((categoria, index) => (
+                <span key={index} className="inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700">
+                  {categoria}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Botones en móvil - horizontal */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => onEdit(product)}
+              className="flex-1 px-3 py-2 bg-[#0D654A] text-white rounded-md hover:bg-[#0D654A] focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow duration-300 text-sm"
+            >
+              <Edit2 className="mr-1 h-3 w-3" />
+              <span>Editar</span>
+            </button>
+            <button
+              onClick={() => onDuplicate(product)}
+              className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow duration-300 text-sm"
+            >
+              <Copy className="h-3 w-3" />
+            </button>
+            <button
+              onClick={() => onDelete(product)}
+              className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow duration-300 text-sm"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        </div>
+
+        {/* Layout desktop - horizontal */}
+        <div className="hidden sm:flex items-center gap-4">
+          {/* Drag Handle */}
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing p-2 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+            title="Arrastrar para reordenar"
+          >
+            <GripVertical className="h-5 w-5 text-gray-500" />
+          </div>
+
+          {/* Imagen */}
+          {product.imagen && (
+            <div className="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden">
+              <Image
+                src={product.imagen}
+                alt={product.nombre}
+                width={80}
+                height={80}
+                objectFit="cover"
+              />
+            </div>
+          )}
+
+          {/* Información del producto */}
+          <div className="flex-grow min-w-0">
+            <h3 className="font-bold text-lg text-gray-800 mb-2 truncate">{product.nombre}</h3>
+            <div className="flex items-center gap-2 mb-2">
+              {product.precioPromocion > 0 ? (
+                <>
+                  <p className="text-gray-800 font-bold text-lg">${product.precioPromocion}</p>
+                  <p className="text-gray-500 line-through text-sm">${product.precio}</p>
+                </>
+              ) : (
+                <p className="text-gray-800 font-bold text-lg">${product.precio}</p>
+              )}
+            </div>
+            <p className="text-gray-600 text-sm mb-2 line-clamp-2">{product.descripcion}</p>
+            {product.categorias && product.categorias.length > 0 && (
+              <div className="flex flex-wrap gap-1 mb-2">
+                {product.categorias.map((categoria, index) => (
+                  <span key={index} className="inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700">
+                    {categoria}
+                  </span>
+                ))}
+              </div>
+            )}
+            <p className={`text-sm ${product.availability ? 'text-green-600' : 'text-red-600'}`}>
+              {product.availability ? 'Disponible' : 'No disponible'}
+            </p>
+          </div>
+
+          {/* Botones de acción desktop */}
+          <div className="flex flex-col gap-2 flex-shrink-0">
+            <button
+              onClick={() => onEdit(product)}
+              className="px-3 py-1 bg-[#0D654A] text-white rounded-md hover:bg-[#0D654A] focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow duration-300"
+            >
+              <Edit2 className="mr-1 h-4 w-4" />
+              <span>Editar</span>
+            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => onDuplicate(product)}
+                className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
+              >
+                <Copy className="mr-1 h-4 w-4" /> Duplicar
+              </button>
+              <button
+                onClick={() => onDelete(product)}
+                className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
+              >
+                <X className="mr-1 h-4 w-4" /> Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Componente sortable para opciones de variantes
 function SortableVariantOption({ option, variantId, onEdit, onDelete }) {
   const {
@@ -818,6 +1004,20 @@ export default function ProductDashboard() {
     }
   }
 
+  // Función para drag and drop de productos
+  const handleDragEndProducts = (event) => {
+    const { active, over } = event
+
+    if (active.id !== over.id) {
+      setProducts((prevProducts) => {
+        const oldIndex = prevProducts.findIndex((product) => product._id === active.id)
+        const newIndex = prevProducts.findIndex((product) => product._id === over.id)
+
+        return arrayMove(prevProducts, oldIndex, newIndex)
+      })
+    }
+  }
+
 
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>
 
@@ -942,7 +1142,7 @@ export default function ProductDashboard() {
       </div>
 
       {/* Agregar Producto y Lista de Productos */}
-      <div className="bg-white shadow rounded-lg p-4 mt-4 sm:mt-6 sm:p-6">
+      <div className="bg-white shadow rounded-lg p-3 mt-4 sm:mt-6 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-2 sm:mb-0">Productos</h2>
           <button
@@ -953,137 +1153,44 @@ export default function ProductDashboard() {
           </button>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6">
-          {products.length === 0 && dataLoaded ? (
-            <p className="col-span-full text-center text-gray-500">No hay productos. Añade un nuevo producto para empezar.</p>
-          ) : (
-            products.map((product) => (
-              <div key={product._id} className="bg-gray-50 shadow rounded-lg overflow-hidden">
-                <div className="p-4">
-                  <div className="flex mb-4">
-                    {product.imagen && (
-                      <div className="w-24 h-24 mr-4 flex-shrink-0 rounded-md overflow-hidden">
-                        <Image
-                          src={product.imagen}
-                          alt={product.nombre}
-                          width={96}
-                          height={96}
-                          objectFit="cover"
-                        />
-                      </div>
-                    )}
-                    <div className="flex-grow">
-                      <h3 className="font-bold text-xl text-gray-800 mb-2">{product.nombre}</h3>
-                      <div className="flex items-center gap-2">
-                        {product.precioPromocion > 0 ? (
-                          <>
-                            <p className="text-gray-800 font-bold text-lg">${product.precioPromocion}</p>
-                            <p className="text-gray-500 line-through text-sm">${product.precio}</p>
-                          </>
-                        ) : (
-                          <p className="text-gray-800 font-bold text-lg">${product.precio}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <p className="text-gray-600 text-sm mb-2">{product.descripcion}</p>
-                  {product.categorias && product.categorias.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-2">
-                      {product.categorias.map((categoria, index) => (
-                        <span key={index} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-700">
-                          {categoria}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <p className={`text-sm ${product.availability ? 'text-green-600' : 'text-red-600'} mb-2`}>
-                    {product.availability ? 'Disponible' : 'No disponible'}
-                  </p>
-                  {product.extras && product.extras.length > 0 && (
-                    <div className="mt-2">
-                      <h4 className="font-semibold text-sm mb-1 text-gray-700">Extras:</h4>
-                      <ul className="text-sm text-gray-600">
-                        {product.extras.map((extra) => (
-                          <li key={extra.id}>{extra.name}: ${extra.price}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {(product.variants && product.variants.length > 0) && (
-                    <div className="mt-2">
-                      <h4 className="font-semibold text-sm mb-1 text-gray-700">Variantes:</h4>
-                      {product.variants.map((variant) => (
-                        <div key={variant.id} className="mb-2">
-                          <span className="text-xs font-medium text-gray-600">{variant.name}:</span>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {variant.options.map((option) => (
-                              <span key={option.id} className="inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700">
-                                {option.name}
-                                {option.price > 0 && (
-                                  <span className="ml-1 text-xs text-green-600">+${option.price.toFixed(2)}</span>
-                                )}
-                                {variant.enableStock && (
-                                  <span className="ml-1 text-xs text-gray-500">(cantidad)</span>
-                                )}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  {(product.wholesalePricing && product.wholesalePricing.length > 0) && (
-                    <div className="mt-2">
-                      <h4 className="font-semibold text-sm mb-1 text-gray-700">Precios Mayoreo:</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {product.wholesalePricing.map((wholesale) => (
-                          <span key={wholesale.id} className="inline-block bg-green-100 rounded-full px-2 py-1 text-xs font-semibold text-green-700">
-                            {wholesale.minQuantity}+ = {wholesale.discount}% desc.
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  {/* Compatibilidad con estructura antigua */}
-                  {product.tipos?.opciones?.length > 0 && !product.variants && (
-                    <div className="mt-2">
-                      <h4 className="font-semibold text-sm mb-1 text-gray-700">{product.tipos.titulo}:</h4>
-                      <div className="flex flex-wrap gap-1">
-                        {product.tipos.opciones.map((tipo) => (
-                          <span key={tipo.id} className="inline-block bg-gray-200 rounded-full px-3 py-1 text-xs font-semibold text-gray-700">
-                            {tipo.nombre}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <div className="mt-4 flex justify-between">
-                    <button
-                      onClick={() => handleEditProduct(product)}
-                      className="px-3 py-1 bg-[#0D654A] text-white rounded-md hover:bg-[#0D654A] focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
-                    >
-                      <Edit2 className="mr-1 h-4 w-4" /> Editar
-                    </button>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleDuplicateProduct(product)}
-                        className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
-                      >
-                        <Copy className="mr-1 h-4 w-4" /> Duplicar
-                      </button>
-                      <button
-                        onClick={() => confirmDeleteProduct(product)}
-                        className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
-                      >
-                        <X className="mr-1 h-4 w-4" /> Eliminar
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="flex items-start">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5 sm:mt-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+            </svg>
+            <p className="text-xs sm:text-sm text-blue-800">
+              <strong>Tip:</strong> Puedes arrastrar las tarjetas de productos para reordenarlas usando el ícono de arrastre.
+            </p>
+          </div>
         </div>
+        
+        {/* Lista de productos con drag and drop */}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEndProducts}
+        >
+          <SortableContext
+            items={products.map(product => product._id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-4">
+              {products.length === 0 && dataLoaded ? (
+                <p className="text-center text-gray-500 py-8">No hay productos. Añade un nuevo producto para empezar.</p>
+              ) : (
+                products.map((product) => (
+                  <SortableProductCard
+                    key={product._id}
+                    product={product}
+                    onEdit={handleEditProduct}
+                    onDuplicate={handleDuplicateProduct}
+                    onDelete={confirmDeleteProduct}
+                  />
+                ))
+              )}
+            </div>
+          </SortableContext>
+        </DndContext>
       </div>
 
       {/* Modal para agregar/editar producto */}
