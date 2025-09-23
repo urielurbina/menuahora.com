@@ -1,10 +1,159 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, X, Edit2, Copy } from "lucide-react"
+import { Plus, X, Edit2, Copy, GripVertical } from "lucide-react"
 import { useDropzone } from 'react-dropzone'
 import Image from 'next/image'
 import { toast } from 'react-hot-toast'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import {
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+
+// Componente sortable para variantes
+function SortableVariant({ variant, onEdit, onDelete, onToggleStock, onToggleRequired, children }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: variant.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className="bg-gray-50 rounded-lg p-4 border">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-3">
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-200 rounded transition-colors"
+            title="Arrastrar para reordenar"
+          >
+            <GripVertical className="h-4 w-4 text-gray-500" />
+          </div>
+          <div className="flex flex-col gap-2">
+            <h4 className="font-medium text-gray-900">{variant.name}</h4>
+            <div className="flex items-center gap-4">
+              <label className="flex items-center gap-2 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={variant.enableStock}
+                  onChange={() => onToggleStock(variant.id)}
+                  className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 rounded"
+                />
+                Permitir seleccionar cantidad
+              </label>
+              <label className="flex items-center gap-2 text-sm text-gray-600">
+                <input
+                  type="checkbox"
+                  checked={variant.isRequired !== false}
+                  onChange={() => onToggleRequired(variant.id)}
+                  className="h-4 w-4 text-orange-500 focus:ring-orange-500 border-gray-300 rounded"
+                />
+                <span className={variant.isRequired !== false ? "text-orange-600 font-medium" : ""}>
+                  Selección obligatoria
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => onEdit(variant)}
+            className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
+          >
+            <Edit2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onDelete(variant.id)}
+            className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+      {children}
+    </div>
+  )
+}
+
+// Componente sortable para opciones de variantes
+function SortableVariantOption({ option, variantId, onEdit, onDelete }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: option.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
+      <div className="flex items-center gap-3">
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-200 rounded transition-colors"
+          title="Arrastrar para reordenar"
+        >
+          <GripVertical className="h-3 w-3 text-gray-400" />
+        </div>
+        <div>
+          <span className="text-sm font-medium text-gray-700">{option.name}</span>
+          {option.price > 0 && (
+            <span className="text-xs text-green-600 ml-2">+${option.price.toFixed(2)}</span>
+          )}
+          {option.quantityMultiplier && option.quantityMultiplier > 1 && (
+            <span className="text-xs text-blue-600 ml-2">({option.quantityMultiplier} piezas)</span>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center space-x-2">
+        <button
+          onClick={() => onEdit(variantId, option)}
+          className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
+        >
+          <Edit2 className="h-4 w-4" />
+        </button>
+        <button
+          onClick={() => onDelete(variantId, option.id)}
+          className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  )
+}
 
 export default function ProductDashboard() {
   const [products, setProducts] = useState([])
@@ -47,6 +196,14 @@ export default function ProductDashboard() {
   const [editingWholesalePrice, setEditingWholesalePrice] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [productToDelete, setProductToDelete] = useState(null)
+
+  // Configuración de sensores para drag and drop
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   useEffect(() => {
     fetchProducts()
@@ -612,6 +769,52 @@ export default function ProductDashboard() {
       })
       setNewWholesalePrice({ minQuantity: 0, discount: 0 })
       setEditingWholesalePrice(null)
+    }
+  }
+
+  // Funciones para drag and drop de variantes
+  const handleDragEndVariants = (event) => {
+    const { active, over } = event
+
+    if (active.id !== over.id) {
+      setNewProduct((prevProduct) => {
+        const oldIndex = prevProduct.variants.findIndex((variant) => variant.id === active.id)
+        const newIndex = prevProduct.variants.findIndex((variant) => variant.id === over.id)
+
+        return {
+          ...prevProduct,
+          variants: arrayMove(prevProduct.variants, oldIndex, newIndex),
+        }
+      })
+    }
+  }
+
+  // Funciones para drag and drop de opciones dentro de una variante
+  const handleDragEndOptions = (event, variantId) => {
+    const { active, over } = event
+
+    if (active.id !== over.id) {
+      setNewProduct((prevProduct) => {
+        const variantIndex = prevProduct.variants.findIndex((variant) => variant.id === variantId)
+        if (variantIndex === -1) return prevProduct
+
+        const variant = prevProduct.variants[variantIndex]
+        const oldIndex = variant.options.findIndex((option) => option.id === active.id)
+        const newIndex = variant.options.findIndex((option) => option.id === over.id)
+
+        const newOptions = arrayMove(variant.options, oldIndex, newIndex)
+
+        const newVariants = [...prevProduct.variants]
+        newVariants[variantIndex] = {
+          ...variant,
+          options: newOptions,
+        }
+
+        return {
+          ...prevProduct,
+          variants: newVariants,
+        }
+      })
     }
   }
 
@@ -1247,6 +1450,16 @@ export default function ProductDashboard() {
                     </div>
                     <h3 className="text-lg font-semibold text-gray-900">Variantes del Producto</h3>
                   </div>
+                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                      </svg>
+                      <p className="text-sm text-blue-800">
+                        <strong>Tip:</strong> Puedes arrastrar las variantes y sus opciones para reordenarlas usando el ícono de arrastre.
+                      </p>
+                    </div>
+                  </div>
                   <div className="space-y-6">
                     
                     {/* Agregar nueva categoría de variantes */}
@@ -1269,91 +1482,53 @@ export default function ProductDashboard() {
                     </div>
                     </div>
 
-                    {/* Lista de categorías de variantes */}
+                    {/* Lista de categorías de variantes con drag and drop */}
                     {newProduct.variants.length > 0 && (
-                      <div className="space-y-4">
-                        {newProduct.variants.map((variant) => (
-                          <div key={variant.id} className="bg-gray-50 rounded-lg p-4 border">
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex flex-col gap-2">
-                                <h4 className="font-medium text-gray-900">{variant.name}</h4>
-                                <div className="flex items-center gap-4">
-                                  <label className="flex items-center gap-2 text-sm text-gray-600">
-                                    <input
-                                      type="checkbox"
-                                      checked={variant.enableStock}
-                                      onChange={() => handleToggleVariantStock(variant.id)}
-                                      className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 rounded"
-                                    />
-                                    Permitir seleccionar cantidad
-                                  </label>
-                                  <label className="flex items-center gap-2 text-sm text-gray-600">
-                                    <input
-                                      type="checkbox"
-                                      checked={variant.isRequired !== false} // Por defecto true
-                                      onChange={() => handleToggleVariantRequired(variant.id)}
-                                      className="h-4 w-4 text-orange-500 focus:ring-orange-500 border-gray-300 rounded"
-                                    />
-                                    <span className={variant.isRequired !== false ? "text-orange-600 font-medium" : ""}>
-                                      Selección obligatoria
-                                    </span>
-                                  </label>
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={() => handleEditVariantCategory(variant)}
-                                  className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
+                      <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEndVariants}
+                      >
+                        <SortableContext
+                          items={newProduct.variants.map(variant => variant.id)}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          <div className="space-y-4">
+                            {newProduct.variants.map((variant) => (
+                              <SortableVariant
+                                key={variant.id}
+                                variant={variant}
+                                onEdit={handleEditVariantCategory}
+                                onDelete={handleDeleteVariantCategory}
+                                onToggleStock={handleToggleVariantStock}
+                                onToggleRequired={handleToggleVariantRequired}
+                              >
+                                {/* Opciones de la categoría con drag and drop */}
+                                <DndContext
+                                  sensors={sensors}
+                                  collisionDetection={closestCenter}
+                                  onDragEnd={(event) => handleDragEndOptions(event, variant.id)}
                                 >
-                                  <Edit2 className="h-4 w-4" />
-                                </button>
-                                <button
-                                  onClick={() => handleDeleteVariantCategory(variant.id)}
-                                  className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
-                                >
-                                  <X className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Opciones de la categoría */}
-                        <div className="space-y-2">
-                              {variant.options.map((option) => (
-                                <div key={option.id} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
-                                  <div className="flex items-center gap-3">
-                                    <div>
-                                      <span className="text-sm font-medium text-gray-700">{option.name}</span>
-                                      {option.price > 0 && (
-                                        <span className="text-xs text-green-600 ml-2">+${option.price.toFixed(2)}</span>
-                                      )}
-                                      {option.quantityMultiplier && option.quantityMultiplier > 1 && (
-                                        <span className="text-xs text-blue-600 ml-2">({option.quantityMultiplier} piezas)</span>
-                                      )}
+                                  <SortableContext
+                                    items={variant.options.map(option => option.id)}
+                                    strategy={verticalListSortingStrategy}
+                                  >
+                                    <div className="space-y-2">
+                                      {variant.options.map((option) => (
+                                        <SortableVariantOption
+                                          key={option.id}
+                                          option={option}
+                                          variantId={variant.id}
+                                          onEdit={handleEditVariantOption}
+                                          onDelete={handleDeleteVariantOption}
+                                        />
+                                      ))}
                                     </div>
-                                    {variant.enableStock && (
-                                      <span className="text-xs text-gray-500">Cantidad seleccionable</span>
-                                    )}
-                                  </div>
-                              <div className="flex items-center space-x-2">
-                                <button
-                                      onClick={() => handleEditVariantOption(variant.id, option)}
-                                  className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
-                                >
-                                      <Edit2 className="h-4 w-4" />
-                                </button>
-                                <button
-                                      onClick={() => handleDeleteVariantOption(variant.id, option.id)}
-                                  className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
-                                >
-                                      <X className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                                  </SortableContext>
+                                </DndContext>
 
-                            {/* Agregar nueva opción */}
-                            <div className="mt-3 pt-3 border-t border-gray-200">
+                                {/* Agregar nueva opción */}
+                                <div className="mt-3 pt-3 border-t border-gray-200">
                               <div className="flex gap-2 mb-2">
                       <input
                         type="text"
@@ -1416,10 +1591,12 @@ export default function ProductDashboard() {
                                   </p>
                 </div>
                               </div>
-                            </div>
+                                </div>
+                              </SortableVariant>
+                            ))}
                           </div>
-                        ))}
-                      </div>
+                        </SortableContext>
+                      </DndContext>
                     )}
 
                     {newProduct.variants.length === 0 && (
