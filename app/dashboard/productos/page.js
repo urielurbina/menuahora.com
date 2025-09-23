@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, X, Edit2, Copy, GripVertical } from "lucide-react"
+import { Plus, X, Edit2, Copy, GripVertical, ChevronDown, ChevronRight, Check } from "lucide-react"
 import { useDropzone } from 'react-dropzone'
 import Image from 'next/image'
 import { toast } from 'react-hot-toast'
@@ -25,7 +25,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 
 // Componente sortable para variantes
-function SortableVariant({ variant, onEdit, onDelete, onToggleStock, onToggleRequired, children }) {
+function SortableVariant({ variant, onDelete, onToggleStock, onToggleRequired, onToggleCollapse, onStartInlineEdit, onSaveInlineEdit, onCancelInlineEdit, isCollapsed, isEditingInline, children }) {
   const {
     attributes,
     listeners,
@@ -42,59 +42,116 @@ function SortableVariant({ variant, onEdit, onDelete, onToggleStock, onToggleReq
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-gray-50 rounded-lg p-4 border">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-3">
-          <div
-            {...attributes}
-            {...listeners}
-            className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-200 rounded transition-colors"
-            title="Arrastrar para reordenar"
-          >
-            <GripVertical className="h-4 w-4 text-gray-500" />
+    <div ref={setNodeRef} style={style} className="bg-white rounded-lg border border-gray-200 shadow-sm">
+      {/* Header de la variante */}
+      <div className="p-4 border-b border-gray-100">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div
+              {...attributes}
+              {...listeners}
+              className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded transition-colors"
+              title="Arrastrar para reordenar"
+            >
+              <GripVertical className="h-4 w-4 text-gray-500" />
+            </div>
+            
+            {/* Botón de colapso */}
+            <button
+              onClick={() => onToggleCollapse(variant.id)}
+              className="p-1 hover:bg-gray-100 rounded transition-colors"
+              title={isCollapsed ? "Expandir" : "Colapsar"}
+            >
+              {isCollapsed ? (
+                <ChevronRight className="h-4 w-4 text-gray-500" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              )}
+            </button>
+
+            {/* Nombre de la variante o campo de edición */}
+            <div className="flex-grow">
+              {isEditingInline ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={variant.name}
+                    onChange={(e) => onStartInlineEdit({ ...variant, name: e.target.value })}
+                    className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#0D654A]"
+                    autoFocus
+                  />
+                  <button
+                    onClick={onSaveInlineEdit}
+                    className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors"
+                    title="Guardar"
+                  >
+                    <Check className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={onCancelInlineEdit}
+                    className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                    title="Cancelar"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <h4 className="font-medium text-gray-900">{variant.name}</h4>
+                  <button
+                    onClick={() => onStartInlineEdit(variant)}
+                    className="p-1 text-gray-400 hover:text-[#0D654A] hover:bg-gray-50 rounded transition-colors"
+                    title="Editar nombre"
+                  >
+                    <Edit2 className="h-3 w-3" />
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="flex flex-col gap-2">
-            <h4 className="font-medium text-gray-900">{variant.name}</h4>
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 text-sm text-gray-600">
+
+          {/* Controles de la variante */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4 text-sm">
+              <label className="flex items-center gap-2 text-gray-600">
                 <input
                   type="checkbox"
                   checked={variant.enableStock}
                   onChange={() => onToggleStock(variant.id)}
                   className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 rounded"
                 />
-                Permitir seleccionar cantidad
+                <span className="text-xs">Cantidad</span>
               </label>
-              <label className="flex items-center gap-2 text-sm text-gray-600">
+              <label className="flex items-center gap-2 text-gray-600">
                 <input
                   type="checkbox"
                   checked={variant.isRequired !== false}
                   onChange={() => onToggleRequired(variant.id)}
                   className="h-4 w-4 text-orange-500 focus:ring-orange-500 border-gray-300 rounded"
                 />
-                <span className={variant.isRequired !== false ? "text-orange-600 font-medium" : ""}>
-                  Selección obligatoria
+                <span className={`text-xs ${variant.isRequired !== false ? "text-orange-600 font-medium" : ""}`}>
+                  Obligatorio
                 </span>
               </label>
             </div>
+            
+            <button
+              onClick={() => onDelete(variant)}
+              className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+              title="Eliminar variante"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => onEdit(variant)}
-            className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
-          >
-            <Edit2 className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => onDelete(variant.id)}
-            className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        </div>
       </div>
-      {children}
+
+      {/* Contenido colapsable */}
+      {!isCollapsed && (
+        <div className="p-4">
+          {children}
+        </div>
+      )}
     </div>
   )
 }
@@ -286,7 +343,7 @@ function SortableProductCard({ product, onEdit, onDuplicate, onDelete }) {
 }
 
 // Componente sortable para opciones de variantes
-function SortableVariantOption({ option, variantId, onEdit, onDelete }) {
+function SortableVariantOption({ option, variantId, onDelete, onStartInlineEdit, onSaveInlineEdit, onCancelInlineEdit, isEditingInline }) {
   const {
     attributes,
     listeners,
@@ -303,7 +360,7 @@ function SortableVariantOption({ option, variantId, onEdit, onDelete }) {
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="flex items-center justify-between bg-white p-2 rounded-md shadow-sm">
+    <div ref={setNodeRef} style={style} className="flex items-center justify-between bg-gray-50 p-3 rounded-md border">
       <div className="flex items-center gap-3">
         <div
           {...attributes}
@@ -313,30 +370,99 @@ function SortableVariantOption({ option, variantId, onEdit, onDelete }) {
         >
           <GripVertical className="h-3 w-3 text-gray-400" />
         </div>
-        <div>
-          <span className="text-sm font-medium text-gray-700">{option.name}</span>
-          {option.price > 0 && (
-            <span className="text-xs text-green-600 ml-2">+${option.price.toFixed(2)}</span>
-          )}
-          {option.quantityMultiplier && option.quantityMultiplier > 1 && (
-            <span className="text-xs text-blue-600 ml-2">({option.quantityMultiplier} piezas)</span>
-          )}
+        
+        {isEditingInline ? (
+          <div className="flex items-center gap-2 flex-grow">
+            <div className="flex flex-col flex-grow">
+              <label className="text-xs text-gray-600 mb-1">Nombre</label>
+              <input
+                type="text"
+                value={option.name}
+                onChange={(e) => onStartInlineEdit({ ...option, name: e.target.value })}
+                className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#0D654A]"
+                placeholder="Nombre de la opción"
+                autoFocus
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col">
+                <label className="text-xs text-gray-600 mb-1">Precio extra</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                    <span className="text-gray-500 text-sm">+$</span>
+                  </div>
+                  <input
+                    type="number"
+                    value={option.price || ''}
+                    onChange={(e) => onStartInlineEdit({ ...option, price: parseFloat(e.target.value) || 0 })}
+                    placeholder="0.00"
+                    step="0.01"
+                    min="0"
+                    className="w-20 pl-6 pr-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#0D654A]"
+                  />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <label className="text-xs text-gray-600 mb-1">Unidades</label>
+                <input
+                  type="number"
+                  value={option.quantityMultiplier || ''}
+                  onChange={(e) => onStartInlineEdit({ ...option, quantityMultiplier: parseInt(e.target.value) || 1 })}
+                  placeholder="1"
+                  min="1"
+                  className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#0D654A]"
+                  title="Cantidad real por unidad"
+                />
+              </div>
+            </div>
+            <button
+              onClick={onSaveInlineEdit}
+              className="p-1 text-green-600 hover:bg-green-50 rounded transition-colors"
+              title="Guardar"
+            >
+              <Check className="h-4 w-4" />
+            </button>
+            <button
+              onClick={onCancelInlineEdit}
+              className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+              title="Cancelar"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex-grow">
+            <div className="flex items-center gap-2">
+              <span className="text-sm font-medium text-gray-700">{option.name}</span>
+              {option.price > 0 && (
+                <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded">+${option.price.toFixed(2)}</span>
+              )}
+              {option.quantityMultiplier && option.quantityMultiplier > 1 && (
+                <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">{option.quantityMultiplier} piezas</span>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {!isEditingInline && (
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={() => onStartInlineEdit(option, variantId)}
+            className="p-1 text-gray-400 hover:text-[#0D654A] hover:bg-gray-100 rounded transition-colors"
+            title="Editar opción"
+          >
+            <Edit2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onDelete(option, variantId)}
+            className="p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors"
+            title="Eliminar opción"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
-      </div>
-      <div className="flex items-center space-x-2">
-        <button
-          onClick={() => onEdit(variantId, option)}
-          className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
-        >
-          <Edit2 className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => onDelete(variantId, option.id)}
-          className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
+      )}
     </div>
   )
 }
@@ -382,6 +508,17 @@ export default function ProductDashboard() {
   const [editingWholesalePrice, setEditingWholesalePrice] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [productToDelete, setProductToDelete] = useState(null)
+  
+  // Estados para UI mejorada de variantes
+  const [collapsedVariants, setCollapsedVariants] = useState({})
+  const [editingVariantInline, setEditingVariantInline] = useState(null)
+  const [editingOptionInline, setEditingOptionInline] = useState(null)
+  
+  // Estados para confirmaciones de eliminación
+  const [showDeleteVariantModal, setShowDeleteVariantModal] = useState(false)
+  const [variantToDelete, setVariantToDelete] = useState(null)
+  const [showDeleteOptionModal, setShowDeleteOptionModal] = useState(false)
+  const [optionToDelete, setOptionToDelete] = useState(null)
 
   // Configuración de sensores para drag and drop
   const sensors = useSensors(
@@ -763,20 +900,6 @@ export default function ProductDashboard() {
     }
   }
 
-  const handleDeleteVariantCategory = (categoryId) => {
-    setNewProduct({
-      ...newProduct,
-      variants: newProduct.variants.filter(variant => variant.id !== categoryId)
-    })
-    if (selectedVariantCategoryId === categoryId) {
-      setSelectedVariantCategoryId(null)
-    }
-  }
-
-  const handleEditVariantCategory = (category) => {
-    setEditingVariantCategory(category)
-    setNewVariantCategory(category.name)
-  }
 
   const handleUpdateVariantCategory = () => {
     if (newVariantCategory.trim()) {
@@ -837,26 +960,6 @@ export default function ProductDashboard() {
     }
   }
 
-  const handleDeleteVariantOption = (categoryId, optionId) => {
-    setNewProduct({
-      ...newProduct,
-      variants: newProduct.variants.map(variant =>
-        variant.id === categoryId
-          ? { ...variant, options: variant.options.filter(option => option.id !== optionId) }
-          : variant
-      )
-    })
-  }
-
-  const handleEditVariantOption = (categoryId, option) => {
-    setEditingVariantOption({ categoryId, ...option })
-    setNewVariantOption({ 
-      name: option.name, 
-      price: option.price || 0,
-      quantityMultiplier: option.quantityMultiplier || 1
-    })
-    setSelectedVariantCategoryId(categoryId)
-  }
 
   const handleUpdateVariantOption = () => {
     if (newVariantOption.name.trim()) {
@@ -1016,6 +1119,135 @@ export default function ProductDashboard() {
         return arrayMove(prevProducts, oldIndex, newIndex)
       })
     }
+  }
+
+  // Funciones para UI mejorada de variantes
+  const toggleVariantCollapse = (variantId) => {
+    setCollapsedVariants(prev => ({
+      ...prev,
+      [variantId]: prev[variantId] !== undefined ? !prev[variantId] : false
+    }))
+  }
+
+  // Función para obtener el estado de colapso (por defecto cerrado)
+  const isVariantCollapsed = (variantId) => {
+    return collapsedVariants[variantId] !== undefined ? collapsedVariants[variantId] : true
+  }
+
+  const startInlineVariantEdit = (variant) => {
+    setEditingVariantInline(variant)
+    setNewVariantCategory(variant.name)
+  }
+
+  const saveInlineVariantEdit = () => {
+    if (newVariantCategory.trim() && editingVariantInline) {
+      setNewProduct({
+        ...newProduct,
+        variants: newProduct.variants.map(variant =>
+          variant.id === editingVariantInline.id
+            ? { ...variant, name: newVariantCategory.trim() }
+            : variant
+        )
+      })
+      setEditingVariantInline(null)
+      setNewVariantCategory("")
+    }
+  }
+
+  const cancelInlineVariantEdit = () => {
+    setEditingVariantInline(null)
+    setNewVariantCategory("")
+  }
+
+  const startInlineOptionEdit = (option, variantId) => {
+    setEditingOptionInline({ ...option, variantId })
+    setNewVariantOption({
+      name: option.name,
+      price: option.price || 0,
+      quantityMultiplier: option.quantityMultiplier || 1
+    })
+  }
+
+  const saveInlineOptionEdit = () => {
+    if (newVariantOption.name.trim() && editingOptionInline) {
+      setNewProduct({
+        ...newProduct,
+        variants: newProduct.variants.map(variant =>
+          variant.id === editingOptionInline.variantId
+            ? {
+                ...variant,
+                options: variant.options.map(option =>
+                  option.id === editingOptionInline.id
+                    ? {
+                        ...option,
+                        name: newVariantOption.name.trim(),
+                        price: parseFloat(newVariantOption.price) || 0,
+                        quantityMultiplier: parseInt(newVariantOption.quantityMultiplier) || 1
+                      }
+                    : option
+                )
+              }
+            : variant
+        )
+      })
+      setEditingOptionInline(null)
+      setNewVariantOption({ name: "", price: 0, quantityMultiplier: 1 })
+    }
+  }
+
+  const cancelInlineOptionEdit = () => {
+    setEditingOptionInline(null)
+    setNewVariantOption({ name: "", price: 0, quantityMultiplier: 1 })
+  }
+
+  // Funciones para confirmaciones de eliminación
+  const confirmDeleteVariant = (variant) => {
+    setVariantToDelete(variant)
+    setShowDeleteVariantModal(true)
+  }
+
+  const confirmDeleteOption = (option, variantId) => {
+    setOptionToDelete({ ...option, variantId })
+    setShowDeleteOptionModal(true)
+  }
+
+  const handleDeleteVariantConfirmed = () => {
+    if (variantToDelete) {
+      setNewProduct({
+        ...newProduct,
+        variants: newProduct.variants.filter(variant => variant.id !== variantToDelete.id)
+      })
+      if (selectedVariantCategoryId === variantToDelete.id) {
+        setSelectedVariantCategoryId(null)
+      }
+      setShowDeleteVariantModal(false)
+      setVariantToDelete(null)
+    }
+  }
+
+  const handleDeleteOptionConfirmed = () => {
+    if (optionToDelete) {
+      setNewProduct({
+        ...newProduct,
+        variants: newProduct.variants.map(variant =>
+          variant.id === optionToDelete.variantId
+            ? { ...variant, options: variant.options.filter(option => option.id !== optionToDelete.id) }
+            : variant
+        )
+      })
+      setShowDeleteOptionModal(false)
+      setOptionToDelete(null)
+    }
+  }
+
+  const cancelDeleteVariant = () => {
+    setShowDeleteVariantModal(false)
+    setVariantToDelete(null)
+  }
+
+  const cancelDeleteOption = () => {
+    setShowDeleteOptionModal(false)
+    setOptionToDelete(null)
   }
 
 
@@ -1570,23 +1802,27 @@ export default function ProductDashboard() {
                   <div className="space-y-6">
                     
                     {/* Agregar nueva categoría de variantes */}
-                <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Nueva Categoría de Variantes</label>
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                      <h5 className="text-sm font-medium text-green-800 mb-3">Agregar nueva categoría de variantes</h5>
                       <div className="flex gap-2">
-                      <input
-                        type="text"
+                        <input
+                          type="text"
                           value={newVariantCategory}
                           onChange={(e) => setNewVariantCategory(e.target.value)}
-                        placeholder="Ej: Tallas, Sabores, Tortillas, Temperaturas, etc."
+                          placeholder="Ej: Tallas, Sabores, Tortillas, Temperaturas, etc."
                           className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
                         />
                         <button
                           onClick={editingVariantCategory ? handleUpdateVariantCategory : handleAddVariantCategory}
-                          className="px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200"
+                          className="px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200 flex items-center gap-2"
                         >
+                          <Plus className="h-4 w-4" />
                           {editingVariantCategory ? "Actualizar" : "Agregar"}
                         </button>
-                    </div>
+                      </div>
+                      <p className="text-xs text-green-700 mt-2">
+                        <strong>Tip:</strong> Las categorías se pueden colapsar para una mejor organización
+                      </p>
                     </div>
 
                     {/* Lista de categorías de variantes con drag and drop */}
@@ -1600,15 +1836,20 @@ export default function ProductDashboard() {
                           items={newProduct.variants.map(variant => variant.id)}
                           strategy={verticalListSortingStrategy}
                         >
-                          <div className="space-y-4">
+                          <div className="space-y-3">
                             {newProduct.variants.map((variant) => (
                               <SortableVariant
                                 key={variant.id}
                                 variant={variant}
-                                onEdit={handleEditVariantCategory}
-                                onDelete={handleDeleteVariantCategory}
+                                onDelete={confirmDeleteVariant}
                                 onToggleStock={handleToggleVariantStock}
                                 onToggleRequired={handleToggleVariantRequired}
+                                onToggleCollapse={toggleVariantCollapse}
+                                onStartInlineEdit={startInlineVariantEdit}
+                                onSaveInlineEdit={saveInlineVariantEdit}
+                                onCancelInlineEdit={cancelInlineVariantEdit}
+                                isCollapsed={isVariantCollapsed(variant.id)}
+                                isEditingInline={editingVariantInline?.id === variant.id}
                               >
                                 {/* Opciones de la categoría con drag and drop */}
                                 <DndContext
@@ -1620,14 +1861,17 @@ export default function ProductDashboard() {
                                     items={variant.options.map(option => option.id)}
                                     strategy={verticalListSortingStrategy}
                                   >
-                                    <div className="space-y-2">
+                                    <div className="space-y-2 mb-4">
                                       {variant.options.map((option) => (
                                         <SortableVariantOption
                                           key={option.id}
                                           option={option}
                                           variantId={variant.id}
-                                          onEdit={handleEditVariantOption}
-                                          onDelete={handleDeleteVariantOption}
+                                          onDelete={confirmDeleteOption}
+                                          onStartInlineEdit={startInlineOptionEdit}
+                                          onSaveInlineEdit={saveInlineOptionEdit}
+                                          onCancelInlineEdit={cancelInlineOptionEdit}
+                                          isEditingInline={editingOptionInline?.id === option.id}
                                         />
                                       ))}
                                     </div>
@@ -1635,69 +1879,73 @@ export default function ProductDashboard() {
                                 </DndContext>
 
                                 {/* Agregar nueva opción */}
-                                <div className="mt-3 pt-3 border-t border-gray-200">
-                              <div className="flex gap-2 mb-2">
-                      <input
-                        type="text"
-                                  value={selectedVariantCategoryId === variant.id ? newVariantOption.name : ""}
-                                  onChange={(e) => setNewVariantOption({ ...newVariantOption, name: e.target.value })}
-                                  placeholder={`Nueva ${variant.name.toLowerCase()}`}
-                                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                                  onClick={() => setSelectedVariantCategoryId(variant.id)}
-                                />
-                                <div className="relative">
-                                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span className="text-gray-500 text-sm">+$</span>
+                                <div className="bg-blue-50 p-3 rounded-md border border-blue-200">
+                                  <h5 className="text-sm font-medium text-blue-800 mb-2">Agregar nueva opción</h5>
+                                  <div className="flex gap-2 mb-2">
+                                    <div className="flex-1">
+                                      <label className="block text-xs text-gray-600 mb-1">Nombre de la opción</label>
+                                      <input
+                                        type="text"
+                                        value={selectedVariantCategoryId === variant.id ? newVariantOption.name : ""}
+                                        onChange={(e) => setNewVariantOption({ ...newVariantOption, name: e.target.value })}
+                                        placeholder={`Nueva ${variant.name.toLowerCase()}`}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                                        onClick={() => setSelectedVariantCategoryId(variant.id)}
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">Precio extra</label>
+                                      <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                          <span className="text-gray-500 text-sm">+$</span>
+                                        </div>
+                                        <input
+                                          type="number"
+                                          value={selectedVariantCategoryId === variant.id && newVariantOption.price > 0 ? newVariantOption.price : ""}
+                                          onChange={(e) => setNewVariantOption({ ...newVariantOption, price: parseFloat(e.target.value) || 0 })}
+                                          placeholder="0.00"
+                                          step="0.01"
+                                          min="0"
+                                          className="w-24 pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                                          onClick={() => setSelectedVariantCategoryId(variant.id)}
+                                        />
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <label className="block text-xs text-gray-600 mb-1">Unidades</label>
+                                      <input
+                                        type="number"
+                                        value={selectedVariantCategoryId === variant.id ? (newVariantOption.quantityMultiplier || "") : ""}
+                                        onChange={(e) => {
+                                          setSelectedVariantCategoryId(variant.id);
+                                          setNewVariantOption({ ...newVariantOption, quantityMultiplier: parseInt(e.target.value) || 1 });
+                                        }}
+                                        placeholder="1"
+                                        min="1"
+                                        className="w-16 px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
+                                        onFocus={() => setSelectedVariantCategoryId(variant.id)}
+                                        title="Cantidad real por unidad"
+                                      />
+                                    </div>
+                                    <div className="flex items-end">
+                                      <button
+                                        onClick={() => {
+                                          setSelectedVariantCategoryId(variant.id)
+                                          editingVariantOption ? handleUpdateVariantOption() : handleAddVariantOption()
+                                        }}
+                                        className="px-3 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200 flex items-center gap-1"
+                                      >
+                                        <Plus className="h-4 w-4" />
+                                        {editingVariantOption ? "Actualizar" : "Agregar"}
+                                      </button>
+                                    </div>
                                   </div>
-                                  <input
-                                    type="number"
-                                    value={selectedVariantCategoryId === variant.id && newVariantOption.price > 0 ? newVariantOption.price : ""}
-                                    onChange={(e) => setNewVariantOption({ ...newVariantOption, price: parseFloat(e.target.value) || 0 })}
-                                    placeholder="0.00"
-                                    step="0.01"
-                                    min="0"
-                                    className="w-32 pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                                    onClick={() => setSelectedVariantCategoryId(variant.id)}
-                                  />
-                                </div>
-                      <button
-                                  onClick={() => {
-                                    setSelectedVariantCategoryId(variant.id)
-                                    editingVariantOption ? handleUpdateVariantOption() : handleAddVariantOption()
-                                  }}
-                                  className="px-3 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200"
-                                >
-                                  {editingVariantOption ? "Actualizar" : "Agregar"}
-                      </button>
-                    </div>
-                              
-                              {/* Campo para multiplicador de cantidad */}
-                              <div className="bg-blue-50 p-3 rounded-md">
-                                <div className="flex gap-2 items-center mb-2">
-                                  <label className="text-xs font-medium text-gray-700">Cantidad real por unidad:</label>
-                                  <input
-                                    type="number"
-                                    value={selectedVariantCategoryId === variant.id ? (newVariantOption.quantityMultiplier || "") : ""}
-                                    onChange={(e) => {
-                                      setSelectedVariantCategoryId(variant.id);
-                                      setNewVariantOption({ ...newVariantOption, quantityMultiplier: parseInt(e.target.value) || 1 });
-                                    }}
-                                    placeholder="1"
-                                    min="1"
-                                    className="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-xs"
-                                    onFocus={() => setSelectedVariantCategoryId(variant.id)}
-                                  />
-                  </div>
-                                <div className="text-xs text-gray-600">
-                                  <p className="mb-1"><strong>¿Qué es esto?</strong></p>
-                                  <p className="mb-1">• <strong>Para productos individuales</strong> (playeras, tacos): Dejar en 1</p>
-                                  <p className="mb-1">• <strong>Para paquetes</strong> (stickers, volantes): Poner la cantidad del paquete</p>
-                                  <p className="text-blue-600">
-                                    <strong>Ejemplo:</strong> Si vendes &quot;Paquete 25 stickers&quot;, pon 25. 
-                                    Así 2 paquetes = 50 stickers para descuentos por mayoreo.
-                                  </p>
-                </div>
-                              </div>
+                                  
+                                  <div className="text-xs text-blue-700">
+                                    <p className="mb-1"><strong>Tip:</strong> Puedes editar cualquier opción haciendo clic en el ícono de editar</p>
+                                    <p>• <strong>Precio extra:</strong> Costo adicional por esta opción (ej: +$5.00)</p>
+                                    <p>• <strong>Unidades:</strong> Cantidad real por unidad (ej: 25 para paquete de stickers)</p>
+                                  </div>
                                 </div>
                               </SortableVariant>
                             ))}
@@ -1996,6 +2244,141 @@ export default function ProductDashboard() {
                   className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
                 >
                   Eliminar producto
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de eliminación de variante */}
+      {showDeleteVariantModal && variantToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl border border-gray-200">
+            {/* Header del modal */}
+            <div className="bg-red-50 px-6 py-4 rounded-t-xl border-b border-red-200">
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-red-900">Confirmar eliminación</h3>
+                  <p className="text-sm text-red-700">Esta acción no se puede deshacer</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Contenido del modal */}
+            <div className="px-6 py-6">
+              <div className="mb-4">
+                <p className="text-gray-700 mb-2">
+                  ¿Estás seguro de que quieres eliminar la categoría de variantes:
+                </p>
+                <div className="bg-gray-50 p-3 rounded-lg border">
+                  <h4 className="font-semibold text-gray-900">{variantToDelete.name}</h4>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Se eliminarán también todas las opciones de esta categoría ({variantToDelete.options?.length || 0} opciones)
+                  </p>
+                </div>
+              </div>
+              
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <div className="flex">
+                  <svg className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-yellow-800">
+                    <strong>Advertencia:</strong> Esta acción eliminará permanentemente la categoría y todas sus opciones.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Footer del modal */}
+            <div className="bg-gray-50 px-6 py-4 rounded-b-xl border-t border-gray-200">
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={cancelDeleteVariant}
+                  className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm font-medium transition-all duration-200"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteVariantConfirmed}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                  Eliminar categoría
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de eliminación de opción */}
+      {showDeleteOptionModal && optionToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl border border-gray-200">
+            {/* Header del modal */}
+            <div className="bg-red-50 px-6 py-4 rounded-t-xl border-b border-red-200">
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-red-900">Confirmar eliminación</h3>
+                  <p className="text-sm text-red-700">Esta acción no se puede deshacer</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Contenido del modal */}
+            <div className="px-6 py-6">
+              <div className="mb-4">
+                <p className="text-gray-700 mb-2">
+                  ¿Estás seguro de que quieres eliminar la opción:
+                </p>
+                <div className="bg-gray-50 p-3 rounded-lg border">
+                  <h4 className="font-semibold text-gray-900">{optionToDelete.name}</h4>
+                  {optionToDelete.price > 0 && (
+                    <p className="text-sm text-green-600 mt-1">Precio extra: +${optionToDelete.price.toFixed(2)}</p>
+                  )}
+                  {optionToDelete.quantityMultiplier > 1 && (
+                    <p className="text-sm text-blue-600 mt-1">Unidades: {optionToDelete.quantityMultiplier}</p>
+                  )}
+                </div>
+              </div>
+              
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <div className="flex">
+                  <svg className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-yellow-800">
+                    <strong>Advertencia:</strong> Esta acción eliminará permanentemente la opción de la variante.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Footer del modal */}
+            <div className="bg-gray-50 px-6 py-4 rounded-b-xl border-t border-gray-200">
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={cancelDeleteOption}
+                  className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm font-medium transition-all duration-200"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleDeleteOptionConfirmed}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                  Eliminar opción
                 </button>
               </div>
             </div>
