@@ -1,9 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, X, Edit2 } from "lucide-react"
+import { Plus, X, Edit2, Copy } from "lucide-react"
 import { useDropzone } from 'react-dropzone'
 import Image from 'next/image'
+import { toast } from 'react-hot-toast'
 
 export default function ProductDashboard() {
   const [products, setProducts] = useState([])
@@ -44,6 +45,8 @@ export default function ProductDashboard() {
   const [editingExtra, setEditingExtra] = useState(null)
   const [newWholesalePrice, setNewWholesalePrice] = useState({ minQuantity: 0, discount: 0 })
   const [editingWholesalePrice, setEditingWholesalePrice] = useState(null)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [productToDelete, setProductToDelete] = useState(null)
 
   useEffect(() => {
     fetchProducts()
@@ -308,6 +311,50 @@ export default function ProductDashboard() {
     setIsAddingProduct(true)
   }
 
+  const handleDuplicateProduct = async (product) => {
+    try {
+      // Crear una copia del producto con un nuevo nombre
+      const duplicatedProduct = {
+        ...product,
+        nombre: `${product.nombre} (Copia)`,
+        _id: undefined // Remover el ID para que se cree como nuevo producto
+      };
+      
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(duplicatedProduct),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Error al duplicar el producto');
+      }
+      
+      await fetchProducts();
+      
+      // Mostrar toast de confirmación
+      toast.success(`¡Producto "${product.nombre}" duplicado exitosamente!`, {
+        duration: 4000,
+        style: {
+          background: '#10B981',
+          color: '#fff',
+          fontWeight: '500',
+        },
+      });
+    } catch (error) {
+      setError(error.message);
+      toast.error(`Error al duplicar el producto: ${error.message}`, {
+        duration: 4000,
+        style: {
+          background: '#EF4444',
+          color: '#fff',
+          fontWeight: '500',
+        },
+      });
+    }
+  };
+
   const handleDeleteProduct = async (id) => {
     try {
       const response = await fetch(`/api/products?id=${id}`, { method: 'DELETE' });
@@ -316,9 +363,21 @@ export default function ProductDashboard() {
         throw new Error(errorData.error || 'Error al eliminar el producto');
       }
       await fetchProducts();
+      setShowDeleteModal(false);
+      setProductToDelete(null);
     } catch (error) {
       setError(error.message);
     }
+  };
+
+  const confirmDeleteProduct = (product) => {
+    setProductToDelete(product);
+    setShowDeleteModal(true);
+  };
+
+  const cancelDeleteProduct = () => {
+    setShowDeleteModal(false);
+    setProductToDelete(null);
   };
 
   const onDrop = async (acceptedFiles) => {
@@ -802,12 +861,20 @@ export default function ProductDashboard() {
                     >
                       <Edit2 className="mr-1 h-4 w-4" /> Editar
                     </button>
-                    <button
-                      onClick={() => handleDeleteProduct(product._id)}
-                      className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
-                    >
-                      <X className="mr-1 h-4 w-4" /> Eliminar
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleDuplicateProduct(product)}
+                        className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
+                      >
+                        <Copy className="mr-1 h-4 w-4" /> Duplicar
+                      </button>
+                      <button
+                        onClick={() => confirmDeleteProduct(product)}
+                        className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
+                      >
+                        <X className="mr-1 h-4 w-4" /> Eliminar
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1565,6 +1632,87 @@ export default function ProductDashboard() {
                     {editingProduct ? "Guardar cambios" : "Crear producto"}
               </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación de eliminación */}
+      {showDeleteModal && productToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl border border-gray-200">
+            {/* Header del modal */}
+            <div className="bg-red-50 px-6 py-4 rounded-t-xl border-b border-red-200">
+              <div className="flex items-center">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-red-900">Confirmar eliminación</h3>
+                  <p className="text-sm text-red-700">Esta acción no se puede deshacer</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Contenido del modal */}
+            <div className="px-6 py-6">
+              <div className="mb-4">
+                <p className="text-gray-700 mb-2">
+                  ¿Estás seguro de que quieres eliminar el producto:
+                </p>
+                <div className="bg-gray-50 p-3 rounded-lg border">
+                  <div className="flex items-center">
+                    {productToDelete.imagen && (
+                      <div className="w-12 h-12 mr-3 flex-shrink-0 rounded-md overflow-hidden">
+                        <Image
+                          src={productToDelete.imagen}
+                          alt={productToDelete.nombre}
+                          width={48}
+                          height={48}
+                          objectFit="cover"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <h4 className="font-semibold text-gray-900">{productToDelete.nombre}</h4>
+                      <p className="text-sm text-gray-600">
+                        ${productToDelete.precioPromocion > 0 ? productToDelete.precioPromocion : productToDelete.precio}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                <div className="flex">
+                  <svg className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-yellow-800">
+                    <strong>Advertencia:</strong> Esta acción eliminará permanentemente el producto y todos sus datos asociados.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Footer del modal */}
+            <div className="bg-gray-50 px-6 py-4 rounded-b-xl border-t border-gray-200">
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={cancelDeleteProduct}
+                  className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm font-medium transition-all duration-200"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => handleDeleteProduct(productToDelete._id)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                  Eliminar producto
+                </button>
               </div>
             </div>
           </div>
