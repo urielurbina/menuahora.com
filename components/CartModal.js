@@ -145,7 +145,7 @@ export default function CartModal({
                           )}
                           {item.wholesaleDiscount && (
                             <p className="text-xs text-green-600">
-                              Descuento mayoreo: -{item.wholesaleDiscount.discountPercentage}%
+                              Descuento aplicado: -{item.wholesaleDiscount.discountPercentage}%
                             </p>
                           )}
                         </div>

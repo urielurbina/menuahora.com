@@ -579,12 +579,31 @@ function UserPageContent({ params }) {
       return { discount: 0, discountPercentage: 0 };
     }
 
-    // Para productos por pieza, usar totalPieces; para productos por paquete, usar totalQuantity
-    const quantityForDiscount = product.priceType === "per_piece" ? totalPieces : totalQuantity;
+    // Para productos por pieza, usar totalPieces; para productos por paquete, usar totalPieces si hay variantes con cantidad, sino totalQuantity
+    const quantityForDiscount = product.priceType === "per_piece" ? totalPieces : 
+      (totalPieces > totalQuantity ? totalPieces : totalQuantity);
+
+    // Debug: mostrar información del descuento
+    console.log('Calculando descuento:', {
+      product: product.nombre,
+      priceType: product.priceType,
+      totalQuantity,
+      totalPieces,
+      quantityForDiscount,
+      itemPrice,
+      wholesalePricing: product.wholesalePricing
+    });
 
     // Encontrar el descuento más alto aplicable según la cantidad
     let applicableDiscount = null;
     for (const pricing of product.wholesalePricing.sort((a, b) => b.minQuantity - a.minQuantity)) {
+      console.log('Verificando descuento:', {
+        minQuantity: pricing.minQuantity,
+        discount: pricing.discount,
+        quantityForDiscount,
+        applies: quantityForDiscount >= pricing.minQuantity
+      });
+      
       if (quantityForDiscount >= pricing.minQuantity) {
         applicableDiscount = pricing;
         break;
@@ -595,6 +614,14 @@ function UserPageContent({ params }) {
       // Si se proporciona itemPrice, usar ese; sino usar el precio base
       const priceToDiscount = itemPrice || (product.precioPromocion > 0 ? product.precioPromocion : product.precio);
       const discountAmount = priceToDiscount * (applicableDiscount.discount / 100);
+      
+      console.log('Descuento aplicado:', {
+        applicableDiscount,
+        priceToDiscount,
+        discountAmount,
+        discountPercentage: applicableDiscount.discount
+      });
+      
       return {
         discount: discountAmount,
         discountPercentage: applicableDiscount.discount,
@@ -602,6 +629,7 @@ function UserPageContent({ params }) {
       };
     }
 
+    console.log('No se aplicó descuento');
     return { discount: 0, discountPercentage: 0 };
   };
 
@@ -752,63 +780,174 @@ function UserPageContent({ params }) {
     const itemsToAdd = [];
     let hasQuantityVariants = false;
     
-    // Procesar variantes con cantidad seleccionable
-    Object.entries(selectedVariants).forEach(([variantId, options]) => {
+    // Verificar si hay variantes con cantidad seleccionable
+    Object.entries(selectedVariants).forEach(([variantId]) => {
       const variant = product.variants?.find(v => v.id === variantId);
       if (variant && variant.enableStock) {
         hasQuantityVariants = true;
-        Object.entries(options).forEach(([optionId, optionQuantity]) => {
-          if (optionQuantity > 0) {
-            const option = variant.options.find(o => o.id === optionId);
-            if (option) {
-              // Crear variantes específicas para este item
-              const itemVariants = { 
-                ...Object.fromEntries(
-                  Object.entries(selectedVariants).filter(([vId]) => {
-                    const v = product.variants?.find(variant => variant.id === vId);
-                    return v && !v.enableStock;
-                  })
-                ),
-                [variantId]: { [optionId]: optionQuantity }
-              };
-              
-              // Calcular precio total para esta combinación específica
-              const totalPrice = calculateItemPrice(product, itemVariants, selectedExtras, optionQuantity);
-              const finalUnitPrice = totalPrice / optionQuantity;
-              
-              // Crear resumen de variantes para este item
-              const itemVariantsSummary = [...staticVariants, `${option.name} (${optionQuantity})`];
-              
-              itemsToAdd.push({
-                id: `${product._id}_${variantId}_${optionId}_${Date.now()}_${Math.random()}`,
-                _id: product._id,
-                nombre: product.nombre,
-                imagen: product.imagen,
-                price: finalUnitPrice,
-                quantity: optionQuantity,
-                variants: itemVariants,
-                variantsSummary: itemVariantsSummary,
-                extras: selectedExtras,
-                businessId: params.username,
-                basePrice: product.precioPromocion > 0 ? product.precioPromocion : product.precio,
-                variantPrice: option.price || 0,
-                extrasPrice: selectedExtras.reduce((sum, extraName) => {
-                  const extra = product.extras?.find(e => e.name === extraName);
-                  return sum + (parseFloat(extra?.price) || 0);
-                }, 0),
-                wholesaleDiscount: product.wholesalePricing && product.wholesalePricing.length > 0 ? 
-                  calculateWholesaleDiscount(product, optionQuantity, totalPrice / optionQuantity) : null
-              });
-            }
-          }
-        });
       }
     });
+    
+    // Si hay variantes con cantidad, crear un solo item con todas las variantes
+    if (hasQuantityVariants) {
+      // Calcular precio total para todas las variantes seleccionadas
+      const totalPrice = calculateItemPrice(product, selectedVariants, selectedExtras, 1);
+      
+      // Calcular cantidades para el descuento por mayoreo
+      let totalPieces = 0;
+      let totalQuantity = 1;
+      
+      Object.entries(selectedVariants).forEach(([variantId, options]) => {
+        const variant = product.variants?.find(v => v.id === variantId);
+        if (variant && variant.enableStock) {
+          Object.entries(options).forEach(([optionId, optionQuantity]) => {
+            if (optionQuantity > 0) {
+              const option = variant.options.find(o => o.id === optionId);
+              if (option) {
+                const multiplier = option.quantityMultiplier || 1;
+                totalPieces += optionQuantity * multiplier;
+              }
+            }
+          });
+        }
+      });
+      
+      // Calcular precio unitario (base + variantes estáticas)
+      let unitPrice = product.precioPromocion > 0 ? product.precioPromocion : product.precio;
+      Object.entries(selectedVariants).forEach(([variantId, options]) => {
+        const variant = product.variants?.find(v => v.id === variantId);
+        if (variant && !variant.enableStock) {
+          Object.entries(options).forEach(([optionId, optionQuantity]) => {
+            if (optionQuantity > 0) {
+              const option = variant.options.find(o => o.id === optionId);
+              if (option && option.price > 0) {
+                unitPrice += option.price;
+              }
+            }
+          });
+        }
+      });
+      
+      // Calcular el descuento por mayoreo
+      const wholesaleDiscount = product.wholesalePricing && product.wholesalePricing.length > 0 ? 
+        calculateWholesaleDiscount(product, totalQuantity, totalPieces, unitPrice) : null;
+      
+      // Debug: mostrar información del descuento
+      if (wholesaleDiscount && wholesaleDiscount.discountPercentage > 0) {
+        console.log('Descuento calculado:', {
+          product: product.nombre,
+          totalPieces,
+          totalQuantity,
+          unitPrice,
+          discountPercentage: wholesaleDiscount.discountPercentage,
+          discount: wholesaleDiscount.discount
+        });
+      }
+      
+      // Crear resumen de todas las variantes
+      const itemVariantsSummary = [...staticVariants];
+      Object.entries(selectedVariants).forEach(([variantId, options]) => {
+        const variant = product.variants?.find(v => v.id === variantId);
+        if (variant && variant.enableStock) {
+          Object.entries(options).forEach(([optionId, optionQuantity]) => {
+            if (optionQuantity > 0) {
+              const option = variant.options.find(o => o.id === optionId);
+              if (option) {
+                itemVariantsSummary.push(`${option.name} (${optionQuantity})`);
+              }
+            }
+          });
+        }
+      });
+      
+      itemsToAdd.push({
+        id: `${product._id}_${Date.now()}`,
+        _id: product._id,
+        nombre: product.nombre,
+        imagen: product.imagen,
+        price: totalPrice,
+        quantity: 1,
+        variants: selectedVariants,
+        variantsSummary: itemVariantsSummary,
+        extras: selectedExtras,
+        businessId: params.username,
+        basePrice: product.precioPromocion > 0 ? product.precioPromocion : product.precio,
+        variantPrice: Object.entries(selectedVariants).reduce((sum, [variantId, options]) => {
+          const variant = product.variants?.find(v => v.id === variantId);
+          if (variant && variant.enableStock) {
+            Object.entries(options).forEach(([optionId, optionQuantity]) => {
+              if (optionQuantity > 0) {
+                const option = variant.options.find(o => o.id === optionId);
+                if (option && option.price) {
+                  sum += option.price * optionQuantity;
+                }
+              }
+            });
+          }
+          return sum;
+        }, 0),
+        extrasPrice: selectedExtras.reduce((sum, extraName) => {
+          const extra = product.extras?.find(e => e.name === extraName);
+          return sum + (parseFloat(extra?.price) || 0);
+        }, 0),
+        wholesaleDiscount: wholesaleDiscount
+      });
+    }
     
     // Si no hay variantes con cantidad, crear un solo item
     if (!hasQuantityVariants) {
       const totalPrice = calculateItemPrice(product, selectedVariants, selectedExtras, quantity);
       const finalUnitPrice = totalPrice / quantity;
+      
+      // Calcular precio unitario (base + variantes estáticas)
+      let unitPrice = product.precioPromocion > 0 ? product.precioPromocion : product.precio;
+      Object.entries(selectedVariants).forEach(([variantId, options]) => {
+        const variant = product.variants?.find(v => v.id === variantId);
+        if (variant && !variant.enableStock) {
+          Object.entries(options).forEach(([optionId, optionQuantity]) => {
+            if (optionQuantity > 0) {
+              const option = variant.options.find(o => o.id === optionId);
+              if (option && option.price > 0) {
+                unitPrice += option.price;
+              }
+            }
+          });
+        }
+      });
+      
+      // Calcular cantidades para el descuento
+      let totalPieces = quantity;
+      let staticMultiplier = 1;
+      Object.entries(selectedVariants).forEach(([variantId, options]) => {
+        const variant = product.variants?.find(v => v.id === variantId);
+        if (variant && !variant.enableStock) {
+          Object.entries(options).forEach(([optionId, optionQuantity]) => {
+            if (optionQuantity > 0) {
+              const option = variant.options.find(o => o.id === optionId);
+              if (option && option.quantityMultiplier) {
+                staticMultiplier *= option.quantityMultiplier;
+              }
+            }
+          });
+        }
+      });
+      totalPieces = quantity * staticMultiplier;
+      
+      // Calcular el descuento por mayoreo
+      const wholesaleDiscount = product.wholesalePricing && product.wholesalePricing.length > 0 ? 
+        calculateWholesaleDiscount(product, quantity, totalPieces, unitPrice) : null;
+      
+      // Debug: mostrar información del descuento
+      if (wholesaleDiscount && wholesaleDiscount.discountPercentage > 0) {
+        console.log('Descuento calculado (sin variantes):', {
+          product: product.nombre,
+          totalPieces,
+          quantity,
+          unitPrice,
+          discountPercentage: wholesaleDiscount.discountPercentage,
+          discount: wholesaleDiscount.discount
+        });
+      }
       
       const itemVariantsSummary = [...staticVariants];
       
@@ -838,8 +977,7 @@ function UserPageContent({ params }) {
           const extra = product.extras?.find(e => e.name === extraName);
           return sum + (parseFloat(extra?.price) || 0);
         }, 0),
-        wholesaleDiscount: product.wholesalePricing && product.wholesalePricing.length > 0 ? 
-          calculateWholesaleDiscount(product, quantity, totalPrice / quantity) : null
+        wholesaleDiscount: wholesaleDiscount
       });
     }
     
