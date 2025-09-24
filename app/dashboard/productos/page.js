@@ -1067,12 +1067,26 @@ export default function ProductDashboard() {
 
     if (active.id !== over.id) {
       setNewProduct((prevProduct) => {
+        // Validar que todas las variantes tengan ID
+        const variantsWithIds = prevProduct.variants.filter(v => v.id)
+        if (variantsWithIds.length !== prevProduct.variants.length) {
+          console.error('Algunas variantes no tienen ID:', prevProduct.variants)
+          return prevProduct
+        }
+
         const oldIndex = prevProduct.variants.findIndex((variant) => variant.id === active.id)
         const newIndex = prevProduct.variants.findIndex((variant) => variant.id === over.id)
+        
+        if (oldIndex === -1 || newIndex === -1) {
+          console.error('No se encontró la variante para reordenar')
+          return prevProduct
+        }
+
+        const newVariants = arrayMove(prevProduct.variants, oldIndex, newIndex)
 
         return {
           ...prevProduct,
-          variants: arrayMove(prevProduct.variants, oldIndex, newIndex),
+          variants: newVariants,
         }
       })
     }
@@ -1108,16 +1122,55 @@ export default function ProductDashboard() {
   }
 
   // Función para drag and drop de productos
-  const handleDragEndProducts = (event) => {
+  const handleDragEndProducts = async (event) => {
     const { active, over } = event
 
     if (active.id !== over.id) {
-      setProducts((prevProducts) => {
-        const oldIndex = prevProducts.findIndex((product) => product._id === active.id)
-        const newIndex = prevProducts.findIndex((product) => product._id === over.id)
-
-        return arrayMove(prevProducts, oldIndex, newIndex)
-      })
+      const newProducts = arrayMove(products, 
+        products.findIndex((product) => product._id === active.id),
+        products.findIndex((product) => product._id === over.id)
+      )
+      
+      // Actualizar el estado local inmediatamente para feedback visual
+      setProducts(newProducts)
+      
+      // Si hay un producto siendo editado, actualizarlo también
+      if (editingProduct) {
+        const updatedProduct = newProducts.find(p => p._id === editingProduct._id)
+        if (updatedProduct) {
+          setEditingProduct(updatedProduct)
+          setNewProduct(updatedProduct)
+        }
+      }
+      
+      // Guardar el nuevo orden en la base de datos
+      try {
+        const response = await fetch('/api/products/reorder', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ products: newProducts }),
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Error al guardar el orden de productos')
+        }
+        
+        toast.success('Orden de productos guardado')
+      } catch (error) {
+        console.error('Error al guardar orden:', error)
+        toast.error('Error al guardar el orden de productos')
+        // Revertir el cambio si falla
+        setProducts(products)
+        // También revertir editingProduct si estaba siendo editado
+        if (editingProduct) {
+          const originalProduct = products.find(p => p._id === editingProduct._id)
+          if (originalProduct) {
+            setEditingProduct(originalProduct)
+            setNewProduct(originalProduct)
+          }
+        }
+      }
     }
   }
 
