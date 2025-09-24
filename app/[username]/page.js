@@ -901,46 +901,27 @@ function UserPageContent({ params }) {
           toggleProductDetails(selectedProduct);
         }}
       >
+        
         <motion.div
-          initial={{ y: '100%' }}
-          animate={{ y: 0 }}
-          exit={{ y: '100%' }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           className="bg-white w-full h-[100vh] sm:h-[85vh] sm:max-w-lg sm:rounded-xl relative flex flex-col overflow-hidden"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Botón de cerrar (X) */}
-          <button
-            className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/80 backdrop-blur-sm shadow-md"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (editingCartItem) {
-                // Si estamos editando, limpiar el estado de edición
-                setEditingCartItem(null);
-                setSelectedProduct(null);
-                setSelectedVariants({});
-                setSelectedExtras([]);
-              } else {
-              toggleProductDetails(selectedProduct);
-              }
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-            </svg>
-          </button>
 
           {/* Contenedor con scroll */}
-          <div className="flex-1 overflow-y-auto pb-[100px]">
-            {/* Imagen del producto con padding */}
-            <div className="p-4 sm:p-6">
-              <div className="w-full aspect-[4/3] sm:aspect-[3/2] relative rounded-xl overflow-hidden">
-                <Image
-                  src={selectedProduct.imagen}
-                  alt={selectedProduct.nombre}
-                  layout="fill"
-                  objectFit="cover"
-                  priority
-                />
+          <div className="flex-1 overflow-y-auto pb-[100px] pt-4">
+            {/* Imagen del producto */}
+            <div className="px-4 sm:px-6 pb-4">
+              <div className="w-full aspect-square relative rounded-2xl overflow-hidden">
+                 <Image
+                   src={selectedProduct.imagen}
+                   alt={selectedProduct.nombre}
+                   fill
+                   style={{ objectFit: 'cover' }}
+                   priority
+                 />
               </div>
             </div>
 
@@ -992,7 +973,7 @@ function UserPageContent({ params }) {
               </div>
               
               {selectedProduct.descripcion && (
-                <p className="text-gray-700 mb-4">{selectedProduct.descripcion}</p>
+                <p className="text-gray-700 mb-8">{selectedProduct.descripcion}</p>
               )}
 
               {/* Variantes */}
@@ -1251,6 +1232,27 @@ function UserPageContent({ params }) {
               )}
             </div>
           </div>
+
+          {/* Botón de cerrar flotante - siempre visible */}
+          <button
+            className="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:bg-white transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (editingCartItem) {
+                // Si estamos editando, limpiar el estado de edición
+                setEditingCartItem(null);
+                setSelectedProduct(null);
+                setSelectedVariants({});
+                setSelectedExtras([]);
+              } else {
+                toggleProductDetails(selectedProduct);
+              }
+            }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
 
 
           {/* Footer fijo con botón de agregar */}
