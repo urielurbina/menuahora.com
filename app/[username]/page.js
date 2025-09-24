@@ -222,7 +222,7 @@ function UserPageContent({ params }) {
 
     // Aplicar descuento por mayoreo solo al precio base + variantes (sin extras)
     if (product.wholesalePricing && product.wholesalePricing.length > 0) {
-      const wholesaleDiscount = calculateWholesaleDiscount(product, totalQuantity, totalPieces, unitPrice);
+      const wholesaleDiscount = calculateWholesaleDiscount(product, totalQuantity, totalPieces, basePriceWithVariants / (product.priceType === "per_piece" ? totalPieces : totalQuantity));
       if (wholesaleDiscount.discount > 0) {
         if (product.priceType === "per_piece") {
           basePriceWithVariants -= wholesaleDiscount.discount * totalPieces;
@@ -727,7 +727,7 @@ function UserPageContent({ params }) {
 
       // Aplicar descuento por mayoreo solo al precio base + variantes (sin extras)
       if (product.wholesalePricing && product.wholesalePricing.length > 0) {
-        const wholesaleDiscount = calculateWholesaleDiscount(product, totalQuantity, totalPieces, unitPrice);
+        const wholesaleDiscount = calculateWholesaleDiscount(product, totalQuantity, totalPieces, basePriceWithVariants / (product.priceType === "per_piece" ? totalPieces : totalQuantity));
         if (wholesaleDiscount.discount > 0) {
           if (product.priceType === "per_piece") {
             basePriceWithVariants -= wholesaleDiscount.discount * totalPieces;
@@ -830,7 +830,7 @@ function UserPageContent({ params }) {
       
       // Calcular el descuento por mayoreo
       const wholesaleDiscount = product.wholesalePricing && product.wholesalePricing.length > 0 ? 
-        calculateWholesaleDiscount(product, totalQuantity, totalPieces, unitPrice) : null;
+        calculateWholesaleDiscount(product, totalQuantity, totalPieces, totalPrice / (product.priceType === "per_piece" ? totalPieces : totalQuantity)) : null;
       
       // Debug: mostrar información del descuento
       if (wholesaleDiscount && wholesaleDiscount.discountPercentage > 0) {
@@ -935,7 +935,7 @@ function UserPageContent({ params }) {
       
       // Calcular el descuento por mayoreo
       const wholesaleDiscount = product.wholesalePricing && product.wholesalePricing.length > 0 ? 
-        calculateWholesaleDiscount(product, quantity, totalPieces, unitPrice) : null;
+        calculateWholesaleDiscount(product, quantity, totalPieces, finalUnitPrice) : null;
       
       // Debug: mostrar información del descuento
       if (wholesaleDiscount && wholesaleDiscount.discountPercentage > 0) {
