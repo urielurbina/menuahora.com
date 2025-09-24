@@ -343,7 +343,7 @@ function SortableProductCard({ product, onEdit, onDuplicate, onDelete }) {
 }
 
 // Componente sortable para opciones de variantes
-function SortableVariantOption({ option, variantId, onDelete, onStartInlineEdit, onSaveInlineEdit, onCancelInlineEdit, isEditingInline }) {
+function SortableVariantOption({ option, variantId, onDelete, onStartInlineEdit, onSaveInlineEdit, onCancelInlineEdit, isEditingInline, newVariantOption, setNewVariantOption }) {
   const {
     attributes,
     listeners,
@@ -377,8 +377,8 @@ function SortableVariantOption({ option, variantId, onDelete, onStartInlineEdit,
               <label className="text-xs text-gray-600 mb-1">Nombre</label>
               <input
                 type="text"
-                value={option.name}
-                onChange={(e) => onStartInlineEdit({ ...option, name: e.target.value })}
+                value={newVariantOption.name}
+                onChange={(e) => setNewVariantOption({ ...newVariantOption, name: e.target.value })}
                 className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#0D654A]"
                 placeholder="Nombre de la opción"
                 autoFocus
@@ -393,8 +393,8 @@ function SortableVariantOption({ option, variantId, onDelete, onStartInlineEdit,
                   </div>
                   <input
                     type="number"
-                    value={option.price || ''}
-                    onChange={(e) => onStartInlineEdit({ ...option, price: parseFloat(e.target.value) || 0 })}
+                    value={newVariantOption.price || ''}
+                    onChange={(e) => setNewVariantOption({ ...newVariantOption, price: parseFloat(e.target.value) || 0 })}
                     placeholder="0.00"
                     step="0.01"
                     min="0"
@@ -406,8 +406,8 @@ function SortableVariantOption({ option, variantId, onDelete, onStartInlineEdit,
                 <label className="text-xs text-gray-600 mb-1">Unidades</label>
                 <input
                   type="number"
-                  value={option.quantityMultiplier || ''}
-                  onChange={(e) => onStartInlineEdit({ ...option, quantityMultiplier: parseInt(e.target.value) || 1 })}
+                  value={newVariantOption.quantityMultiplier || ''}
+                  onChange={(e) => setNewVariantOption({ ...newVariantOption, quantityMultiplier: parseInt(e.target.value) || 1 })}
                   placeholder="1"
                   min="1"
                   className="w-16 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-[#0D654A]"
@@ -1872,6 +1872,8 @@ export default function ProductDashboard() {
                                           onSaveInlineEdit={saveInlineOptionEdit}
                                           onCancelInlineEdit={cancelInlineOptionEdit}
                                           isEditingInline={editingOptionInline?.id === option.id}
+                                          newVariantOption={newVariantOption}
+                                          setNewVariantOption={setNewVariantOption}
                                         />
                                       ))}
                                     </div>
