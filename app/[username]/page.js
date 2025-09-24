@@ -130,17 +130,17 @@ function UserPageContent({ params }) {
   // Función para calcular el precio total dinámico
   const calculateDynamicPrice = (product) => {
     let basePrice = product.precioPromocion > 0 ? product.precioPromocion : product.precio;
-    let totalPrice = 0;
     
-    // Calcular cantidad total de piezas considerando multiplicadores
+    // Calcular cantidad total de piezas y cantidad de unidades
     let totalPieces = 1;
     let totalQuantity = 1;
     
     if (hasVariantsWithQuantity(product)) {
       // Para productos con variantes con cantidad seleccionable
       totalQuantity = calculateTotalVariantQuantity(product);
-      totalPieces = 0;
       
+      // Calcular totalPieces considerando multiplicadores
+      totalPieces = 0;
       Object.entries(selectedVariants).forEach(([variantId, options]) => {
         const variant = product.variants?.find(v => v.id === variantId);
         if (variant && variant.enableStock) {
@@ -196,14 +196,46 @@ function UserPageContent({ params }) {
       }
     });
 
-    // Calcular precio total
+    // Calcular precio base + variantes (sin extras)
+    let basePriceWithVariants = 0;
     if (product.priceType === "per_piece") {
-      totalPrice = unitPrice * totalPieces;
+      basePriceWithVariants = unitPrice * totalPieces;
     } else {
-      totalPrice = unitPrice * totalQuantity;
+      basePriceWithVariants = unitPrice * totalQuantity;
     }
 
-    // Agregar precios de extras al total (no por unidad)
+    // Agregar precios de variantes con cantidad seleccionable
+    Object.entries(selectedVariants).forEach(([variantId, options]) => {
+      const variant = product.variants?.find(v => v.id === variantId);
+      if (variant && variant.enableStock) {
+        Object.entries(options).forEach(([optionId, optionQuantity]) => {
+          if (optionQuantity > 0) {
+            const option = variant.options.find(o => o.id === optionId);
+            if (option && option.price > 0) {
+              // Para variantes con cantidad, siempre multiplicar por la cantidad
+              basePriceWithVariants += option.price * optionQuantity;
+            }
+          }
+        });
+      }
+    });
+
+    // Aplicar descuento por mayoreo solo al precio base + variantes (sin extras)
+    if (product.wholesalePricing && product.wholesalePricing.length > 0) {
+      const wholesaleDiscount = calculateWholesaleDiscount(product, totalQuantity, totalPieces, unitPrice);
+      if (wholesaleDiscount.discount > 0) {
+        if (product.priceType === "per_piece") {
+          basePriceWithVariants -= wholesaleDiscount.discount * totalPieces;
+        } else {
+          basePriceWithVariants -= wholesaleDiscount.discount * totalQuantity;
+        }
+      }
+    }
+
+    // Calcular precio total agregando extras (que no tienen descuento)
+    let totalPrice = basePriceWithVariants;
+    
+    // Agregar precios de extras al total (sin descuento por mayoreo)
     if (selectedExtras.length > 0 && product.extras) {
       selectedExtras.forEach(extraName => {
         const extra = product.extras.find(e => e.name === extraName);
@@ -218,30 +250,6 @@ function UserPageContent({ params }) {
           }
         }
       });
-    }
-
-    // Agregar precios de variantes con cantidad seleccionable
-    Object.entries(selectedVariants).forEach(([variantId, options]) => {
-      const variant = product.variants?.find(v => v.id === variantId);
-      if (variant && variant.enableStock) {
-        Object.entries(options).forEach(([optionId, optionQuantity]) => {
-          if (optionQuantity > 0) {
-            const option = variant.options.find(o => o.id === optionId);
-            if (option && option.price > 0) {
-              // Para variantes con cantidad, siempre multiplicar por la cantidad
-              totalPrice += option.price * optionQuantity;
-            }
-          }
-        });
-      }
-    });
-
-    // Aplicar descuento por mayoreo si aplica
-    if (product.wholesalePricing && product.wholesalePricing.length > 0) {
-      const wholesaleDiscount = calculateWholesaleDiscount(product, totalQuantity, totalPrice / totalQuantity);
-      if (wholesaleDiscount.discount > 0) {
-        totalPrice -= wholesaleDiscount.discount * totalQuantity;
-      }
     }
 
     return totalPrice;
@@ -566,15 +574,18 @@ function UserPageContent({ params }) {
 
 
   // Función para calcular el descuento por mayoreo
-  const calculateWholesaleDiscount = (product, totalQuantity, itemPrice = null) => {
+  const calculateWholesaleDiscount = (product, totalQuantity, totalPieces, itemPrice = null) => {
     if (!product.wholesalePricing || product.wholesalePricing.length === 0) {
       return { discount: 0, discountPercentage: 0 };
     }
 
+    // Para productos por pieza, usar totalPieces; para productos por paquete, usar totalQuantity
+    const quantityForDiscount = product.priceType === "per_piece" ? totalPieces : totalQuantity;
+
     // Encontrar el descuento más alto aplicable según la cantidad
     let applicableDiscount = null;
     for (const pricing of product.wholesalePricing.sort((a, b) => b.minQuantity - a.minQuantity)) {
-      if (totalQuantity >= pricing.minQuantity) {
+      if (quantityForDiscount >= pricing.minQuantity) {
         applicableDiscount = pricing;
         break;
       }
@@ -598,17 +609,17 @@ function UserPageContent({ params }) {
     // Función para calcular el precio total de un item específico
     const calculateItemPrice = (product, selectedVariants, selectedExtras, quantity) => {
       let basePrice = product.precioPromocion > 0 ? product.precioPromocion : product.precio;
-      let totalPrice = 0;
       
-      // Calcular cantidad total de piezas considerando multiplicadores
+      // Calcular cantidad total de piezas y cantidad de unidades
       let totalPieces = 1;
       let totalQuantity = quantity;
       
       if (hasVariantsWithQuantity(product)) {
         // Para productos con variantes con cantidad seleccionable
         totalQuantity = calculateTotalVariantQuantity(product);
-        totalPieces = 0;
         
+        // Calcular totalPieces considerando multiplicadores
+        totalPieces = 0;
         Object.entries(selectedVariants).forEach(([variantId, options]) => {
           const variant = product.variants?.find(v => v.id === variantId);
           if (variant && variant.enableStock) {
@@ -662,14 +673,46 @@ function UserPageContent({ params }) {
         }
       });
 
-      // Calcular precio total
+      // Calcular precio base + variantes (sin extras)
+      let basePriceWithVariants = 0;
       if (product.priceType === "per_piece") {
-        totalPrice = unitPrice * totalPieces;
+        basePriceWithVariants = unitPrice * totalPieces;
       } else {
-        totalPrice = unitPrice * totalQuantity;
+        basePriceWithVariants = unitPrice * totalQuantity;
       }
 
-      // Agregar precios de extras al total (no por unidad)
+      // Agregar precios de variantes con cantidad seleccionable
+      Object.entries(selectedVariants).forEach(([variantId, options]) => {
+        const variant = product.variants?.find(v => v.id === variantId);
+        if (variant && variant.enableStock) {
+          Object.entries(options).forEach(([optionId, optionQuantity]) => {
+            if (optionQuantity > 0) {
+              const option = variant.options.find(o => o.id === optionId);
+              if (option && option.price > 0) {
+                // Para variantes con cantidad, siempre multiplicar por la cantidad
+                basePriceWithVariants += option.price * optionQuantity;
+              }
+            }
+          });
+        }
+      });
+
+      // Aplicar descuento por mayoreo solo al precio base + variantes (sin extras)
+      if (product.wholesalePricing && product.wholesalePricing.length > 0) {
+        const wholesaleDiscount = calculateWholesaleDiscount(product, totalQuantity, totalPieces, unitPrice);
+        if (wholesaleDiscount.discount > 0) {
+          if (product.priceType === "per_piece") {
+            basePriceWithVariants -= wholesaleDiscount.discount * totalPieces;
+          } else {
+            basePriceWithVariants -= wholesaleDiscount.discount * totalQuantity;
+          }
+        }
+      }
+
+      // Calcular precio total agregando extras (que no tienen descuento)
+      let totalPrice = basePriceWithVariants;
+      
+      // Agregar precios de extras al total (sin descuento por mayoreo)
       if (selectedExtras.length > 0 && product.extras) {
         selectedExtras.forEach(extraName => {
           const extra = product.extras.find(e => e.name === extraName);
@@ -684,30 +727,6 @@ function UserPageContent({ params }) {
             }
           }
         });
-      }
-
-      // Agregar precios de variantes con cantidad seleccionable
-      Object.entries(selectedVariants).forEach(([variantId, options]) => {
-        const variant = product.variants?.find(v => v.id === variantId);
-        if (variant && variant.enableStock) {
-          Object.entries(options).forEach(([optionId, optionQuantity]) => {
-            if (optionQuantity > 0) {
-              const option = variant.options.find(o => o.id === optionId);
-              if (option && option.price > 0) {
-                // Para variantes con cantidad, siempre multiplicar por la cantidad
-                totalPrice += option.price * optionQuantity;
-              }
-            }
-          });
-        }
-      });
-
-      // Aplicar descuento por mayoreo si aplica
-      if (product.wholesalePricing && product.wholesalePricing.length > 0) {
-        const wholesaleDiscount = calculateWholesaleDiscount(product, totalQuantity, totalPrice / totalQuantity);
-        if (wholesaleDiscount.discount > 0) {
-          totalPrice -= wholesaleDiscount.discount * totalQuantity;
-        }
       }
 
       return totalPrice;
