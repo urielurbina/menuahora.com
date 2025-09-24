@@ -911,7 +911,7 @@ function UserPageContent({ params }) {
         >
 
           {/* Contenedor con scroll */}
-          <div className="flex-1 overflow-y-auto pb-[100px] pt-4">
+          <div className="flex-1 overflow-y-auto pb-[150px] pt-16">
             {/* Imagen del producto */}
             <div className="px-4 sm:px-6 pb-4">
               <div className="w-full aspect-square relative rounded-2xl overflow-hidden">
@@ -1235,7 +1235,7 @@ function UserPageContent({ params }) {
 
           {/* Botón de cerrar flotante - siempre visible */}
           <button
-            className="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:bg-white transition-colors"
+            className="absolute top-12 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:bg-white transition-colors"
             onClick={(e) => {
               e.stopPropagation();
               if (editingCartItem) {
@@ -1255,8 +1255,11 @@ function UserPageContent({ params }) {
           </button>
 
 
+          {/* Fondo blanco adicional en la parte inferior para mobile */}
+          <div className="absolute bottom-0 left-0 right-0 h-20 bg-white -z-10"></div>
+
           {/* Footer fijo con botón de agregar */}
-          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 p-4 bg-white">
+          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 p-4 bg-white shadow-lg">
             <div className="max-w-lg mx-auto">
               {/* Banner de descuentos */}
               {(() => {
