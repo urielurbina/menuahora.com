@@ -243,6 +243,25 @@ function UserPageContent({ params }) {
     };
   };
 
+  // Función para obtener el próximo descuento disponible
+  const getNextDiscount = (product) => {
+    if (!product?.wholesalePricing || product.wholesalePricing.length === 0) {
+      return null;
+    }
+
+    const totalQuantity = calculateRealPiecesQuantity(product);
+    
+    // Encontrar el próximo descuento disponible (el más cercano que aún no se alcanza)
+    const nextDiscount = product.wholesalePricing
+      .sort((a, b) => a.minQuantity - b.minQuantity)
+      .find(pricing => totalQuantity < pricing.minQuantity);
+
+    return nextDiscount ? {
+      ...nextDiscount,
+      needed: nextDiscount.minQuantity - totalQuantity
+    } : null;
+  };
+
   // Función para calcular la cantidad total de variantes seleccionadas
   const calculateTotalVariantQuantity = (product) => {
     let totalQuantity = 0;
@@ -958,27 +977,17 @@ function UserPageContent({ params }) {
                   const discountInfo = getAvailableDiscounts(selectedProduct);
                   if (!discountInfo || !discountInfo.allDiscounts) return null;
                   
-                  return (
-                    <div className="flex flex-wrap gap-1 ml-2">
-                      {discountInfo.allDiscounts.map((discount, index) => {
-                        if (discount.isActive) {
-                          // Descuento activo (verde)
-                          return (
-                            <span key={index} className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                              -{discount.discount}% mayoreo activo
-                            </span>
-                          );
-                        } else {
-                          // Descuento disponible (azul)
-                          return (
-                            <span key={index} className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
-                              +{discount.needed} para {discount.discount}% desc.
-                            </span>
-                          );
-                        }
-                      })}
-                    </div>
-                  );
+                  // Mostrar solo el descuento activo si existe
+                  const activeDiscount = discountInfo.allDiscounts.find(d => d.isActive);
+                  if (activeDiscount) {
+                    return (
+                      <span className="text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full ml-2">
+                        -{activeDiscount.discount}% mayoreo activo
+                      </span>
+                    );
+                  }
+                  
+                  return null;
                 })()}
               </div>
               
@@ -989,14 +998,23 @@ function UserPageContent({ params }) {
               {/* Variantes */}
               {selectedProduct.variants && selectedProduct.variants.length > 0 && (
                 <div className="mb-6">
-                  {selectedProduct.variants.map((variant) => (
-                    <div key={variant.id} className="mb-4">
-                      <h4 className="font-semibold mb-3 text-gray-800 flex items-center">
-                        {variant.name}
+                  {selectedProduct.variants.map((variant, variantIndex) => (
+                    <div key={variant.id} className="mb-6">
+                      {/* Divisor entre variantes */}
+                      {variantIndex > 0 && (
+                        <div className="border-t-2 border-gray-200 mb-4"></div>
+                      )}
+                      
+                      <h4 className="font-semibold mb-3 text-gray-800 flex items-center justify-between">
+                        <span>{variant.name}</span>
                         {variant.isRequired !== false ? (
-                          <span className="text-red-500 ml-1">*</span>
+                          <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium">
+                            Requerido
+                          </span>
                         ) : (
-                          <span className="text-gray-400 ml-2 text-sm font-normal">(opcional)</span>
+                          <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">
+                            Opcional
+                          </span>
                         )}
                       </h4>
                       <div className="space-y-2">
@@ -1062,16 +1080,14 @@ function UserPageContent({ params }) {
                                   htmlFor={`variant-${variant.id}-${option.id}`}
                                   className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-gray-600 peer-checked:bg-gray-50 hover:bg-gray-50 transition-all"
                                 >
-                                  <div className="flex items-center">
-                                    <div className="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center mr-3 peer-checked:border-gray-600">
-                                      <div className={`w-2.5 h-2.5 bg-gray-600 rounded-full ${getVariantQuantity(variant.id, option.id) > 0 ? 'block' : 'hidden'}`}></div>
-                                    </div>
-                                    <div className="text-sm font-medium text-gray-700">
-                                      {option.name}
-                                      {option.price > 0 && (
-                                        <span className="text-xs text-green-600 ml-2">+${option.price.toFixed(2)}</span>
-                                      )}
-                                    </div>
+                                  <div className="flex-1 text-sm font-medium text-gray-700">
+                                    {option.name}
+                                    {option.price > 0 && (
+                                      <span className="text-xs text-green-600 ml-2">+${option.price.toFixed(2)}</span>
+                                    )}
+                                  </div>
+                                  <div className="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center ml-3 peer-checked:border-gray-600 flex-shrink-0">
+                                    <div className={`w-2.5 h-2.5 bg-gray-600 rounded-full ${getVariantQuantity(variant.id, option.id) > 0 ? 'block' : 'hidden'}`}></div>
                                   </div>
                                 </label>
                               </div>
@@ -1087,9 +1103,14 @@ function UserPageContent({ params }) {
               {/* Compatibilidad con estructura antigua (tipos) */}
               {selectedProduct.tipos && !selectedProduct.variants && (
                 <div className="mb-6">
-                  <h4 className="font-semibold mb-3 text-gray-800 flex items-center">
-                    {selectedProduct.tipos.titulo}
-                    <span className="text-red-500 ml-1">*</span>
+                  {/* Divisor antes de tipos */}
+                  <div className="border-t-2 border-gray-200 mb-4"></div>
+                  
+                  <h4 className="font-semibold mb-3 text-gray-800 flex items-center justify-between">
+                    <span>{selectedProduct.tipos.titulo}</span>
+                    <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium">
+                      Requerido
+                    </span>
                   </h4>
                   <div className="space-y-2">
                     {selectedProduct.tipos.opciones.map((opcion, index) => (
@@ -1114,20 +1135,16 @@ function UserPageContent({ params }) {
                           htmlFor={`tipo-${index}`}
                           className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-gray-600 peer-checked:bg-gray-50 hover:bg-gray-50 transition-all"
                         >
-                          <div className="flex items-center">
-                            <div className="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center mr-3 peer-checked:border-gray-600">
-                              <div className={`w-2.5 h-2.5 bg-gray-600 rounded-full ${Object.keys(selectedVariants).includes(opcion.nombre) ? 'block' : 'hidden'}`}></div>
-                            </div>
-                            <div>
-                              <div className="text-sm font-medium text-gray-700">
-                                {opcion.nombre}
-                              </div>
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-gray-700">
+                              {opcion.nombre}
                               {opcion.precio && (
-                                <div className="text-xs text-gray-500">
-                                  +${opcion.precio.toFixed(2)}
-                                </div>
+                                <span className="text-xs text-green-600 ml-2">+${opcion.precio.toFixed(2)}</span>
                               )}
                             </div>
+                          </div>
+                          <div className="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center ml-3 peer-checked:border-gray-600 flex-shrink-0">
+                            <div className={`w-2.5 h-2.5 bg-gray-600 rounded-full ${Object.keys(selectedVariants).includes(opcion.nombre) ? 'block' : 'hidden'}`}></div>
                           </div>
                         </label>
                       </div>
@@ -1139,7 +1156,15 @@ function UserPageContent({ params }) {
               {/* Extras */}
               {selectedProduct.extras && selectedProduct.extras.length > 0 && (
                 <div className="mb-6">
-                  <h4 className="font-semibold mb-3 text-gray-800">Extras</h4>
+                  {/* Divisor antes de extras */}
+                  <div className="border-t-2 border-gray-200 mb-4"></div>
+                  
+                  <h4 className="font-semibold mb-3 text-gray-800 flex items-center justify-between">
+                    <span>Extras</span>
+                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">
+                      Opcional
+                    </span>
+                  </h4>
                   <div className="space-y-2">
                     {selectedProduct.extras.map((extra, index) => (
                       <div key={index} className="relative">
@@ -1160,30 +1185,26 @@ function UserPageContent({ params }) {
                           htmlFor={`extra-${index}`}
                           className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-gray-600 peer-checked:bg-gray-50 hover:bg-gray-50 transition-all"
                         >
-                          <div className="flex items-center">
-                            <div className="w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center mr-3 peer-checked:border-gray-600">
-                              <svg 
-                                className={`w-3 h-3 text-gray-600 ${selectedExtras.includes(extra.name) ? 'block' : 'hidden'}`}
-                                fill="none" 
-                                stroke="currentColor" 
-                                viewBox="0 0 24 24"
-                              >
-                                <path 
-                                  strokeLinecap="round" 
-                                  strokeLinejoin="round" 
-                                  strokeWidth="2" 
-                                  d="M5 13l4 4L19 7"
-                                />
-                              </svg>
-                            </div>
-                            <div className="flex items-center justify-between w-full">
-                              <span className="text-sm font-medium text-gray-700">
-                                {extra.name}
-                              </span>
-                              <span className="text-sm text-gray-500 ml-2">
-                                +${typeof extra.price === 'number' ? extra.price.toFixed(2) : extra.price}
-                              </span>
-                            </div>
+                          <div className="flex-1 text-sm font-medium text-gray-700">
+                            {extra.name}
+                            <span className="text-xs text-green-600 ml-2">
+                              +${typeof extra.price === 'number' ? extra.price.toFixed(2) : extra.price}
+                            </span>
+                          </div>
+                          <div className="w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center ml-3 peer-checked:border-gray-600 flex-shrink-0">
+                            <svg 
+                              className={`w-3 h-3 text-gray-600 ${selectedExtras.includes(extra.name) ? 'block' : 'hidden'}`}
+                              fill="none" 
+                              stroke="currentColor" 
+                              viewBox="0 0 24 24"
+                            >
+                              <path 
+                                strokeLinecap="round" 
+                                strokeLinejoin="round" 
+                                strokeWidth="2" 
+                                d="M5 13l4 4L19 7"
+                              />
+                            </svg>
                           </div>
                         </label>
                       </div>
@@ -1191,46 +1212,99 @@ function UserPageContent({ params }) {
                   </div>
                 </div>
               )}
+
+              {/* Selector de cantidad - Movido aquí desde el footer */}
+              {!hasVariantsWithQuantity(selectedProduct) && (
+                <div className="mb-6">
+                  {/* Divisor antes de cantidad */}
+                  <div className="border-t-2 border-gray-200 mb-4"></div>
+                  
+                  <h4 className="font-semibold mb-3 text-gray-800">
+                    Cantidad
+                  </h4>
+                  <div className="flex items-center justify-center w-full">
+                    <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDecreaseQuantity(selectedProduct._id);
+                        }}
+                        className="w-12 h-12 flex items-center justify-center bg-gray-100 text-gray-700 text-lg font-medium hover:bg-gray-200"
+                      >
+                        -
+                      </button>
+                      <div className="w-16 h-12 flex items-center justify-center bg-white text-lg font-medium">
+                        {productQuantities[selectedProduct._id] || 1}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleIncreaseQuantity(selectedProduct._id);
+                        }}
+                        className="w-12 h-12 flex items-center justify-center bg-gray-100 text-gray-700 text-lg font-medium hover:bg-gray-200"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Footer fijo con selector de cantidad y botón de agregar */}
-          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 p-4 bg-white">
-            <div className="flex items-center justify-between gap-4 max-w-lg mx-auto">
-              {hasVariantsWithQuantity(selectedProduct) ? (
-                // Si tiene variantes con cantidad, mostrar la cantidad total calculada
-                <div className="flex items-center h-12 px-4 border border-gray-200 rounded-lg bg-gray-50">
-                  <div className="text-sm text-gray-600">
-                    Total: <span className="font-semibold">{calculateTotalVariantQuantity(selectedProduct)}</span> unidades
-                  </div>
-                </div>
-              ) : (
-                // Si no tiene variantes con cantidad, mostrar el selector normal
-              <div className="flex items-center h-12 border border-gray-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDecreaseQuantity(selectedProduct._id);
-                  }}
-                  className="w-12 h-full flex items-center justify-center bg-gray-100 text-gray-700 text-lg font-medium hover:bg-gray-200"
-                >
-                  -
-                </button>
-                <div className="w-16 h-full flex items-center justify-center bg-white text-lg">
-                  {productQuantities[selectedProduct._id] || 0}
-                </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleIncreaseQuantity(selectedProduct._id);
-                  }}
-                  className="w-12 h-full flex items-center justify-center bg-gray-100 text-gray-700 text-lg font-medium hover:bg-gray-200"
-                >
-                  +
-                </button>
-              </div>
-              )}
 
+          {/* Footer fijo con botón de agregar */}
+          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 p-4 bg-white">
+            <div className="max-w-lg mx-auto">
+              {/* Banner de descuentos */}
+              {(() => {
+                const discountInfo = getAvailableDiscounts(selectedProduct);
+                const nextDiscount = getNextDiscount(selectedProduct);
+                
+                if (!discountInfo || !discountInfo.allDiscounts) return null;
+                
+                // Mostrar el descuento activo más alto (el mayor descuento alcanzado)
+                const activeDiscounts = discountInfo.allDiscounts.filter(d => d.isActive);
+                const activeDiscount = activeDiscounts.length > 0 
+                  ? activeDiscounts.reduce((max, current) => current.discount > max.discount ? current : max)
+                  : null;
+                
+                if (activeDiscount) {
+                  // Mostrar descuento actual activo Y próximo nivel si existe
+                  return (
+                    <div className="mb-3">
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-2">
+                        <div className="flex flex-col items-center justify-center text-center space-y-1">
+                          <span className="text-xs text-gray-700 font-medium">
+                            🎉 Descuento activo: <span className="font-bold">{activeDiscount.discount}%</span> de mayoreo
+                          </span>
+                          {nextDiscount && nextDiscount.needed > 0 && (
+                            <span className="text-xs text-gray-600 font-medium">
+                              Agrega <span className="font-bold">{nextDiscount.needed}</span> piezas más para <span className="font-bold">{nextDiscount.discount}%</span> descuento
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                } else if (nextDiscount && nextDiscount.needed > 0) {
+                  // Mostrar próximo descuento disponible
+                  return (
+                    <div className="mb-3">
+                      <div className="bg-gray-50 border border-gray-200 rounded-lg p-2">
+                        <div className="flex items-center justify-center text-center">
+                          <span className="text-xs text-gray-700 font-medium">
+                            Agrega <span className="font-bold">{nextDiscount.needed}</span> piezas más para <span className="font-bold">{nextDiscount.discount}%</span> descuento
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+                
+                return null;
+              })()}
+              
               {/* Botón de Agregar al Carrito */}
               <button
                 onClick={(e) => {
@@ -1287,14 +1361,11 @@ function UserPageContent({ params }) {
                   );
                   }
                 }}
-                className="flex-1 h-12 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                className="w-full h-12 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 20a1 1 0 1 0 0 2 1 1 0 1 0 0-2z" />
-                  <path d="M20 20a1 1 0 1 0 0 2 1 1 0 1 0 0-2z" />
-                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-                </svg>
-                <span>{editingCartItem ? "Actualizar item" : "Agregar al carrito"}</span>
+                <span className="text-white">
+                  {editingCartItem ? "Actualizar item" : `Agregar ${hasVariantsWithQuantity(selectedProduct) ? calculateTotalVariantQuantity(selectedProduct) : (productQuantities[selectedProduct._id] || 1)} al carrito • $${calculateDynamicPrice(selectedProduct).toFixed(2)}`}
+                </span>
               </button>
             </div>
           </div>
