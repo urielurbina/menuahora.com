@@ -43,7 +43,7 @@ export default function BigCTA() {
                   ¡Quiero mi catálogo digital!
                 </a>
                 <a
-                  href="https://www.menuahora.com/tacosuriel"
+                  href="https://repisa.co/tacosuriel"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-md bg-white/80 backdrop-blur-sm px-5 py-3 text-sm font-semibold text-[#0D654A] shadow-md ring-1 ring-[#0D654A]/20 hover:bg-white hover:shadow-lg transition-all duration-200"

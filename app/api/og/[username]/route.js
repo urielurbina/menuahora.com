@@ -42,7 +42,7 @@ export async function GET(request, { params }) {
           }}
         >
           <img
-            src={businessData['basic-info']?.logoUrl || 'https://menuahora.com/default-logo.png'}
+            src={businessData['basic-info']?.logoUrl || 'https://repisa.co/default-logo.png'}
             alt="Business Logo"
             width={200}
             height={200}

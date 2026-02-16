@@ -6,7 +6,7 @@ export const revalidate = 0;
 
 async function fetchBusinessData(username) {
   // Aseguramos que usemos una URL absoluta
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://menuahora.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://repisa.co';
   const url = new URL(`/api/business/${username}`, baseUrl).toString();
   
   const response = await fetch(url, {
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }) {
         type: 'website',
         locale: 'es_ES',
         url: `${process.env.NEXT_PUBLIC_BASE_URL}/${params.username}`,
-        siteName: basicInfo.businessName || 'MenuAhora',
+        siteName: basicInfo.businessName || 'Repisa',
         title: basicInfo.businessName || 'Menú digital',
         description: basicInfo.description || 'Menú digital',
         images: [
@@ -86,7 +86,7 @@ export async function generateMetadata({ params }) {
         type: 'website',
         locale: 'es_ES',
         url: `${process.env.NEXT_PUBLIC_BASE_URL}/${params.username}`,
-        siteName: 'MenuAhora',
+        siteName: 'Repisa',
         title: 'Menú digital',
         description: 'Menú digital',
         images: [

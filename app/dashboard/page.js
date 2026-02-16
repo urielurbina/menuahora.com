@@ -27,7 +27,7 @@ export default function Welcome() {
   }, []);
 
   const handleCopyLink = async () => {
-    const menuLink = `https://menuahora.com/${username}`;
+    const menuLink = `https://repisa.co/${username}`;
     try {
       await navigator.clipboard.writeText(menuLink);
       setCopied(true);
@@ -41,7 +41,7 @@ export default function Welcome() {
     const canvas = document.querySelector('#qr-canvas canvas');
     if (canvas) {
       const link = document.createElement('a');
-      link.download = `menuahora-${username}-qr.png`;
+      link.download = `repisa-${username}-qr.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     }
@@ -77,7 +77,7 @@ export default function Welcome() {
           <div className="link-copy-field">
             <input
               type="text"
-              value={`https://menuahora.com/${username}`}
+              value={`https://repisa.co/${username}`}
               readOnly
               className="link-copy-input"
             />
@@ -122,7 +122,7 @@ export default function Welcome() {
           <div className="qr-section">
             <div id="qr-canvas" className="qr-code-container mb-4">
               <Canvas
-                text={`https://menuahora.com/${username}`}
+                text={`https://repisa.co/${username}`}
                 options={{
                   level: 'M',
                   margin: 2,

@@ -83,8 +83,8 @@ export default function TrialExpiradoPage() {
       {/* Header */}
       <div className="py-6 px-4 flex justify-center">
         <img
-          src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
-          alt="MenúAhora"
+          src="/images/logotipo_repisa_co_negro.png"
+          alt="Repisa"
           className="h-7"
         />
       </div>
@@ -219,7 +219,7 @@ export default function TrialExpiradoPage() {
                 Cerrar sesión
               </button>
               <a
-                href="mailto:uriel@menuahora.com"
+                href="mailto:uriel@repisa.co"
                 className="text-sm text-gray-500 hover:text-gray-700"
               >
                 ¿Necesitas ayuda?

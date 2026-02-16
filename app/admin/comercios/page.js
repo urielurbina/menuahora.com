@@ -12,7 +12,7 @@ const FILTERS = [
   { id: 'pending', name: 'Pendientes' },
 ];
 
-const PAYMENT_LINK = 'https://menuahora.com/trial-expirado';
+const PAYMENT_LINK = 'https://repisa.co/trial-expirado';
 
 const getRenewalMessage = (businessName, status, daysLeft) => {
   const name = businessName || 'tu negocio';
@@ -20,7 +20,7 @@ const getRenewalMessage = (businessName, status, daysLeft) => {
   if (status === 'trial_expired') {
     return `¡Hola! 👋
 
-Tu prueba gratuita de MenúAhora para *${name}* ha terminado.
+Tu prueba gratuita de Repisa para *${name}* ha terminado.
 
 Para seguir recibiendo pedidos por WhatsApp y mantener tu menú digital activo, puedes renovar tu suscripción aquí:
 
@@ -32,7 +32,7 @@ ${PAYMENT_LINK}
   if (status === 'trial' && daysLeft <= 3) {
     return `¡Hola! 👋
 
-Tu prueba gratuita de MenúAhora para *${name}* termina en ${daysLeft} ${daysLeft === 1 ? 'día' : 'días'}.
+Tu prueba gratuita de Repisa para *${name}* termina en ${daysLeft} ${daysLeft === 1 ? 'día' : 'días'}.
 
 Para no perder tus pedidos y mantener tu menú activo, puedes suscribirte aquí:
 
@@ -43,7 +43,7 @@ ${PAYMENT_LINK}
 
   return `¡Hola! 👋
 
-Te escribo de MenúAhora sobre *${name}*.
+Te escribo de Repisa sobre *${name}*.
 
 Si deseas continuar con tu suscripción, puedes hacerlo aquí:
 

@@ -101,8 +101,8 @@ export default function ResponsiveLayout({ children }) {
               <div className="dashboard-sidebar-header">
                 <img
                   className="h-6 w-auto"
-                  src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
-                  alt="Logo MenúAhora"
+                  src="/images/logotipo_repisa_co_negro.png"
+                  alt="Logo Repisa"
                 />
               </div>
 
@@ -154,8 +154,8 @@ export default function ResponsiveLayout({ children }) {
                   <div className="flex items-center justify-between h-16 px-5 border-b border-gray-100">
                     <img
                       className="h-6 w-auto"
-                      src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
-                      alt="Logo MenúAhora"
+                      src="/images/logotipo_repisa_co_negro.png"
+                      alt="Logo Repisa"
                     />
                     <button
                       onClick={() => setIsMobileMenuOpen(false)}
@@ -214,8 +214,8 @@ export default function ResponsiveLayout({ children }) {
               </button>
               <img
                 className="h-5 w-auto ml-3"
-                src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
-                alt="Logo MenúAhora"
+                src="/images/logotipo_repisa_co_negro.png"
+                alt="Logo Repisa"
               />
             </div>
 

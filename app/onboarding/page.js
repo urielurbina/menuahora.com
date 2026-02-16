@@ -362,7 +362,7 @@ export default function OnboardingPage() {
       {/* Logo */}
       <div className="pt-6 pb-2 px-4 flex justify-center">
         <img
-          src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
+          src="/images/logotipo_repisa_co_negro.png"
           alt="MenúAhora"
           className="h-7"
         />
@@ -452,7 +452,7 @@ export default function OnboardingPage() {
                   </label>
                   <div className="flex">
                     <span className="inline-flex items-center px-3 bg-gray-100 border border-r-0 border-gray-300 rounded-l-lg text-gray-500 text-sm">
-                      menuahora.com/
+                      repisa.co/
                     </span>
                     <input
                       type="text"

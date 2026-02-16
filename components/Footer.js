@@ -17,17 +17,17 @@ const navigation = {
   social: [
     {
       name: 'WhatsApp',
-      href: 'https://api.whatsapp.com/send?phone=526143348253&text=Hola,%20tengo%20una%20pregunta%20sobre%20MenúAhora',
+      href: 'https://api.whatsapp.com/send?phone=526143348253&text=Hola,%20tengo%20una%20pregunta%20sobre%20Repisa',
       icon: FaWhatsapp
     },
     {
       name: 'Instagram',
-      href: 'https://instagram.com/menuahora',
+      href: 'https://instagram.com/repisa.co',
       icon: FaInstagram
     },
     {
       name: 'Facebook',
-      href: 'https://facebook.com/menuahora',
+      href: 'https://facebook.com/repisa.co',
       icon: FaFacebook
     },
   ],
@@ -44,8 +44,8 @@ const Footer = () => {
           <div className="space-y-8">
             <Link href="/#" className="flex items-center">
               <Image
-                alt="Logo MenúAhora"
-                src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
+                alt="Logo Repisa"
+                src="/images/logotipo_repisa_co_negro.png"
                 className="h-6 w-auto"
                 width={200}
                 height={50}

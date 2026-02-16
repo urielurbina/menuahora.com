@@ -29,7 +29,7 @@ export default function Example() {
               <span className="sr-only">MenúAhora - Tu catálogo digital para restaurantes</span>
               <img
                 alt="MenúAhora - Tu catálogo digital para restaurantes"
-                src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
+                src="/images/logotipo_repisa_co_negro.png"
                 className="h-6 w-auto"
               />
             </a>
@@ -66,7 +66,7 @@ export default function Example() {
                 <span className="sr-only">MenúAhora - Tu catálogo digital para restaurantes</span>
                 <img
                   alt="MenúAhora - Tu catálogo digital para restaurantes"
-                  src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
+                  src="/images/logotipo_repisa_co_negro.png"
                   className="h-6 w-auto"
                 />
               </a>
@@ -134,7 +134,7 @@ export default function Example() {
                   Crear Mi Catálogo Digital
                 </a>
                 <a
-                  href="https://www.menuahora.com/tacosuriel"
+                  href="https://repisa.co/tacosuriel"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-md bg-white/80 backdrop-blur-sm px-5 py-3 text-sm font-semibold text-[#0D654A] shadow-md ring-1 ring-[#0D654A]/20 hover:bg-white hover:shadow-lg transition-all duration-200"

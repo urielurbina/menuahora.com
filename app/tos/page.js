@@ -59,15 +59,15 @@ const TOS = () => {
         >
           {`Última actualización: 11 de octubre de 2024
 
-Bienvenido a MenúAhora ("nosotros" o "nuestro"). Al acceder o usar nuestro sitio web, https://menuahora.com ("Sitio Web"), aceptas cumplir con estos Términos y Servicios ("Términos"). Por favor, léelos cuidadosamente.
+Bienvenido a Repisa ("nosotros" o "nuestro"). Al acceder o usar nuestro sitio web, https://repisa.co ("Sitio Web"), aceptas cumplir con estos Términos y Servicios ("Términos"). Por favor, léelos cuidadosamente.
 
 1. Descripción del Servicio
-MenúAhora ofrece herramientas para crear y personalizar menús digitales, así como la descarga de código para crear aplicaciones. Al comprar un paquete, los usuarios adquieren la propiedad del código, pero no pueden revenderlo ni transferir estos derechos a terceros.
+Repisa ofrece herramientas para crear y personalizar menús digitales, así como la descarga de código para crear aplicaciones. Al comprar un paquete, los usuarios adquieren la propiedad del código, pero no pueden revenderlo ni transferir estos derechos a terceros.
 
 2. Propiedad y Licencia
 Los usuarios que compren un paquete tienen derecho a usar y modificar el código descargado para sus propios fines.
 El código proporcionado es para uso personal o comercial, y está prohibida la reventa, redistribución o sublicencia del código.
-MenúAhora retiene todos los demás derechos no expresamente otorgados en estos Términos.
+Repisa retiene todos los demás derechos no expresamente otorgados en estos Términos.
 3. Política de Reembolso
 Ofrecemos un reembolso completo dentro de los 7 días posteriores a la fecha de compra si no estás satisfecho. Para solicitar un reembolso, por favor contáctanos en soyurielurbina@gmail.com.
 

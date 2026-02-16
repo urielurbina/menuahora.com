@@ -198,8 +198,8 @@ export default function Component() {
         <footer className="mt-16 text-center text-gray-400 pb-4">
           <p className="text-sm">
             ¿Quieres un menú digital como este para tu negocio? Visita{' '}
-            <a href="https://menuahora.com" className="underline hover:text-white transition-colors">
-              menuahora.com
+            <a href="https://repisa.co" className="underline hover:text-white transition-colors">
+              repisa.co
             </a>
           </p>
         </footer>

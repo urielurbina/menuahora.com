@@ -8,7 +8,7 @@ export const size = {
 };
 
 async function fetchBusinessData(username) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://menuahora.com';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://repisa.co';
   const url = new URL(`/api/business/${username}`, baseUrl).toString();
   
   const response = await fetch(url, {
@@ -69,7 +69,7 @@ export default async function Image({ params }) {
                 marginBottom: '20px',
               }}
             >
-              {basicInfo.businessName || 'MenuAhora'}
+              {basicInfo.businessName || 'Repisa'}
             </h1>
             <p
               style={{
@@ -108,7 +108,7 @@ export default async function Image({ params }) {
               color: '#000',
             }}
           >
-            MenuAhora
+            Repisa
           </h1>
         </div>
       ),

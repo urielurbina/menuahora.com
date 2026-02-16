@@ -175,7 +175,7 @@ export default function ComercioDetailPage() {
                 rel="noopener noreferrer"
                 className="text-indigo-400 hover:text-indigo-300"
               >
-                menuahora.com/{business.username}
+                repisa.co/{business.username}
               </a>
             </div>
           </div>

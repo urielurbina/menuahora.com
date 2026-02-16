@@ -52,7 +52,7 @@ export default function HowItWorks() {
           <meta itemProp="totalTime" content="PT10M" />
           <meta itemProp="tool" content="Menú Digital QR" />
           <meta itemProp="supply" content="Información del restaurante" />
-          <link itemProp="target" href="https://menuahora.com/crear-menu-digital" />
+          <link itemProp="target" href="https://repisa.co/crear-menu-digital" />
           <p className="mt-6 text-lg leading-8 text-gray-600 max-w-xl mx-auto" itemProp="description">
             Descubre cómo transformar tu catálogo en una herramienta digital para recibir pedidos de manera eficiente.
           </p>

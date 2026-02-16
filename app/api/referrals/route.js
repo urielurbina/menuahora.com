@@ -99,7 +99,7 @@ export async function GET() {
 
     return NextResponse.json({
       referralCode,
-      referralLink: referralCode ? `https://menuahora.com/?ref=${referralCode.toLowerCase()}` : null,
+      referralLink: referralCode ? `https://repisa.co/?ref=${referralCode.toLowerCase()}` : null,
       // Estado de suscripción del usuario actual
       subscription: {
         hasAccess: user.hasAccess || false,

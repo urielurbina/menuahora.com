@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-const REFERRAL_STORAGE_KEY = 'menuahora_referral';
+const REFERRAL_STORAGE_KEY = 'repisa_referral';
 
 export function useReferralCode() {
   const searchParams = useSearchParams();

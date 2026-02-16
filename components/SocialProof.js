@@ -10,25 +10,25 @@ import 'swiper/css/pagination'
 
 const testimonials = [
   {
-    content: "MenúAhora transformó la manera en que gestionamos nuestro menú digital. Es intuitivo, eficiente y nos ha ahorrado horas de trabajo.",
+    content: "Repisa transformó la manera en que gestionamos nuestro menú digital. Es intuitivo, eficiente y nos ha ahorrado horas de trabajo.",
     author: "Alejandro Gómez",
     role: "Taquería Los Amigos",
     image: "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=96&h=96&q=80",
-    website: "https://www.menuahora.com"
+    website: "https://repisa.co"
   },
   {
     content: "La facilidad para actualizar el menú es un cambio total. Nuestros clientes valoran la conveniencia y nosotros disfrutamos del tiempo que ahorramos.",
     author: "Carla Fernández",
     role: "Restaurante La Fiesta",
     image: "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=96&h=96&q=80",
-    website: "https://www.menuahora.com"
+    website: "https://repisa.co"
   },
   {
     content: "El diseño personalizado ha sido clave para mantener nuestra imagen de marca. Ha mejorado la manera en que presentamos nuestros productos.",
     author: "Martín López",
     role: "Delicias Gourmet",
     image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=96&h=96&q=80",
-    website: "https://www.menuahora.com"
+    website: "https://repisa.co"
   }
 ]
 

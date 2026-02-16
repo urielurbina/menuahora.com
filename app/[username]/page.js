@@ -1057,15 +1057,15 @@ function UserPageContent({ params }) {
           {/* Footer */}
           <footer className="w-full bg-gray-50 py-6 px-4 text-center mt-8 mb-20 sm:mb-4">
             <Link
-              href="https://menuahora.com"
+              href="https://repisa.co"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
             >
               <span>Crea tu catálogo digital en</span>
               <Image
-                src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
-                alt="Logo MenúAhora"
+                src="/images/logotipo_repisa_co_negro.png"
+                alt="Logo Repisa"
                 width={90}
                 height={18}
                 className="opacity-70 hover:opacity-100 transition-opacity"

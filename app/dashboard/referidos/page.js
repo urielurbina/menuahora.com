@@ -473,7 +473,7 @@ export default function ReferidosPage() {
                     <div>
                       <p className="text-sm font-medium text-gray-900">{referral.businessName || referral.name || 'Sin nombre'}</p>
                       {referral.username && (
-                        <p className="text-xs text-gray-500">menuahora.com/{referral.username}</p>
+                        <p className="text-xs text-gray-500">repisa.co/{referral.username}</p>
                       )}
                     </div>
                   </div>

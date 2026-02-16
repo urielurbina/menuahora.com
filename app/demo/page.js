@@ -257,11 +257,11 @@ export default function Menu() {
                 </div>
               </div>
               <footer className="w-full bg-gray-100 py-4 px-4 text-center text-sm text-gray-600 mt-8">
-    <Link href="https://menuahora.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center">
+    <Link href="https://repisa.co" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center">
       <span className="mr-2">Sitio creado en:</span>
       <Image
-        src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
-        alt="Logo MenúAhora"
+        src="/images/logotipo_repisa_co_negro.png"
+        alt="Logo Repisa"
         width={100}
           height={20}
         />

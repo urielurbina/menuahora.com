@@ -410,8 +410,8 @@ export default function SuscripcionPage() {
         </svg>
         <div className="alert-content">
           <strong>¿Necesitas ayuda?</strong> Escríbenos a{' '}
-          <a href="mailto:uriel@menuahora.com" className="underline hover:no-underline">
-            uriel@menuahora.com
+          <a href="mailto:uriel@repisa.co" className="underline hover:no-underline">
+            uriel@repisa.co
           </a>{' '}
           o por WhatsApp.
         </div>

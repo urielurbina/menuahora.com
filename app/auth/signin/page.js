@@ -9,7 +9,7 @@ export default function SignIn() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <Image
-            src={`https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg`}
+            src="/images/logotipo_repisa_co_negro.png"
             alt="Logo"
             width={200}
             height={50}

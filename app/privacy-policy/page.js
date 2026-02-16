@@ -59,7 +59,7 @@ const PrivacyPolicy = () => {
         >
           {`Última actualización: 11 de octubre de 2024
 
-En MenúAhora ("nosotros" o "nuestro"), accesible desde https://menuahora.com, estamos comprometidos con la protección de tu privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos y protegemos tu información. Al utilizar nuestro sitio web, aceptas los términos descritos a continuación.
+En Repisa ("nosotros" o "nuestro"), accesible desde https://repisa.co, estamos comprometidos con la protección de tu privacidad. Esta Política de Privacidad explica cómo recopilamos, usamos y protegemos tu información. Al utilizar nuestro sitio web, aceptas los términos descritos a continuación.
 
 1. Información que Recopilamos
 Recopilamos dos tipos de datos:
