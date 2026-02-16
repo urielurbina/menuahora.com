@@ -36,41 +36,54 @@ const fonts = [
   { name: 'Work Sans', value: '"Work Sans", sans-serif' },
 ];
 
-const customStyles = {
-  control: (provided) => ({
+const selectStyles = {
+  control: (provided, state) => ({
     ...provided,
     minWidth: '200px',
-    margin: '0 5px'
+    fontSize: '0.875rem',
+    borderColor: state.isFocused ? 'var(--brand-primary)' : 'var(--gray-300)',
+    boxShadow: state.isFocused ? '0 0 0 2px var(--brand-primary-light)' : 'none',
+    borderRadius: '0.5rem',
+    '&:hover': {
+      borderColor: 'var(--brand-primary)',
+    },
   }),
   menu: (provided) => ({
     ...provided,
-    minWidth: '200px'
+    minWidth: '200px',
+    zIndex: 50,
+    borderRadius: '0.5rem',
+    boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
   }),
   option: (provided, state) => ({
     ...provided,
     fontFamily: state.data.value,
-    fontSize: '16px',
+    fontSize: '14px',
+    backgroundColor: state.isSelected ? 'var(--brand-primary)' : state.isFocused ? 'var(--brand-primary-light)' : 'white',
+    color: state.isSelected ? 'white' : 'var(--gray-900)',
+    padding: '10px 12px',
   })
 };
 
 const ColorPicker = ({ id, label, value, onChange }) => (
-  <div className="sm:col-span-3">
-    <label htmlFor={id} className="block text-sm font-medium leading-6 text-gray-900">
-      {label}
-    </label>
-    <div className="mt-2 flex items-center">
-      <input
-        type="color"
-        id={id}
-        value={value}
-        onChange={onChange}
-        className="h-10 w-10 rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-      />
+  <div className="form-field">
+    <label htmlFor={id} className="form-label">{label}</label>
+    <div className="flex items-center gap-3">
+      <div className="relative">
+        <input
+          type="color"
+          id={id}
+          value={value}
+          onChange={onChange}
+          className="w-12 h-12 rounded-lg border border-gray-300 cursor-pointer overflow-hidden"
+          style={{ padding: 0 }}
+        />
+      </div>
       <input
         type="text"
         value={value}
         onChange={(e) => onChange({ target: { value: e.target.value } })}
-        className="ml-2 block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
+        className="form-input flex-1"
         placeholder="#000000"
       />
     </div>
@@ -78,27 +91,22 @@ const ColorPicker = ({ id, label, value, onChange }) => (
 );
 
 const FontSelector = ({ id, label, value, onChange }) => (
-  <div className="sm:col-span-4">
-    <label htmlFor={id} className="block text-sm font-medium leading-6 text-gray-900">
-      {label}
-    </label>
-    <div className="mt-2">
-      <Select
-        id={id}
-        value={{ value: value, label: value.split(',')[0] }}
-        onChange={(option) => onChange({ target: { value: option.value } })}
-        options={fonts.map(font => ({ 
-          value: font.value, 
-          label: font.name,
-          style: { fontFamily: font.value }
-        }))}
-        styles={customStyles}
-        formatOptionLabel={({ label, style }) => (
-          <span style={style}>{label}</span>
-        )}
-      />
-    </div>
-    <p className="mt-2 text-sm text-gray-500" style={{ fontFamily: value }}>
+  <div className="form-field">
+    <label htmlFor={id} className="form-label">{label}</label>
+    <Select
+      id={id}
+      value={{ value: value, label: value.split(',')[0].replace(/"/g, '') }}
+      onChange={(option) => onChange({ target: { value: option.value } })}
+      options={fonts.map(font => ({
+        value: font.value,
+        label: font.name,
+      }))}
+      styles={selectStyles}
+      formatOptionLabel={({ label, value }) => (
+        <span style={{ fontFamily: value }}>{label}</span>
+      )}
+    />
+    <p className="form-hint mt-2" style={{ fontFamily: value }}>
       The quick brown fox jumps over the lazy dog
     </p>
   </div>
@@ -192,37 +200,71 @@ export default function Apariencia() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-12">
-      <div className="border-b border-gray-900/10 pb-8 sm:pb-12">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Apariencia</h2>
-        <p className="mt-1 text-sm leading-6 text-gray-600">
+    <div className="space-y-6">
+      {/* Page Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="page-header"
+      >
+        <h1 className="page-title">Apariencia</h1>
+        <p className="page-description">
           Personaliza la apariencia visual de tu sitio.
         </p>
+      </motion.div>
 
-        <div className="mt-6 sm:mt-10 grid grid-cols-1 gap-x-4 gap-y-6 sm:gap-y-8 sm:grid-cols-6">
-          <FontSelector
-            id="titleFont"
-            label="Tipografía del título"
-            value={titleFont}
-            onChange={(e) => handleFontChange(e, setTitleFont)}
-          />
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Typography Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="card"
+        >
+          <div className="card-header">
+            <h2 className="card-title">Tipografía</h2>
+            <p className="card-description">Elige las fuentes para tu menú</p>
+          </div>
+          <div className="card-body">
+            <div className="form-group">
+              <FontSelector
+                id="titleFont"
+                label="Tipografía del título"
+                value={titleFont}
+                onChange={(e) => handleFontChange(e, setTitleFont)}
+              />
 
-          <FontSelector
-            id="bodyFont"
-            label="Tipografía cuerpos de texto"
-            value={bodyFont}
-            onChange={(e) => handleFontChange(e, setBodyFont)}
-          />
+              <FontSelector
+                id="bodyFont"
+                label="Tipografía cuerpos de texto"
+                value={bodyFont}
+                onChange={(e) => handleFontChange(e, setBodyFont)}
+              />
 
-          <FontSelector
-            id="buttonFont"
-            label="Tipografía botones"
-            value={buttonFont}
-            onChange={(e) => handleFontChange(e, setButtonFont)}
-          />
+              <FontSelector
+                id="buttonFont"
+                label="Tipografía botones"
+                value={buttonFont}
+                onChange={(e) => handleFontChange(e, setButtonFont)}
+              />
+            </div>
+          </div>
+        </motion.div>
 
-          <div className="sm:col-span-6">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6">
+        {/* Colors Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="card"
+        >
+          <div className="card-header">
+            <h2 className="card-title">Colores</h2>
+            <p className="card-description">Define los colores principales de tu menú</p>
+          </div>
+          <div className="card-body">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <ColorPicker
                 id="primaryColor"
                 label="Color del fondo"
@@ -238,29 +280,98 @@ export default function Apariencia() {
               />
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
 
-      <div className="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
-        <button type="button" className="w-full sm:w-auto text-sm font-semibold leading-6 text-gray-900">
-          Cancelar
-        </button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          type="submit"
-          className="w-full sm:w-auto rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
-          disabled={isLoading}
+        {/* Preview Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.3 }}
+          className="card"
         >
-          {isLoading ? 'Guardando...' : 'Guardar'}
-        </motion.button>
-      </div>
+          <div className="card-header">
+            <h2 className="card-title">Vista previa</h2>
+            <p className="card-description">Así se verá tu menú con los estilos seleccionados</p>
+          </div>
+          <div className="card-body">
+            <div
+              className="p-6 rounded-lg"
+              style={{ backgroundColor: primaryColor }}
+            >
+              <h3
+                className="text-2xl font-bold mb-2"
+                style={{ fontFamily: titleFont, color: secondaryColor }}
+              >
+                Nombre del Negocio
+              </h3>
+              <p
+                className="mb-4"
+                style={{ fontFamily: bodyFont, color: secondaryColor }}
+              >
+                Esta es una descripción de ejemplo para ver cómo se verá el texto en tu menú.
+              </p>
+              <button
+                type="button"
+                className="px-4 py-2 rounded-lg"
+                style={{
+                  fontFamily: buttonFont,
+                  backgroundColor: secondaryColor,
+                  color: primaryColor
+                }}
+              >
+                Botón de ejemplo
+              </button>
+            </div>
+          </div>
+        </motion.div>
 
-      {message && (
-        <p className={`mt-2 text-sm ${message.includes('error') ? 'text-red-600' : 'text-green-600'}`}>
-          {message}
-        </p>
-      )}
-    </form>
+        {/* Message Alert */}
+        {message && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`alert ${message.includes('error') || message.includes('Error') ? 'alert-error' : 'alert-success'}`}
+          >
+            <svg className="alert-icon" viewBox="0 0 20 20" fill="currentColor">
+              {message.includes('error') || message.includes('Error') ? (
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              ) : (
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              )}
+            </svg>
+            <div className="alert-content">{message}</div>
+          </motion.div>
+        )}
+
+        {/* Form Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+          className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-4"
+        >
+          <button type="button" className="btn-ghost w-full sm:w-auto">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className="btn-primary w-full sm:w-auto"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Guardando...
+              </>
+            ) : (
+              'Guardar'
+            )}
+          </button>
+        </motion.div>
+      </form>
+    </div>
   );
 }

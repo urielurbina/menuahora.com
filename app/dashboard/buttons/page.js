@@ -3,7 +3,7 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import * as FaIcons from 'react-icons/fa'
 
 export default function Buttons() {
@@ -39,7 +39,7 @@ export default function Buttons() {
   }
 
   const updateLink = (id, field, value) => {
-    setLinks(links.map(link => 
+    setLinks(links.map(link =>
       link.id === id ? { ...link, [field]: value } : link
     ))
   }
@@ -49,7 +49,7 @@ export default function Buttons() {
   }
 
   const toggleLinkActive = (id) => {
-    setLinks(links.map(link => 
+    setLinks(links.map(link =>
       link.id === id ? { ...link, isActive: !link.isActive } : link
     ))
   }
@@ -84,54 +84,71 @@ export default function Buttons() {
     ]
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white p-6 rounded-lg max-w-md w-full">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">Selecciona un icono</h3>
-            <button onClick={closeIconModal} className="text-gray-500 hover:text-gray-700">
-              <FaIcons.FaTimes />
-            </button>
-          </div>
-          <div className="grid grid-cols-4 gap-4">
-            {icons.map((icon) => (
-              <button
-                key={icon.value}
-                className="p-2 hover:bg-gray-100 rounded flex items-center justify-center"
-                onClick={() => {
-                  updateLink(currentEditingLink, 'icon', icon.value)
-                  closeIconModal()
-                }}
+      <AnimatePresence>
+        {isIconModalOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="modal-backdrop"
+              onClick={closeIconModal}
+            />
+            <div className="modal-container">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="modal-panel"
               >
-                <icon.icon className="w-6 h-6" />
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+                <div className="modal-header">
+                  <h3 className="modal-title">Selecciona un icono</h3>
+                  <button onClick={closeIconModal} className="modal-close">
+                    <FaIcons.FaTimes className="w-5 h-5" />
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <div className="grid grid-cols-5 gap-3">
+                    {icons.map((icon) => (
+                      <button
+                        key={icon.value}
+                        type="button"
+                        className="p-3 hover:bg-gray-100 rounded-lg flex items-center justify-center transition-colors border border-transparent hover:border-gray-200"
+                        onClick={() => {
+                          updateLink(currentEditingLink, 'icon', icon.value)
+                          closeIconModal()
+                        }}
+                      >
+                        <icon.icon className="w-6 h-6 text-gray-600" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </>
+        )}
+      </AnimatePresence>
     )
   }
 
-  const Switch = ({ isOn, onToggle }) => {
+  const Toggle = ({ isOn, onToggle }) => {
     return (
       <button
+        type="button"
         onClick={onToggle}
-        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 ${
-            isOn ? 'bg-[#0D654A]' : 'bg-gray-200'
-        }`}
+        className={`toggle ${isOn ? 'active' : ''}`}
       >
         <span className="sr-only">Activar enlace</span>
-        <span
-          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-            isOn ? 'translate-x-5' : 'translate-x-0'
-          }`}
-        />
+        <span className="toggle-knob" />
       </button>
-    );
-  };
+    )
+  }
 
   const getIconComponent = (iconName) => {
+    if (!iconName) return FaIcons.FaLink
     const pascalCase = iconName.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('')
-    return FaIcons[`Fa${pascalCase}`] || FaIcons.FaPlus
+    return FaIcons[`Fa${pascalCase}`] || FaIcons.FaLink
   }
 
   const handleSubmit = async (e) => {
@@ -174,103 +191,179 @@ export default function Buttons() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 sm:space-y-12">
-      <div className="border-b border-gray-900/10 pb-8 sm:pb-12">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">Gestiona tus Enlaces</h2>
-        <p className="mt-1 text-sm leading-6 text-gray-600">
+    <div className="space-y-6">
+      {/* Page Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="page-header"
+      >
+        <h1 className="page-title">Gestiona tus Enlaces</h1>
+        <p className="page-description">
           Añade y personaliza los enlaces que aparecerán en tu perfil.
         </p>
+      </motion.div>
 
-        <div className="mt-6 sm:mt-10 grid grid-cols-1 gap-x-4 gap-y-6 sm:gap-y-8">
-          {links.map((link, index) => (
-            <div key={link.id} className="col-span-full">
-              <div className="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-lg p-4">
-                {index === 0 && (
-                  <div className="text-sm text-[#0D654A] font-semibold mb-2">
-                    <FaIcons.FaStar className="inline mr-1" /> Este es tu link destacado
-                  </div>
-                )}
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex-grow mr-4">
-                    <input
-                      type="text"
-                      value={link.title}
-                      onChange={(e) => updateLink(link.id, 'title', e.target.value)}
-                      placeholder="Título del enlace"
-                      className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
-                    />
-                  </div>
-                  <Switch
-                    isOn={link.isActive}
-                    onToggle={() => toggleLinkActive(link.id)}
-                  />
-                </div>
-                <div className="flex items-center mb-2">
-                  <input
-                    type="text"
-                    value={link.url}
-                    onChange={(e) => updateLink(link.id, 'url', e.target.value)}
-                    placeholder="URL del enlace"
-                    className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6 mr-2"
-                  />
-                  <button
-                    onClick={() => openIconModal(link.id)}
-                    className="flex-shrink-0 rounded-md bg-white px-2.5 py-1.5 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 whitespace-nowrap"
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Links Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="card"
+        >
+          <div className="card-header">
+            <h2 className="card-title">Tus enlaces</h2>
+            <p className="card-description">El primer enlace será tu link destacado</p>
+          </div>
+          <div className="card-body">
+            <div className="space-y-4">
+              <AnimatePresence mode="popLayout">
+                {links.map((link, index) => (
+                  <motion.div
+                    key={link.id}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    layout
+                    className={`link-item ${index === 0 ? 'link-item-featured' : ''}`}
                   >
-                    {React.createElement(getIconComponent(link.icon), { className: "inline mr-2" })}
-                    {link.icon ? 'Cambiar icono' : 'Seleccionar icono'}
-                  </button>
+                    {index === 0 && (
+                      <div className="link-item-badge">
+                        <FaIcons.FaStar />
+                        Este es tu link destacado
+                      </div>
+                    )}
+
+                    <div className="link-item-row">
+                      <div className="link-item-inputs">
+                        <input
+                          type="text"
+                          value={link.title}
+                          onChange={(e) => updateLink(link.id, 'title', e.target.value)}
+                          placeholder="Título del enlace"
+                          className="form-input"
+                        />
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={link.url}
+                            onChange={(e) => updateLink(link.id, 'url', e.target.value)}
+                            placeholder="URL del enlace"
+                            className="form-input flex-1"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => openIconModal(link.id)}
+                            className="btn-secondary flex-shrink-0"
+                          >
+                            {React.createElement(getIconComponent(link.icon), { className: "w-4 h-4" })}
+                            <span className="hidden sm:inline">
+                              {link.icon ? 'Cambiar' : 'Icono'}
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                      <Toggle
+                        isOn={link.isActive}
+                        onToggle={() => toggleLinkActive(link.id)}
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                      <button
+                        type="button"
+                        onClick={() => removeLink(link.id)}
+                        className="text-sm text-red-600 hover:text-red-700 flex items-center gap-1.5 transition-colors"
+                      >
+                        <FaIcons.FaTrash className="w-3 h-3" />
+                        Eliminar
+                      </button>
+                      <span className={`text-xs ${link.isActive ? 'text-green-600' : 'text-gray-400'}`}>
+                        {link.isActive ? 'Activo' : 'Inactivo'}
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {links.length === 0 && (
+                <div className="text-center py-8">
+                  <FaIcons.FaLink className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+                  <p className="text-gray-500 text-sm">No tienes enlaces aún</p>
+                  <p className="text-gray-400 text-xs">Añade tu primer enlace para comenzar</p>
                 </div>
-                <button
-                  onClick={() => removeLink(link.id)}
-                  className="text-sm text-red-600 hover:text-red-500"
-                >
-                  <FaIcons.FaTrash className="inline mr-1" /> Eliminar
-                </button>
-              </div>
+              )}
             </div>
-          ))}
-        </div>
 
-        <div className="mt-6">
-          <motion.button
-            onClick={addLink}
-            className="w-full sm:w-auto rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            <div className="mt-6">
+              <button
+                type="button"
+                onClick={addLink}
+                className="btn-secondary w-full sm:w-auto"
+              >
+                <FaIcons.FaPlus className="w-4 h-4" />
+                Añadir enlace
+              </button>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Icon Modal */}
+        <IconModal />
+
+        {/* Message Alert */}
+        {message && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`alert ${message.includes('error') || message.includes('Error') ? 'alert-error' : 'alert-success'}`}
           >
-            <FaIcons.FaPlus className="inline mr-2" />
-            Añadir enlace
-          </motion.button>
-        </div>
-      </div>
+            <svg className="alert-icon" viewBox="0 0 20 20" fill="currentColor">
+              {message.includes('error') || message.includes('Error') ? (
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              ) : (
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              )}
+            </svg>
+            <div className="alert-content">{message}</div>
+          </motion.div>
+        )}
 
-      {isIconModalOpen && <IconModal />}
-
-      <div className="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
-        <button
-          type="button"
-          className="w-full sm:w-auto text-sm font-semibold leading-6 text-gray-900"
-          onClick={() => fetchButtonsData()}
+        {/* Form Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-4"
         >
-          Cancelar
-        </button>
-        <motion.button
-          type="submit"
-          className="w-full sm:w-auto rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          disabled={isLoading}
-        >
-          {isLoading ? 'Guardando...' : 'Guardar'}
-        </motion.button>
-      </div>
-
-      {message && (
-        <p className={`mt-2 text-sm ${message.includes('error') ? 'text-red-600' : 'text-green-600'}`}>
-          {message}
-        </p>
-      )}
-    </form>
+          <button
+            type="button"
+            className="btn-ghost w-full sm:w-auto"
+            onClick={() => fetchButtonsData()}
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className="btn-primary w-full sm:w-auto"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Guardando...
+              </>
+            ) : (
+              'Guardar'
+            )}
+          </button>
+        </motion.div>
+      </form>
+    </div>
   )
 }

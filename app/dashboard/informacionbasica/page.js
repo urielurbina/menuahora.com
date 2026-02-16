@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
+import { motion } from 'framer-motion';
 import Select from 'react-select';
 import { PhotoIcon, UserCircleIcon } from '@heroicons/react/24/solid'
 import { Cloudinary } from "@cloudinary/url-gen";
@@ -57,21 +58,21 @@ export default function InformacionBasica() {
       console.log('Iniciando fetch de información básica...');
       const response = await fetch('/api/get-basic-info');
       console.log('Respuesta recibida:', response.status, response.ok);
-      
+
       if (response.ok) {
         const data = await response.json();
         console.log('Datos recibidos:', data);
-        
+
         // Verificar que los datos existan antes de usarlos
         const basicInfo = data['basic-info'] || {};
-        
+
         setFormData(prevData => ({
           ...prevData,
           ...basicInfo,
           contact: { ...prevData.contact, ...(basicInfo.contact || {}) },
           schedule: { ...prevData.schedule, ...(basicInfo.schedule || {}) }
         }));
-        
+
         // Actualizar previewImage si es necesario
         if (basicInfo.logoUrl) {
           setPreviewImage(prev => ({ ...prev, logo: basicInfo.logoUrl }));
@@ -168,7 +169,7 @@ export default function InformacionBasica() {
           }
 
           const imageUrl = data.url;
-          
+
           setPreviewImage(prev => ({ ...prev, [type]: imageUrl }));
           setFormData(prevData => ({
             ...prevData,
@@ -303,316 +304,379 @@ export default function InformacionBasica() {
 
   const timeOptions = generateTimeOptions();
 
-  const customStyles = {
-    control: (provided) => ({
+  const selectStyles = {
+    control: (provided, state) => ({
       ...provided,
       minWidth: '100px',
-      margin: '0',
       fontSize: '0.875rem',
+      borderColor: state.isFocused ? 'var(--brand-primary)' : 'var(--gray-300)',
+      boxShadow: state.isFocused ? '0 0 0 2px var(--brand-primary-light)' : 'none',
+      '&:hover': {
+        borderColor: 'var(--brand-primary)',
+      },
     }),
     menu: (provided) => ({
       ...provided,
       minWidth: '100px',
+      zIndex: 50,
     }),
-    container: (provided) => ({
+    option: (provided, state) => ({
       ...provided,
-      width: '100%',
-      '@media (min-width: 640px)': {
-        width: 'auto',
-      },
+      backgroundColor: state.isSelected ? 'var(--brand-primary)' : state.isFocused ? 'var(--brand-primary-light)' : 'white',
+      color: state.isSelected ? 'white' : 'var(--gray-900)',
+      fontSize: '0.875rem',
     }),
-  };
-
-  const handleOptionalFieldToggle = (field) => {
-    setFormData(prevData => ({
-      ...prevData,
-      [`has${field.charAt(0).toUpperCase() + field.slice(1)}`]: !prevData[`has${field.charAt(0).toUpperCase() + field.slice(1)}`]
-    }));
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="border-b border-gray-900/10 pb-8">
-        <h2 className="text-2xl font-bold text-gray-900">Información básica</h2>
-        <p className="mt-1 text-sm leading-6 text-gray-600">
+    <div className="space-y-6">
+      {/* Page Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="page-header"
+      >
+        <h1 className="page-title">Información básica</h1>
+        <p className="page-description">
           Esta información será mostrada públicamente, así que ten cuidado con lo que compartes.
         </p>
+      </motion.div>
 
-        <div className="mt-6 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
-          <div className="col-span-full sm:col-span-4">
-            <label htmlFor="businessName" className="block text-sm font-medium leading-6 text-gray-900">
-              Nombre del negocio
-            </label>
-            <div className="mt-2">
-              <input
-                type="text"
-                id="businessName"
-                name="businessName"
-                value={formData.businessName}
-                onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
-                placeholder="Tu negocio"
-              />
-            </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Business Info Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="card"
+        >
+          <div className="card-header">
+            <h2 className="card-title">Datos del negocio</h2>
+            <p className="card-description">Información principal que verán tus clientes</p>
           </div>
+          <div className="card-body">
+            <div className="form-group">
+              <div className="form-field">
+                <label htmlFor="businessName" className="form-label">
+                  Nombre del negocio
+                </label>
+                <input
+                  type="text"
+                  id="businessName"
+                  name="businessName"
+                  value={formData.businessName}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Tu negocio"
+                />
+              </div>
 
-          <div className="col-span-full sm:col-span-4">
-            <label htmlFor="slogan" className="block text-sm font-medium leading-6 text-gray-900">
-              Slogan
-            </label>
-            <div className="mt-2">
-              <input
-                type="text"
-                id="slogan"
-                name="slogan"
-                value={formData.slogan}
-                onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
-                placeholder="Tu slogan aquí"
-              />
-            </div>
-          </div>
+              <div className="form-field">
+                <label htmlFor="slogan" className="form-label">
+                  Slogan
+                </label>
+                <input
+                  type="text"
+                  id="slogan"
+                  name="slogan"
+                  value={formData.slogan}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Tu slogan aquí"
+                />
+              </div>
 
-          <div className="col-span-full">
-            <label htmlFor="description" className="block text-sm font-medium leading-6 text-gray-900">
-              Descripción general
-            </label>
-            <div className="mt-2">
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                maxLength={200}
-                rows={3}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
-                placeholder="Breve descripción de tu negocio"
-              />
-            </div>
-            <p className="mt-3 text-sm leading-6 text-gray-600">Máximo 200 caracteres.</p>
-          </div>
-
-          <div className="col-span-full">
-            <label htmlFor="logoFile" className="block text-sm font-medium leading-6 text-gray-900">
-              Logotipo
-            </label>
-            <div 
-              className={`mt-2 flex justify-center rounded-lg border border-dashed ${dragActive.logo ? 'border-[#0D654A]' : 'border-gray-900/25'} px-6 py-10`}
-              onDragEnter={(e) => handleDrag(e, 'logo')}
-              onDragLeave={(e) => handleDrag(e, 'logo')}
-              onDragOver={(e) => handleDrag(e, 'logo')}
-              onDrop={(e) => handleDrop(e, 'logo')}
-            >
-              <div className="text-center">
-                {previewImage.logo ? (
-                  <img src={previewImage.logo} alt="Logo Preview" className="mx-auto h-32 w-32 object-cover" />
-                ) : (
-                  <UserCircleIcon className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
-                )}
-                <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                  <label
-                    htmlFor="logoFile"
-                    className="relative cursor-pointer rounded-md bg-white font-semibold text-[#0D654A] focus-within:outline-none focus-within:ring-2 focus-within:ring-[#0D654A] focus-within:ring-offset-2 hover:text-[#0D654A]"
-                  >
-                    <span>Sube un archivo</span>
-                    <input 
-                      id="logoFile" 
-                      name="logoFile" 
-                      type="file" 
-                      className="sr-only" 
-                      onChange={(e) => handleFiles(e.target.files, 'logo')}
-                      accept=".jpg,.jpeg,.png"
-                    />
-                  </label>
-                  <p className="pl-1">o arrastra y suelta</p>
-                </div>
-                <p className="text-xs leading-5 text-gray-600">PNG, JPG hasta 10MB</p>
+              <div className="form-field">
+                <label htmlFor="description" className="form-label">
+                  Descripción general
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  maxLength={200}
+                  rows={3}
+                  className="form-input"
+                  placeholder="Breve descripción de tu negocio"
+                />
+                <p className="form-hint">Máximo 200 caracteres.</p>
               </div>
             </div>
           </div>
+        </motion.div>
 
-          <div className="col-span-full">
-            <label htmlFor="coverFile" className="block text-sm font-medium leading-6 text-gray-900">
-              Foto de portada
-            </label>
-            <div 
-              className={`mt-2 flex justify-center rounded-lg border border-dashed ${dragActive.cover ? 'border-[#0D654A]' : 'border-gray-900/25'} px-6 py-10`}
-              onDragEnter={(e) => handleDrag(e, 'cover')}
-              onDragLeave={(e) => handleDrag(e, 'cover')}
-              onDragOver={(e) => handleDrag(e, 'cover')}
-              onDrop={(e) => handleDrop(e, 'cover')}
-            >
-              <div className="text-center">
-                {previewImage.cover ? (
-                  <img src={previewImage.cover} alt="Cover Preview" className="mx-auto h-32 w-full object-cover" />
-                ) : (
-                  <PhotoIcon className="mx-auto h-12 w-12 text-gray-300" aria-hidden="true" />
-                )}
-                <div className="mt-4 flex text-sm leading-6 text-gray-600">
-                  <label
-                    htmlFor="coverFile"
-                    className="relative cursor-pointer rounded-md bg-white font-semibold text-[#0D654A] focus-within:outline-none focus-within:ring-2 focus-within:ring-[#0D654A] focus-within:ring-offset-2 hover:text-[#0D654A]"
-                  >
-                    <span>Sube un archivo</span>
-                    <input 
-                      id="coverFile" 
-                      name="coverFile" 
-                      type="file" 
-                      className="sr-only" 
-                      onChange={(e) => handleFiles(e.target.files, 'cover')}
-                      accept=".jpg,.jpeg,.png"
-                    />
-                  </label>
-                  <p className="pl-1">o arrastra y suelta</p>
+        {/* Images Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.2 }}
+          className="card"
+        >
+          <div className="card-header">
+            <h2 className="card-title">Imágenes</h2>
+            <p className="card-description">Logotipo y foto de portada de tu negocio</p>
+          </div>
+          <div className="card-body">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Logo Upload */}
+              <div className="form-field">
+                <label className="form-label">Logotipo</label>
+                <div
+                  className={`file-upload-zone ${dragActive.logo ? 'dragging' : ''}`}
+                  onDragEnter={(e) => handleDrag(e, 'logo')}
+                  onDragLeave={(e) => handleDrag(e, 'logo')}
+                  onDragOver={(e) => handleDrag(e, 'logo')}
+                  onDrop={(e) => handleDrop(e, 'logo')}
+                >
+                  {previewImage.logo ? (
+                    <div className="file-preview">
+                      <img src={previewImage.logo} alt="Logo Preview" />
+                    </div>
+                  ) : (
+                    <UserCircleIcon className="file-upload-icon" aria-hidden="true" />
+                  )}
+                  <div className="file-upload-text mt-3">
+                    <label htmlFor="logoFile" className="cursor-pointer">
+                      <strong>Sube un archivo</strong>
+                      <span className="text-gray-500"> o arrastra y suelta</span>
+                      <input
+                        id="logoFile"
+                        name="logoFile"
+                        type="file"
+                        className="sr-only"
+                        onChange={(e) => handleFiles(e.target.files, 'logo')}
+                        accept=".jpg,.jpeg,.png"
+                      />
+                    </label>
+                  </div>
+                  <p className="file-upload-hint">PNG, JPG hasta 10MB</p>
                 </div>
-                <p className="text-xs leading-5 text-gray-600">PNG, JPG hasta 10MB</p>
+              </div>
+
+              {/* Cover Photo Upload */}
+              <div className="form-field">
+                <label className="form-label">Foto de portada</label>
+                <div
+                  className={`file-upload-zone ${dragActive.cover ? 'dragging' : ''}`}
+                  onDragEnter={(e) => handleDrag(e, 'cover')}
+                  onDragLeave={(e) => handleDrag(e, 'cover')}
+                  onDragOver={(e) => handleDrag(e, 'cover')}
+                  onDrop={(e) => handleDrop(e, 'cover')}
+                >
+                  {previewImage.cover ? (
+                    <img src={previewImage.cover} alt="Cover Preview" className="h-24 w-full object-cover rounded-lg" />
+                  ) : (
+                    <PhotoIcon className="file-upload-icon" aria-hidden="true" />
+                  )}
+                  <div className="file-upload-text mt-3">
+                    <label htmlFor="coverFile" className="cursor-pointer">
+                      <strong>Sube un archivo</strong>
+                      <span className="text-gray-500"> o arrastra y suelta</span>
+                      <input
+                        id="coverFile"
+                        name="coverFile"
+                        type="file"
+                        className="sr-only"
+                        onChange={(e) => handleFiles(e.target.files, 'cover')}
+                        accept=".jpg,.jpeg,.png"
+                      />
+                    </label>
+                  </div>
+                  <p className="file-upload-hint">PNG, JPG hasta 10MB</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
 
-      <div className="border-b border-gray-900/10 pb-8">
-        <h2 className="text-xl font-semibold leading-7 text-gray-900">Información de contacto</h2>
-        <p className="mt-1 text-sm leading-6 text-gray-600">Usa información de contacto donde puedas ser localizado.</p>
+        {/* Contact Info Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.3 }}
+          className="card"
+        >
+          <div className="card-header">
+            <h2 className="card-title">Información de contacto</h2>
+            <p className="card-description">Usa información de contacto donde puedas ser localizado</p>
+          </div>
+          <div className="card-body">
+            <div className="form-group">
+              <div className="form-field">
+                <label htmlFor="contact.address" className="form-label">
+                  Dirección <span className="form-label-optional">(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  id="contact.address"
+                  name="contact.address"
+                  value={formData.contact.address}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Ingresa la dirección de tu negocio"
+                />
+              </div>
 
-        <div className="mt-6 space-y-6 sm:space-y-8">
-          <div className="sm:col-span-3">
-            <label htmlFor="contact.address" className="block text-sm font-medium leading-6 text-gray-900">
-              Dirección <span className="text-gray-500">(opcional)</span>
-            </label>
-            <div className="mt-2">
-              <input
-                type="text"
-                id="contact.address"
-                name="contact.address"
-                value={formData.contact.address}
-                onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
-                placeholder="Ingresa la dirección de tu negocio"
-              />
+              <div className="form-field">
+                <label htmlFor="contact.whatsappNumber" className="form-label">
+                  Número de WhatsApp para pedidos
+                </label>
+                <input
+                  type="tel"
+                  id="contact.whatsappNumber"
+                  name="contact.whatsappNumber"
+                  value={formData.contact.whatsappNumber}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="Ejemplo: +525512345678"
+                />
+                <p className="form-hint">
+                  Ingresa el número con código de país (ejemplo: +52 para México)
+                </p>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="contact.facebookLink" className="form-label">
+                  Enlace de Facebook <span className="form-label-optional">(opcional)</span>
+                </label>
+                <input
+                  type="url"
+                  id="contact.facebookLink"
+                  name="contact.facebookLink"
+                  value={formData.contact.facebookLink}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="https://www.facebook.com/tu-pagina"
+                />
+              </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Schedule Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.4 }}
+          className="card"
+        >
+          <div className="card-header">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="card-title">Horario de atención</h2>
+                <p className="card-description">Configura los días y horas de apertura</p>
+              </div>
+              <label className="flex items-center gap-3 cursor-pointer">
+                <span className="text-sm font-medium text-gray-700">Activar</span>
+                <button
+                  type="button"
+                  onClick={() => handleScheduleToggle({ target: { checked: !formData.schedule.enabled } })}
+                  className={`toggle ${formData.schedule.enabled ? 'active' : ''}`}
+                >
+                  <span className="toggle-knob" />
+                </button>
+              </label>
             </div>
           </div>
 
-          <div className="sm:col-span-3">
-            <label htmlFor="contact.whatsappNumber" className="block text-sm font-medium leading-6 text-gray-900">
-              Número de WhatsApp para pedidos
-            </label>
-            <div className="mt-2">
-              <input
-                type="tel"
-                id="contact.whatsappNumber"
-                name="contact.whatsappNumber"
-                value={formData.contact.whatsappNumber}
-                onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
-                placeholder="Ejemplo: +525512345678"
-              />
-            </div>
-            <p className="mt-1 text-sm text-gray-500">
-              Ingresa el número con código de país (ejemplo: +52 para México)
-            </p>
-          </div>
-
-          <div className="sm:col-span-3">
-            <label htmlFor="contact.facebookLink" className="block text-sm font-medium leading-6 text-gray-900">
-              Enlace de Facebook <span className="text-gray-500">(opcional)</span>
-            </label>
-            <div className="mt-2">
-              <input
-                type="url"
-                id="contact.facebookLink"
-                name="contact.facebookLink"
-                value={formData.contact.facebookLink}
-                onChange={handleChange}
-                className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
-                placeholder="https://www.facebook.com/tu-pagina"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sección de horario (opcional) */}
-      <div className="border-b border-gray-900/10 pb-8">
-        <div className="flex items-center mb-4">
-          <input
-            type="checkbox"
-            id="schedule.enabled"
-            checked={formData.schedule.enabled}
-            onChange={handleScheduleToggle}
-            className="h-4 w-4 rounded border-gray-300 text-[#0D654A] focus:ring-[#0D654A]"
-          />
-          <label htmlFor="schedule.enabled" className="ml-2 block text-sm font-medium leading-6 text-gray-900">
-            ¿Deseas agregar un horario de atención?
-          </label>
-        </div>
-        
-        {formData.schedule.enabled && (
-          <div className="mt-10 space-y-10">
-            <fieldset>
-              <legend className="text-sm font-semibold leading-6 text-gray-900">Horario de atención</legend>
-              <div className="mt-6 space-y-6">
+          {formData.schedule.enabled && (
+            <div className="card-body">
+              <div className="schedule-grid">
                 {Object.entries(formData.schedule.days).map(([day, hours]) => (
-                  <div key={day} className="flex flex-col sm:flex-row sm:items-center gap-y-2 sm:gap-x-3">
-                    <div className="flex items-center">
+                  <div key={day} className="schedule-row">
+                    <div className="schedule-day">
                       <input
                         type="checkbox"
                         checked={!hours.isClosed}
                         onChange={(e) => handleScheduleChange(day, 'isClosed', !e.target.checked)}
-                        className="h-4 w-4 rounded border-gray-300 text-[#0D654A] focus:ring-[#0D654A]"
+                        className="form-checkbox"
                       />
-                      <label className="ml-2 block text-sm font-medium leading-6 text-gray-900 w-24">
+                      <span className="schedule-day-name">
                         {day.charAt(0).toUpperCase() + day.slice(1)}
-                      </label>
+                      </span>
                     </div>
                     {!hours.isClosed && (
-                      <div className="flex items-center space-x-2 mt-2 sm:mt-0">
+                      <div className="schedule-times">
                         <Select
                           options={timeOptions}
                           value={{ value: hours.open, label: hours.open }}
                           onChange={(option) => handleScheduleChange(day, 'open', option.value)}
-                          styles={customStyles}
+                          styles={selectStyles}
                           isDisabled={hours.isClosed}
-                          className="w-full sm:w-auto"
+                          className="flex-1"
+                          menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                         />
-                        <span className="text-sm font-medium text-gray-700">a</span>
+                        <span className="schedule-separator">a</span>
                         <Select
                           options={timeOptions}
                           value={{ value: hours.close, label: hours.close }}
                           onChange={(option) => handleScheduleChange(day, 'close', option.value)}
-                          styles={customStyles}
+                          styles={selectStyles}
                           isDisabled={hours.isClosed}
-                          className="w-full sm:w-auto"
+                          className="flex-1"
+                          menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
                         />
                       </div>
+                    )}
+                    {hours.isClosed && (
+                      <span className="text-sm text-gray-400 italic">Cerrado</span>
                     )}
                   </div>
                 ))}
               </div>
-            </fieldset>
-          </div>
+            </div>
+          )}
+        </motion.div>
+
+        {/* Message Alert */}
+        {message && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`alert ${message.includes('error') || message.includes('Error') ? 'alert-error' : 'alert-success'}`}
+          >
+            <svg className="alert-icon" viewBox="0 0 20 20" fill="currentColor">
+              {message.includes('error') || message.includes('Error') ? (
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              ) : (
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              )}
+            </svg>
+            <div className="alert-content">{message}</div>
+          </motion.div>
         )}
-      </div>
 
-      <div className="mt-6 flex flex-col sm:flex-row items-center justify-end gap-3">
-        <button type="button" className="w-full sm:w-auto text-sm font-semibold leading-6 text-gray-900">
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          className="w-full sm:w-auto rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
-          disabled={isLoading}
+        {/* Form Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.5 }}
+          className="flex flex-col sm:flex-row items-center justify-end gap-3 pt-4"
         >
-          {isLoading ? 'Guardando...' : 'Guardar información'}
-        </button>
-      </div>
-
-      {message && (
-        <p className={`mt-2 text-sm ${message.includes('error') ? 'text-red-600' : 'text-green-600'}`}>
-          {message}
-        </p>
-      )}
-    </form>
+          <button type="button" className="btn-ghost w-full sm:w-auto">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            className="btn-primary w-full sm:w-auto"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Guardando...
+              </>
+            ) : (
+              'Guardar información'
+            )}
+          </button>
+        </motion.div>
+      </form>
+    </div>
   );
 }

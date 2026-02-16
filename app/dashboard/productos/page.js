@@ -5,6 +5,7 @@ import { Plus, X, Edit2, Copy, GripVertical, ChevronDown, ChevronRight, Check } 
 import { useDropzone } from 'react-dropzone'
 import Image from 'next/image'
 import { toast } from 'react-hot-toast'
+import { motion } from 'framer-motion'
 import {
   DndContext,
   closestCenter,
@@ -174,168 +175,104 @@ function SortableProductCard({ product, onEdit, onDuplicate, onDelete }) {
   }
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-gray-50 shadow rounded-lg overflow-hidden">
-      <div className="p-3 sm:p-4">
-        {/* Layout móvil - vertical */}
-        <div className="block sm:hidden">
-          <div className="flex items-start gap-3 mb-3">
-            {/* Drag Handle */}
-            <div
-              {...attributes}
-              {...listeners}
-              className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0 mt-1"
-              title="Arrastrar para reordenar"
-            >
-              <GripVertical className="h-4 w-4 text-gray-500" />
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors group"
+    >
+      <div className="flex items-center gap-3 p-3">
+        {/* Drag Handle */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing p-1.5 hover:bg-gray-100 rounded transition-colors flex-shrink-0 opacity-40 group-hover:opacity-100"
+          title="Arrastrar para reordenar"
+        >
+          <GripVertical className="h-4 w-4 text-gray-400" />
+        </div>
+
+        {/* Imagen */}
+        <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+          {product.imagen ? (
+            <Image
+              src={product.imagen}
+              alt={product.nombre}
+              width={56}
+              height={56}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-300">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
             </div>
+          )}
+        </div>
 
-            {/* Imagen */}
-            {product.imagen && (
-              <div className="w-16 h-16 flex-shrink-0 rounded-md overflow-hidden">
-                <Image
-                  src={product.imagen}
-                  alt={product.nombre}
-                  width={64}
-                  height={64}
-                  objectFit="cover"
-                />
-              </div>
-            )}
-
-            {/* Información principal */}
-            <div className="flex-grow min-w-0">
-              <h3 className="font-bold text-base text-gray-800 mb-1 truncate">{product.nombre}</h3>
-              <div className="flex items-center gap-2 mb-2">
+        {/* Información del producto */}
+        <div className="flex-grow min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <h3 className="font-semibold text-gray-900 truncate text-sm sm:text-base">{product.nombre}</h3>
+              <div className="flex items-center gap-2 mt-0.5">
                 {product.precioPromocion > 0 ? (
                   <>
-                    <p className="text-gray-800 font-bold text-base">${product.precioPromocion}</p>
-                    <p className="text-gray-500 line-through text-sm">${product.precio}</p>
+                    <span className="font-bold text-gray-900">${product.precioPromocion}</span>
+                    <span className="text-gray-400 line-through text-sm">${product.precio}</span>
                   </>
                 ) : (
-                  <p className="text-gray-800 font-bold text-base">${product.precio}</p>
+                  <span className="font-bold text-gray-900">${product.precio}</span>
                 )}
+                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
+                  product.availability
+                    ? 'bg-green-50 text-green-700'
+                    : 'bg-red-50 text-red-700'
+                }`}>
+                  {product.availability ? 'Disponible' : 'Agotado'}
+                </span>
               </div>
-              <p className={`text-xs ${product.availability ? 'text-green-600' : 'text-red-600'} mb-2`}>
-                {product.availability ? 'Disponible' : 'No disponible'}
-              </p>
             </div>
           </div>
 
-          {/* Descripción */}
-          <p className="text-gray-600 text-sm mb-2 line-clamp-2">{product.descripcion}</p>
-
-          {/* Categorías */}
+          {/* Categorías - solo mostrar si hay */}
           {product.categorias && product.categorias.length > 0 && (
-            <div className="flex flex-wrap gap-1 mb-3">
-              {product.categorias.map((categoria, index) => (
-                <span key={index} className="inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700">
+            <div className="flex flex-wrap gap-1 mt-1.5">
+              {product.categorias.slice(0, 3).map((categoria, index) => (
+                <span key={index} className="inline-block bg-gray-100 rounded px-1.5 py-0.5 text-xs text-gray-600">
                   {categoria}
                 </span>
               ))}
-            </div>
-          )}
-
-          {/* Botones en móvil - horizontal */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => onEdit(product)}
-              className="flex-1 px-3 py-2 bg-[#0D654A] text-white rounded-md hover:bg-[#0D654A] focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow duration-300 text-sm"
-            >
-              <Edit2 className="mr-1 h-3 w-3" />
-              <span>Editar</span>
-            </button>
-            <button
-              onClick={() => onDuplicate(product)}
-              className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow duration-300 text-sm"
-            >
-              <Copy className="h-3 w-3" />
-            </button>
-            <button
-              onClick={() => onDelete(product)}
-              className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow duration-300 text-sm"
-            >
-              <X className="h-3 w-3" />
-            </button>
-          </div>
-        </div>
-
-        {/* Layout desktop - horizontal */}
-        <div className="hidden sm:flex items-center gap-4">
-          {/* Drag Handle */}
-          <div
-            {...attributes}
-            {...listeners}
-            className="cursor-grab active:cursor-grabbing p-2 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
-            title="Arrastrar para reordenar"
-          >
-            <GripVertical className="h-5 w-5 text-gray-500" />
-          </div>
-
-          {/* Imagen */}
-          {product.imagen && (
-            <div className="w-20 h-20 flex-shrink-0 rounded-md overflow-hidden">
-              <Image
-                src={product.imagen}
-                alt={product.nombre}
-                width={80}
-                height={80}
-                objectFit="cover"
-              />
-            </div>
-          )}
-
-          {/* Información del producto */}
-          <div className="flex-grow min-w-0">
-            <h3 className="font-bold text-lg text-gray-800 mb-2 truncate">{product.nombre}</h3>
-            <div className="flex items-center gap-2 mb-2">
-              {product.precioPromocion > 0 ? (
-                <>
-                  <p className="text-gray-800 font-bold text-lg">${product.precioPromocion}</p>
-                  <p className="text-gray-500 line-through text-sm">${product.precio}</p>
-                </>
-              ) : (
-                <p className="text-gray-800 font-bold text-lg">${product.precio}</p>
+              {product.categorias.length > 3 && (
+                <span className="text-xs text-gray-400">+{product.categorias.length - 3}</span>
               )}
             </div>
-            <p className="text-gray-600 text-sm mb-2 line-clamp-2">{product.descripcion}</p>
-            {product.categorias && product.categorias.length > 0 && (
-              <div className="flex flex-wrap gap-1 mb-2">
-                {product.categorias.map((categoria, index) => (
-                  <span key={index} className="inline-block bg-gray-200 rounded-full px-2 py-1 text-xs font-semibold text-gray-700">
-                    {categoria}
-                  </span>
-                ))}
-              </div>
-            )}
-            <p className={`text-sm ${product.availability ? 'text-green-600' : 'text-red-600'}`}>
-              {product.availability ? 'Disponible' : 'No disponible'}
-            </p>
-          </div>
+          )}
+        </div>
 
-          {/* Botones de acción desktop */}
-          <div className="flex flex-col gap-2 flex-shrink-0">
-            <button
-              onClick={() => onEdit(product)}
-              className="px-3 py-1 bg-[#0D654A] text-white rounded-md hover:bg-[#0D654A] focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:ring-offset-2 flex items-center justify-center shadow-sm hover:shadow-md transition-shadow duration-300"
-            >
-              <Edit2 className="mr-1 h-4 w-4" />
-              <span>Editar</span>
-            </button>
-            <div className="flex gap-2">
-              <button
-                onClick={() => onDuplicate(product)}
-                className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
-              >
-                <Copy className="mr-1 h-4 w-4" /> Duplicar
-              </button>
-              <button
-                onClick={() => onDelete(product)}
-                className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center shadow-sm hover:shadow-md transition-shadow duration-300"
-              >
-                <X className="mr-1 h-4 w-4" /> Eliminar
-              </button>
-            </div>
-          </div>
+        {/* Botones de acción - compactos */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <button
+            onClick={() => onEdit(product)}
+            className="p-2 text-gray-500 hover:text-[#0D654A] hover:bg-green-50 rounded-lg transition-colors"
+            title="Editar"
+          >
+            <Edit2 className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onDuplicate(product)}
+            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+            title="Duplicar"
+          >
+            <Copy className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onDelete(product)}
+            className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            title="Eliminar"
+          >
+            <X className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>
@@ -508,6 +445,11 @@ export default function ProductDashboard() {
   const [editingWholesalePrice, setEditingWholesalePrice] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [productToDelete, setProductToDelete] = useState(null)
+
+  // Estados para secciones avanzadas colapsables
+  const [showAdvancedPricing, setShowAdvancedPricing] = useState(false)
+  const [showVariants, setShowVariants] = useState(false)
+  const [showExtras, setShowExtras] = useState(false)
   
   // Estados para UI mejorada de variantes
   const [collapsedVariants, setCollapsedVariants] = useState({})
@@ -644,6 +586,10 @@ export default function ProductDashboard() {
     setSelectedVariantCategoryId(null)
     setNewWholesalePrice({ minQuantity: 0, discount: 0 })
     setEditingWholesalePrice(null)
+    // Reset collapsible sections
+    setShowAdvancedPricing(false)
+    setShowVariants(false)
+    setShowExtras(false)
   }
 
   const handleAddCategory = async () => {
@@ -789,6 +735,11 @@ export default function ProductDashboard() {
     
     setNewProduct(productWithVariants)
     setIsAddingProduct(true)
+
+    // Auto-expand sections that have data
+    setShowAdvancedPricing(productWithVariants.wholesalePricing?.length > 0 || productWithVariants.precioPromocion > 0)
+    setShowVariants(productWithVariants.variants?.length > 0)
+    setShowExtras(productWithVariants.extras?.length > 0)
   }
 
   const handleDuplicateProduct = async (product) => {
@@ -880,7 +831,7 @@ export default function ProductDashboard() {
     }
   }
 
-  const { getRootProps, getInputProps } = useDropzone({ onDrop })
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
   // Funciones para manejar categorías de variantes
   const handleAddVariantCategory = () => {
@@ -1304,48 +1255,53 @@ export default function ProductDashboard() {
   }
 
 
-  if (error) return <div className="text-center py-10 text-red-500">{error}</div>
+  if (error) return <div className="alert alert-error">{error}</div>
 
   return (
-    <div className="container mx-auto p-4 ">
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Administrador de Productos</h1>
+    <div className="space-y-6">
+      {/* Page Header */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="page-header"
+      >
+        <h1 className="page-title">Administrador de Productos</h1>
+        <p className="page-description">Gestiona tu catálogo de productos, categorías y configuración de tarjetas.</p>
+      </motion.div>
 
       {/* Categorías e Información en Tarjeta */}
-        {/* Categorías */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Categorías</h2>
-          <p className="text-sm text-gray-600 mb-6">
-            Gestiona las categorías de tus productos.
-          </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.1 }}
+          className="card"
+        >
+          <div className="card-header">
+            <h2 className="card-title">Categorías</h2>
+            <p className="card-description">Gestiona las categorías de tus productos</p>
+          </div>
+          <div className="card-body">
           <div className="flex items-center gap-2 mb-4">
             <input
               type="text"
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
               placeholder={editingCategory ? "Editar categoría" : "Nueva categoría"}
-              className="block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#0D654A] sm:text-sm sm:leading-6"
+              className="form-input"
             />
             {editingCategory ? (
               <>
-                <button
-                  onClick={handleUpdateCategory}
-                  className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
-                >
+                <button onClick={handleUpdateCategory} className="btn-primary">
                   Actualizar
                 </button>
-                <button
-                  onClick={handleCancelEditCategory}
-                  className="rounded-md bg-gray-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-500"
-                >
+                <button onClick={handleCancelEditCategory} className="btn-secondary">
                   Cancelar
                 </button>
               </>
             ) : (
-              <button
-                onClick={handleAddCategory}
-                className="rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
-              >
+              <button onClick={handleAddCategory} className="btn-primary">
                 Agregar
               </button>
             )}
@@ -1383,69 +1339,81 @@ export default function ProductDashboard() {
               </div>
             )}
           </div>
-        </div>
+          </div>
+        </motion.div>
 
         {/* Información en Tarjeta */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Información en Tarjeta</h2>
-          <p className="text-sm text-gray-600 mb-6">
-            Configura la información que se mostrará en las tarjetas de productos.
-          </p>
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 0.15 }}
+          className="card"
+        >
+          <div className="card-header">
+            <h2 className="card-title">Información en Tarjeta</h2>
+            <p className="card-description">Configura la información que se mostrará en las tarjetas de productos</p>
+          </div>
+          <div className="card-body">
           <div className="space-y-4">
             {Object.entries(cardInfoSettings)
               .filter(([key]) => key !== 'detailedView')
               .map(([key, value]) => (
                 <div key={key} className="flex items-center justify-between">
                   <span className="text-sm font-medium text-gray-700 capitalize">{key}</span>
-                  <label className="relative inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={value}
-                      onChange={(e) => handleCardInfoSettingChange(key, e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D654A]"></div>
-                  </label>
+                  <button
+                    type="button"
+                    onClick={() => handleCardInfoSettingChange(key, !value)}
+                    className={`toggle ${value ? 'active' : ''}`}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
                 </div>
               ))}
             <div className="pt-4 border-t border-gray-200">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">Vista detallada</span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="sr-only peer"
-                    checked={cardInfoSettings.detailedView}
-                    onChange={(e) => handleCardInfoSettingChange('detailedView', e.target.checked)}
-                  />
-                  <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-300 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0D654A]"></div>
-                </label>
+                <button
+                  type="button"
+                  onClick={() => handleCardInfoSettingChange('detailedView', !cardInfoSettings.detailedView)}
+                  className={`toggle ${cardInfoSettings.detailedView ? 'active' : ''}`}
+                >
+                  <span className="toggle-knob" />
+                </button>
               </div>
             </div>
           </div>
-        </div>
+          </div>
+        </motion.div>
       </div>
 
       {/* Agregar Producto y Lista de Productos */}
-      <div className="bg-white shadow rounded-lg p-3 mt-4 sm:mt-6 sm:p-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2 sm:mb-0">Productos</h2>
-          <button
-            onClick={() => setIsAddingProduct(true)}
-            className="w-full sm:w-auto rounded-md bg-[#0D654A] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:shadow-md transition-shadow duration-300 hover:bg-[#0D654A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D654A]"
-          >
-            <Plus className="inline-block mr-2 h-5 w-5" /> Agregar Producto
-          </button>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.2 }}
+        className="card"
+      >
+        <div className="card-header">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div>
+              <h2 className="card-title">Productos</h2>
+              <p className="card-description">Gestiona tu catálogo de productos</p>
+            </div>
+            <button
+              onClick={() => setIsAddingProduct(true)}
+              className="btn-primary w-full sm:w-auto"
+            >
+              <Plus className="h-4 w-4" /> Agregar Producto
+            </button>
+          </div>
         </div>
-        
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="flex items-start">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5 sm:mt-0" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-            </svg>
-            <p className="text-xs sm:text-sm text-blue-800">
-              <strong>Tip:</strong> Puedes arrastrar las tarjetas de productos para reordenarlas usando el ícono de arrastre.
-            </p>
+        <div className="card-body">
+        <div className="alert alert-info mb-4">
+          <svg className="alert-icon" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+          </svg>
+          <div className="alert-content">
+            <strong>Tip:</strong> Puedes arrastrar las tarjetas de productos para reordenarlas usando el ícono de arrastre.
           </div>
         </div>
         
@@ -1476,750 +1444,439 @@ export default function ProductDashboard() {
             </div>
           </SortableContext>
         </DndContext>
-      </div>
+        </div>
+      </motion.div>
 
       {/* Modal para agregar/editar producto */}
       {isAddingProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl w-full max-w-4xl h-[90vh] flex flex-col shadow-2xl border border-gray-200">
-            {/* Header mejorado */}
-            <div className="bg-gradient-to-r from-[#0D654A] to-[#0a5a42] px-6 py-4 rounded-t-xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-white">
-                    {editingProduct ? "Editar Producto" : "Nuevo Producto"}
-                  </h2>
-                  <p className="text-green-100 text-sm mt-1">
-                    {editingProduct ? "Modifica la información de tu producto" : "Crea un nuevo producto para tu negocio"}
-                  </p>
-                </div>
-                <button
-                  onClick={() => {
-                    setIsAddingProduct(false)
-                    resetNewProduct()
-                    setEditingProduct(null)
-                  }}
-                  className="text-white hover:text-gray-200 transition-colors duration-200 p-2 hover:bg-white/10 rounded-lg"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-              </div>
-            </div>
-            
-            <div className="flex-grow overflow-y-auto px-6 py-6">
-              <div className="max-w-4xl mx-auto space-y-8">
-                {/* Información Básica */}
-                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                    <div className="flex items-center mb-4">
-                      <div className="w-8 h-8 bg-[#0D654A] rounded-lg flex items-center justify-center mr-3">
-                        <span className="text-white text-sm font-bold">1</span>
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-900">Información Básica</h3>
-                    </div>
-                  <div className="space-y-4">
-                    <div>
-                        <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-2">
-                          Nombre del producto
-                        </label>
-                      <input
-                        type="text"
-                        id="nombre"
-                        value={newProduct.nombre}
-                        onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
-                          placeholder="Ej: Playera Personalizada, Stickers Pack 25"
-                          className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm"
-                      />
-                    </div>
-                    <div>
-                        <label htmlFor="descripcion" className="block text-sm font-medium text-gray-700 mb-2">
-                          Descripción
-                        </label>
-                      <textarea
-                        id="descripcion"
-                        value={newProduct.descripcion}
-                        onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
-                          rows={4}
-                          placeholder="Describe tu producto, materiales, características especiales..."
-                          className="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm resize-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                  {/* Imagen del Producto */}
-                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                    <div className="flex items-center mb-4">
-                      <div className="w-8 h-8 bg-[#0D654A] rounded-lg flex items-center justify-center mr-3">
-                        <span className="text-white text-sm font-bold">2</span>
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-900">Imagen del Producto</h3>
-                    </div>
-                    <div {...getRootProps()} className="relative group cursor-pointer">
-                      <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-[#0D654A] hover:bg-gray-100 transition-all duration-300 group-hover:shadow-md">
-                      {newProduct.imagen ? (
-                          <div className="relative">
-                            <Image 
-                              src={newProduct.imagen} 
-                              alt="Preview" 
-                              width={200} 
-                              height={200} 
-                              className="mx-auto object-cover rounded-lg shadow-md" 
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 rounded-lg transition-all duration-300 flex items-center justify-center">
-                              <span className="text-white opacity-0 group-hover:opacity-100 font-medium">
-                                Cambiar imagen
-                              </span>
-                            </div>
-                        </div>
-                      ) : (
-                          <div className="py-8">
-                            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-[#0D654A] transition-colors duration-300">
-                              <svg className="w-8 h-8 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                            </div>
-                            <p className="text-gray-600 font-medium mb-2">Agregar imagen del producto</p>
-                            <p className="text-sm text-gray-500">Arrastra una imagen o haz click para seleccionar</p>
-                          </div>
-                        )}
-                        <input {...getInputProps()} className="sr-only" />
-                      </div>
-                      <p className="text-xs text-gray-500 mt-2 text-center">PNG, JPG hasta 10MB • Recomendado: 800x800px</p>
-                    </div>
-                  </div>
-
-                {/* Precio y Disponibilidad */}
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                  <div className="flex items-center mb-4">
-                    <div className="w-8 h-8 bg-[#0D654A] rounded-lg flex items-center justify-center mr-3">
-                      <span className="text-white text-sm font-bold">3</span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Precio y Disponibilidad</h3>
-                  </div>
-                    <div className="space-y-6">
-                      
-                      {/* Tipo de precio */}
-                      <div className="bg-gradient-to-r from-yellow-50 to-orange-50 p-4 rounded-lg border border-yellow-200">
-                        <div className="flex items-center mb-3">
-                          <label className="text-sm font-semibold text-gray-800">Tipo de precio</label>
-                        </div>
-                        <div className="grid grid-cols-1 gap-3">
-                          <label className="flex items-start p-3 bg-white rounded-lg border-2 border-gray-200 cursor-pointer hover:border-[#0D654A] transition-colors duration-200">
-                            <input
-                              type="radio"
-                              name="priceType"
-                              value="per_package"
-                              checked={newProduct.priceType === "per_package"}
-                              onChange={(e) => setNewProduct({ ...newProduct, priceType: e.target.value })}
-                              className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 mt-1"
-                            />
-                            <div className="ml-3">
-                              <div className="text-sm font-medium text-gray-900">Precio por paquete/item</div>
-                              <div className="text-xs text-gray-600 mt-1">El precio es fijo por cada unidad completa</div>
-                              <div className="text-xs text-blue-600 mt-1">
-                                <strong>Ejemplo:</strong> Paquete de 25 stickers = $100 (sin importar las 25 piezas)
-                              </div>
-                            </div>
-                        </label>
-                          <label className="flex items-start p-3 bg-white rounded-lg border-2 border-gray-200 cursor-pointer hover:border-[#0D654A] transition-colors duration-200">
-                            <input
-                              type="radio"
-                              name="priceType"
-                              value="per_piece"
-                              checked={newProduct.priceType === "per_piece"}
-                              onChange={(e) => setNewProduct({ ...newProduct, priceType: e.target.value })}
-                              className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 mt-1"
-                            />
-                            <div className="ml-3">
-                              <div className="text-sm font-medium text-gray-900">Precio por pieza individual</div>
-                              <div className="text-xs text-gray-600 mt-1">El precio se multiplica por la cantidad de piezas</div>
-                              <div className="text-xs text-blue-600 mt-1">
-                                <strong>Ejemplo:</strong> $4 por sticker × 25 stickers = $100 total
-                              </div>
-                            </div>
-                          </label>
-                  </div>
-                </div>
-
-                      {/* Campos de precio */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                          <label htmlFor="precio" className="block text-sm font-medium text-gray-700 mb-2">
-                            Precio Regular
-                            {newProduct.priceType === "per_piece" && (
-                              <span className="text-xs text-blue-600 ml-2">(por pieza individual)</span>
-                            )}
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <span className="text-gray-500 text-sm font-medium">$</span>
-                          </div>
-                          <input
-                            type="number"
-                            id="precio"
-                              value={newProduct.precio || ''}
-                              onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) || 0 })}
-                              className="block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm font-medium"
-                            placeholder="0.00"
-                              step="0.01"
-                              min="0"
-                          />
-                        </div>
-                      </div>
-                      
-                      <div>
-                          <label htmlFor="precioPromocion" className="block text-sm font-medium text-gray-700 mb-2">
-                            Precio Promoción
-                            <span className="ml-1 text-xs text-gray-500">(Opcional)</span>
-                          </label>
-                          <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                              <span className="text-gray-500 text-sm font-medium">$</span>
-                          </div>
-                          <input
-                            type="number"
-                            id="precioPromocion"
-                            value={newProduct.precioPromocion || ''}
-                            onChange={(e) => {
-                              const value = e.target.value === '' ? 0 : parseFloat(e.target.value);
-                              setNewProduct({ ...newProduct, precioPromocion: value });
-                            }}
-                              className="block w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm font-medium"
-                            placeholder="0.00"
-                              step="0.01"
-                              min="0"
-                          />
-                        </div>
-                        {newProduct.precioPromocion > newProduct.precio && (
-                            <div className="mt-2 flex items-center text-red-600 text-xs">
-                              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                              </svg>
-                              El precio de promoción no puede ser mayor al precio regular
-                            </div>
-                        )}
-                      </div>
-                    </div>
-                      {/* Disponibilidad */}
-                      <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3" style={{backgroundColor: newProduct.availability ? '#10B981' : '#EF4444'}}>
-                              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                {newProduct.availability ? (
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                ) : (
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                )}
-                              </svg>
-                            </div>
-                            <div>
-                              <label htmlFor="availability" className="text-sm font-medium text-gray-900">
-                                Estado del producto
-                              </label>
-                              <p className="text-xs text-gray-600">
-                                {newProduct.availability ? "Visible para los clientes" : "Oculto en el menú"}
-                              </p>
-                            </div>
-                          </div>
-                      <label className="relative inline-flex items-center cursor-pointer">
-                        <input
-                          type="checkbox"
-                          id="availability"
-                          className="sr-only peer"
-                          checked={newProduct.availability}
-                          onChange={(e) => setNewProduct({ ...newProduct, availability: e.target.checked })}
-                        />
-                            <div className="w-12 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
-                      </label>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Precios por Mayoreo */}
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                  <div className="flex items-center mb-4">
-                    <div className="w-8 h-8 bg-[#0D654A] rounded-lg flex items-center justify-center mr-3">
-                      <span className="text-white text-sm font-bold">4</span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Precios por Mayoreo</h3>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Configura descuentos automáticos basados en la cantidad comprada.
-                  </p>
-                  
-                  <div className="bg-gray-50 rounded-md p-4 mb-4">
-                    {newProduct.wholesalePricing && newProduct.wholesalePricing.length > 0 ? (
-                      <div className="space-y-2">
-                        {newProduct.wholesalePricing.map((wholesale) => (
-                          <div key={wholesale.id} className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm">
-                            <div className="flex items-center space-x-4">
-                              <span className="text-sm font-medium text-gray-700">
-                                {wholesale.minQuantity}+ unidades
-                              </span>
-                              <span className="text-sm text-green-600 font-medium">
-                                {wholesale.discount}% descuento
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                (${((newProduct.precio * (100 - wholesale.discount)) / 100).toFixed(2)} c/u)
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <button
-                                onClick={() => handleEditWholesalePrice(wholesale)}
-                                className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
-                              >
-                                <Edit2 className="h-4 w-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteWholesalePrice(wholesale.id)}
-                                className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
-                              >
-                                <X className="h-4 w-4" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500 text-center">No hay precios mayoreo configurados</p>
-                    )}
-                  </div>
-                  
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Cantidad mínima</label>
-                      <input
-                        type="number"
-                        value={newWholesalePrice.minQuantity || ''}
-                        onChange={(e) => setNewWholesalePrice({ ...newWholesalePrice, minQuantity: parseInt(e.target.value) || 0 })}
-                        placeholder="Ej: 10"
-                        min="2"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Descuento (%)</label>
-                      <input
-                        type="number"
-                        value={newWholesalePrice.discount || ''}
-                        onChange={(e) => setNewWholesalePrice({ ...newWholesalePrice, discount: parseFloat(e.target.value) || 0 })}
-                        placeholder="Ej: 15"
-                        min="1"
-                        max="50"
-                        step="0.1"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                      />
-                    </div>
-                    <div className="flex items-end">
-                      <button
-                        onClick={editingWholesalePrice ? handleUpdateWholesalePrice : handleAddWholesalePrice}
-                        className="w-full sm:w-auto px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200"
-                      >
-                        {editingWholesalePrice ? "Actualizar" : "Agregar"}
-                      </button>
-                    </div>
-                  </div>
-                  
-                  {newWholesalePrice.minQuantity > 0 && newWholesalePrice.discount > 0 && (
-                    <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
-                      <p className="text-sm text-blue-800">
-                        <strong>Vista previa:</strong> {newWholesalePrice.minQuantity}+ unidades = 
-                        ${((newProduct.precio * (100 - newWholesalePrice.discount)) / 100).toFixed(2)} c/u 
-                        ({newWholesalePrice.discount}% descuento)
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Variantes del Producto */}
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                  <div className="flex items-center mb-4">
-                    <div className="w-8 h-8 bg-[#0D654A] rounded-lg flex items-center justify-center mr-3">
-                      <span className="text-white text-sm font-bold">5</span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Variantes del Producto</h3>
-                  </div>
-                  <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div className="flex items-center">
-                      <svg className="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                      </svg>
-                      <p className="text-sm text-blue-800">
-                        <strong>Tip:</strong> Puedes arrastrar las variantes y sus opciones para reordenarlas usando el ícono de arrastre.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-6">
-                    
-                    {/* Agregar nueva categoría de variantes */}
-                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-                      <h5 className="text-sm font-medium text-green-800 mb-3">Agregar nueva categoría de variantes</h5>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={newVariantCategory}
-                          onChange={(e) => setNewVariantCategory(e.target.value)}
-                          placeholder="Ej: Tallas, Sabores, Tortillas, Temperaturas, etc."
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                        />
-                        <button
-                          onClick={editingVariantCategory ? handleUpdateVariantCategory : handleAddVariantCategory}
-                          className="px-4 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200 flex items-center gap-2"
-                        >
-                          <Plus className="h-4 w-4" />
-                          {editingVariantCategory ? "Actualizar" : "Agregar"}
-                        </button>
-                      </div>
-                      <p className="text-xs text-green-700 mt-2">
-                        <strong>Tip:</strong> Las categorías se pueden colapsar para una mejor organización
-                      </p>
-                    </div>
-
-                    {/* Lista de categorías de variantes con drag and drop */}
-                    {newProduct.variants.length > 0 && (
-                      <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEndVariants}
-                      >
-                        <SortableContext
-                          items={newProduct.variants.map(variant => variant.id)}
-                          strategy={verticalListSortingStrategy}
-                        >
-                          <div className="space-y-3">
-                            {newProduct.variants.map((variant) => (
-                              <SortableVariant
-                                key={variant.id}
-                                variant={variant}
-                                onDelete={confirmDeleteVariant}
-                                onToggleStock={handleToggleVariantStock}
-                                onToggleRequired={handleToggleVariantRequired}
-                                onToggleCollapse={toggleVariantCollapse}
-                                onStartInlineEdit={startInlineVariantEdit}
-                                onSaveInlineEdit={saveInlineVariantEdit}
-                                onCancelInlineEdit={cancelInlineVariantEdit}
-                                isCollapsed={isVariantCollapsed(variant.id)}
-                                isEditingInline={editingVariantInline?.id === variant.id}
-                              >
-                                {/* Opciones de la categoría con drag and drop */}
-                                <DndContext
-                                  sensors={sensors}
-                                  collisionDetection={closestCenter}
-                                  onDragEnd={(event) => handleDragEndOptions(event, variant.id)}
-                                >
-                                  <SortableContext
-                                    items={variant.options.map(option => option.id)}
-                                    strategy={verticalListSortingStrategy}
-                                  >
-                                    <div className="space-y-2 mb-4">
-                                      {variant.options.map((option) => (
-                                        <SortableVariantOption
-                                          key={option.id}
-                                          option={option}
-                                          variantId={variant.id}
-                                          onDelete={confirmDeleteOption}
-                                          onStartInlineEdit={startInlineOptionEdit}
-                                          onSaveInlineEdit={saveInlineOptionEdit}
-                                          onCancelInlineEdit={cancelInlineOptionEdit}
-                                          isEditingInline={editingOptionInline?.id === option.id}
-                                          newVariantOption={newVariantOption}
-                                          setNewVariantOption={setNewVariantOption}
-                                        />
-                                      ))}
-                                    </div>
-                                  </SortableContext>
-                                </DndContext>
-
-                                {/* Agregar nueva opción */}
-                                <div className="bg-blue-50 p-3 rounded-md border border-blue-200">
-                                  <h5 className="text-sm font-medium text-blue-800 mb-2">Agregar nueva opción</h5>
-                                  <div className="flex gap-2 mb-2">
-                                    <div className="flex-1">
-                                      <label className="block text-xs text-gray-600 mb-1">Nombre de la opción</label>
-                                      <input
-                                        type="text"
-                                        value={selectedVariantCategoryId === variant.id ? newVariantOption.name : ""}
-                                        onChange={(e) => setNewVariantOption({ ...newVariantOption, name: e.target.value })}
-                                        placeholder={`Nueva ${variant.name.toLowerCase()}`}
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                                        onClick={() => setSelectedVariantCategoryId(variant.id)}
-                                      />
-                                    </div>
-                                    <div>
-                                      <label className="block text-xs text-gray-600 mb-1">Precio extra</label>
-                                      <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                          <span className="text-gray-500 text-sm">+$</span>
-                                        </div>
-                                        <input
-                                          type="number"
-                                          value={selectedVariantCategoryId === variant.id && newVariantOption.price > 0 ? newVariantOption.price : ""}
-                                          onChange={(e) => setNewVariantOption({ ...newVariantOption, price: parseFloat(e.target.value) || 0 })}
-                                          placeholder="0.00"
-                                          step="0.01"
-                                          min="0"
-                                          className="w-24 pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                                          onClick={() => setSelectedVariantCategoryId(variant.id)}
-                                        />
-                                      </div>
-                                    </div>
-                                    <div>
-                                      <label className="block text-xs text-gray-600 mb-1">Unidades</label>
-                                      <input
-                                        type="number"
-                                        value={selectedVariantCategoryId === variant.id ? (newVariantOption.quantityMultiplier || "") : ""}
-                                        onChange={(e) => {
-                                          setSelectedVariantCategoryId(variant.id);
-                                          setNewVariantOption({ ...newVariantOption, quantityMultiplier: parseInt(e.target.value) || 1 });
-                                        }}
-                                        placeholder="1"
-                                        min="1"
-                                        className="w-16 px-2 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0D654A] text-sm"
-                                        onFocus={() => setSelectedVariantCategoryId(variant.id)}
-                                        title="Cantidad real por unidad"
-                                      />
-                                    </div>
-                                    <div className="flex items-end">
-                                      <button
-                                        onClick={() => {
-                                          setSelectedVariantCategoryId(variant.id)
-                                          editingVariantOption ? handleUpdateVariantOption() : handleAddVariantOption()
-                                        }}
-                                        className="px-3 py-2 bg-[#0D654A] text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm transition-colors duration-200 flex items-center gap-1"
-                                      >
-                                        <Plus className="h-4 w-4" />
-                                        {editingVariantOption ? "Actualizar" : "Agregar"}
-                                      </button>
-                                    </div>
-                                  </div>
-                                  
-                                  <div className="text-xs text-blue-700">
-                                    <p className="mb-1"><strong>Tip:</strong> Puedes editar cualquier opción haciendo clic en el ícono de editar</p>
-                                    <p>• <strong>Precio extra:</strong> Costo adicional por esta opción (ej: +$5.00)</p>
-                                    <p>• <strong>Unidades:</strong> Cantidad real por unidad (ej: 25 para paquete de stickers)</p>
-                                  </div>
-                                </div>
-                              </SortableVariant>
-                            ))}
-                          </div>
-                        </SortableContext>
-                      </DndContext>
-                    )}
-
-                    {newProduct.variants.length === 0 && (
-                      <div className="text-center py-8 text-gray-500">
-                        <p className="text-sm">No hay categorías de variantes agregadas</p>
-                        <p className="text-xs mt-1">Agrega una categoría para empezar (ej: Tallas, Sabores, etc.)</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Extras */}
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                  <div className="flex items-center mb-4">
-                    <div className="w-8 h-8 bg-[#0D654A] rounded-lg flex items-center justify-center mr-3">
-                      <span className="text-white text-sm font-bold">6</span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Extras del Producto</h3>
-                  </div>
-                  <div className="bg-gray-50 rounded-md p-4 mb-4">
-                    {newProduct.extras.length > 0 ? (
-                      <div className="space-y-2">
-                        {newProduct.extras.map((extra) => (
-                          <div key={extra.id} className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm border border-gray-100">
-                            <div className="flex items-center space-x-3">
-                              <span className="text-sm font-medium text-gray-700">{extra.name}</span>
-                              <span className="text-sm text-green-600 font-medium">${extra.price.toFixed(2)}</span>
-                              <span className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
-                                {extra.priceType === "per_piece" ? "por pieza" : "por paquete"}
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <button
-                                onClick={() => handleEditExtra(extra)}
-                                className="text-[#0D654A] hover:text-[#0D654A] focus:outline-none transition-colors duration-200"
-                              >
-                                <Edit2 className="h-5 w-5" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteExtra(extra.id)}
-                                className="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-200"
-                              >
-                                <X className="h-5 w-5" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-500 text-center">No hay extras agregados</p>
-                    )}
-                  </div>
-                  <div className="space-y-4">
-                    {/* Campos de entrada para extras */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Nombre del extra</label>
-                    <input
-                      type="text"
-                      value={newExtra.name}
-                      onChange={(e) => setNewExtra({ ...newExtra, name: e.target.value })}
-                          placeholder="Ej: Impresión personalizada, Queso extra"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Precio</label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <span className="text-gray-500 text-sm font-medium">$</span>
-                          </div>
-                    <input
-                      type="number"
-                            value={newExtra.price || ''}
-                            onChange={(e) => setNewExtra({ ...newExtra, price: parseFloat(e.target.value) || 0 })}
-                            placeholder="0.00"
-                            step="0.01"
-                            min="0"
-                            className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0D654A] focus:border-transparent transition-all duration-200 text-sm font-medium"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Tipo de precio para extras */}
-                    <div className="bg-purple-50 p-3 rounded-lg border border-purple-200">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Tipo de precio del extra
-                      </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <label className="flex items-center p-2 bg-white rounded-md border border-gray-200 cursor-pointer hover:border-[#0D654A] transition-colors duration-200">
-                          <input
-                            type="radio"
-                            name="extraPriceType"
-                            value="per_package"
-                            checked={newExtra.priceType === "per_package"}
-                            onChange={(e) => setNewExtra({ ...newExtra, priceType: e.target.value })}
-                            className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300"
-                          />
-                          <div className="ml-2">
-                            <div className="text-sm font-medium text-gray-900">Por paquete/total</div>
-                            <div className="text-xs text-gray-600">Precio fijo por pedido</div>
-                          </div>
-                        </label>
-                        <label className="flex items-center p-2 bg-white rounded-md border border-gray-200 cursor-pointer hover:border-[#0D654A] transition-colors duration-200">
-                          <input
-                            type="radio"
-                            name="extraPriceType"
-                            value="per_piece"
-                            checked={newExtra.priceType === "per_piece"}
-                            onChange={(e) => setNewExtra({ ...newExtra, priceType: e.target.value })}
-                            className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300"
-                          />
-                          <div className="ml-2">
-                            <div className="text-sm font-medium text-gray-900">Por pieza</div>
-                            <div className="text-xs text-gray-600">Se multiplica por cantidad</div>
-                          </div>
-                        </label>
-                      </div>
-                      <div className="mt-2 text-xs text-gray-600">
-                        {newExtra.priceType === "per_package" ? (
-                          <p><strong>Ejemplo:</strong> Impresión $10 por todo el pedido</p>
-                        ) : (
-                          <p><strong>Ejemplo:</strong> Impresión $2 por cada sticker</p>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <button
-                      onClick={editingExtra ? handleUpdateExtra : handleAddExtra}
-                      className="w-full px-4 py-3 bg-[#0D654A] text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm font-medium transition-colors duration-200 shadow-md hover:shadow-lg"
-                    >
-                      {editingExtra ? "Actualizar Extra" : "Agregar Extra"}
-                    </button>
-                  </div>
-                </div>
-
-                {/* Categorías */}
-                <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-                  <div className="flex items-center mb-4">
-                    <div className="w-8 h-8 bg-[#0D654A] rounded-lg flex items-center justify-center mr-3">
-                      <span className="text-white text-sm font-bold">7</span>
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Categorías del Producto</h3>
-                  </div>
-                  <div className="mt-2 grid grid-cols-2 gap-2">
-                    {categories.map((category) => (
-                      <div key={category._id} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id={`category-${category._id}`}
-                          value={category.name}
-                          checked={newProduct.categorias?.includes(category.name) || false}
-                          onChange={(e) => {
-                            const categoryName = e.target.value;
-                            setNewProduct(prev => {
-                              const currentCategories = prev.categorias || [];
-                              if (e.target.checked) {
-                                if (currentCategories.length < 2) {
-                                  return { ...prev, categorias: [...currentCategories, categoryName] };
-                                }
-                              } else {
-                                return { ...prev, categorias: currentCategories.filter(cat => cat !== categoryName) };
-                              }
-                              return prev;
-                            });
-                          }}
-                          className="h-4 w-4 text-[#0D654A] focus:ring-[#0D654A] border-gray-300 rounded"
-                        />
-                        <label htmlFor={`category-${category._id}`} className="ml-2 block text-sm text-gray-900">
-                          {category.name}
-                        </label>
-                      </div>
-                    ))}
-                  </div>
-                  {newProduct.categorias && newProduct.categorias.length === 2 && (
-                    <div className="mt-3 flex items-center text-[#0D654A] text-sm">
-                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                      </svg>
-                      Máximo de categorías seleccionadas (2/2)
-                    </div>
-                  )}
-                </div>
-              </div>
-            {/* Footer mejorado */}
-            <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-xl">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="text-sm text-gray-600 flex items-center">
-                  <svg className="w-4 h-4 mr-2 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-                  </svg>
-                  <span className="font-medium">Tip:</span> Asegúrate de configurar las variantes y precios antes de guardar
-                </div>
-                <div className="flex gap-3 w-full sm:w-auto">
+        <div className="modal-backdrop" />
+      )}
+      {isAddingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-3xl h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+            {/* Header simple */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {editingProduct ? "Editar Producto" : "Nuevo Producto"}
+              </h2>
               <button
                 onClick={() => {
                   setIsAddingProduct(false)
                   resetNewProduct()
                   setEditingProduct(null)
                 }}
-                    className="flex-1 sm:flex-none px-6 py-3 bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                    Cancelar
+                <X className="h-5 w-5" />
               </button>
-              <button
-                onClick={handleAddProduct}
-                    className="flex-1 sm:flex-none px-6 py-3 bg-gradient-to-r from-[#0D654A] to-[#0a5a42] text-white rounded-lg hover:from-[#0a5a42] hover:to-[#084c3a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0D654A] text-sm font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                    {editingProduct ? "Guardar cambios" : "Crear producto"}
-              </button>
+            </div>
+
+            <div className="flex-grow overflow-y-auto">
+              <div className="p-6 space-y-6">
+                {/* Sección principal: Imagen + Info básica lado a lado */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Imagen - columna izquierda */}
+                  <div {...getRootProps()} className="md:col-span-1">
+                    <div className={`aspect-square rounded-xl border-2 border-dashed transition-colors cursor-pointer flex items-center justify-center overflow-hidden ${isDragActive ? 'border-[#0D654A] bg-green-50' : 'border-gray-300 hover:border-[#0D654A]'}`}>
+                      {newProduct.imagen ? (
+                        <div className="relative w-full h-full group">
+                          <Image
+                            src={newProduct.imagen}
+                            alt="Preview"
+                            fill
+                            className="object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors flex items-center justify-center">
+                            <span className="text-white font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                              Cambiar
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center p-4">
+                          <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                            <Plus className="w-6 h-6 text-gray-400" />
+                          </div>
+                          <p className="text-sm text-gray-500">Agregar imagen</p>
+                        </div>
+                      )}
+                      <input {...getInputProps()} className="sr-only" />
+                    </div>
+                  </div>
+
+                  {/* Info básica - columna derecha */}
+                  <div className="md:col-span-2 space-y-4">
+                    <div>
+                      <label className="form-label">Nombre del producto</label>
+                      <input
+                        type="text"
+                        value={newProduct.nombre}
+                        onChange={(e) => setNewProduct({ ...newProduct, nombre: e.target.value })}
+                        placeholder="Ej: Tacos al Pastor"
+                        className="form-input"
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label">Descripción <span className="text-gray-400 font-normal">(opcional)</span></label>
+                      <textarea
+                        value={newProduct.descripcion}
+                        onChange={(e) => setNewProduct({ ...newProduct, descripcion: e.target.value })}
+                        rows={3}
+                        placeholder="Breve descripción del producto..."
+                        className="form-input resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Precio y Categorías */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Precio */}
+                  <div>
+                    <label className="form-label">Precio</label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                      <input
+                        type="number"
+                        value={newProduct.precio || ''}
+                        onChange={(e) => setNewProduct({ ...newProduct, precio: parseFloat(e.target.value) || 0 })}
+                        className="form-input pl-7"
+                        placeholder="0.00"
+                        step="0.01"
+                        min="0"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Categorías */}
+                  <div>
+                    <label className="form-label">Categoría</label>
+                    <div className="flex flex-wrap gap-2">
+                      {categories.map((category) => (
+                        <label
+                          key={category._id}
+                          className={`px-3 py-1.5 rounded-full text-sm cursor-pointer transition-colors ${
+                            newProduct.categorias?.includes(category.name)
+                              ? 'bg-[#0D654A] text-white'
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          } ${newProduct.categorias?.length >= 2 && !newProduct.categorias?.includes(category.name) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                          <input
+                            type="checkbox"
+                            value={category.name}
+                            checked={newProduct.categorias?.includes(category.name) || false}
+                            onChange={(e) => {
+                              const categoryName = e.target.value;
+                              setNewProduct(prev => {
+                                const currentCategories = prev.categorias || [];
+                                if (e.target.checked) {
+                                  if (currentCategories.length < 2) {
+                                    return { ...prev, categorias: [...currentCategories, categoryName] };
+                                  }
+                                } else {
+                                  return { ...prev, categorias: currentCategories.filter(cat => cat !== categoryName) };
+                                }
+                                return prev;
+                              });
+                            }}
+                            className="sr-only"
+                          />
+                          {category.name}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Disponibilidad */}
+                <div className="flex items-center justify-between py-3 px-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${newProduct.availability ? 'bg-green-500' : 'bg-gray-300'}`}>
+                      {newProduct.availability ? (
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">
+                        {newProduct.availability ? "Disponible" : "No disponible"}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {newProduct.availability ? "Visible en el menú" : "Oculto del menú"}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setNewProduct({ ...newProduct, availability: !newProduct.availability })}
+                    className={`toggle ${newProduct.availability ? 'active' : ''}`}
+                  >
+                    <span className="toggle-knob" />
+                  </button>
+                </div>
+
+                {/* Opciones avanzadas - Acordeón */}
+                <div className="border-t pt-6">
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-4">Opciones avanzadas</p>
+
+                  {/* Precio de promoción */}
+                  <button
+                    type="button"
+                    onClick={() => setShowAdvancedPricing(!showAdvancedPricing)}
+                    className="w-full flex items-center justify-between py-3 text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${showAdvancedPricing ? 'rotate-90' : ''}`} />
+                      <span className="text-sm font-medium text-gray-700">Precio promoción y mayoreo</span>
+                      {(newProduct.precioPromocion > 0 || newProduct.wholesalePricing?.length > 0) && (
+                        <span className="px-2 py-0.5 text-xs bg-green-100 text-green-700 rounded-full">Configurado</span>
+                      )}
+                    </div>
+                  </button>
+                  {showAdvancedPricing && (
+                    <div className="pl-6 pb-4 space-y-4">
+                      <div>
+                        <label className="form-label">Precio de promoción <span className="text-gray-400 font-normal">(opcional)</span></label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                          <input
+                            type="number"
+                            value={newProduct.precioPromocion || ''}
+                            onChange={(e) => setNewProduct({ ...newProduct, precioPromocion: parseFloat(e.target.value) || 0 })}
+                            className="form-input pl-7"
+                            placeholder="0.00"
+                            step="0.01"
+                            min="0"
+                          />
+                        </div>
+                        {newProduct.precioPromocion > 0 && newProduct.precio > 0 && (
+                          <p className="form-hint text-green-600 mt-1">
+                            {Math.round((1 - newProduct.precioPromocion / newProduct.precio) * 100)}% de descuento
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Precios mayoreo */}
+                      <div className="mt-4">
+                        <label className="form-label">Descuentos por mayoreo</label>
+                        {newProduct.wholesalePricing?.length > 0 && (
+                          <div className="space-y-2 mb-3">
+                            {newProduct.wholesalePricing.map((wholesale) => (
+                              <div key={wholesale.id} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg text-sm">
+                                <span>{wholesale.minQuantity}+ unidades = <strong>{wholesale.discount}% desc.</strong></span>
+                                <button onClick={() => handleDeleteWholesalePrice(wholesale.id)} className="text-gray-400 hover:text-red-500">
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="flex gap-2">
+                          <input
+                            type="number"
+                            value={newWholesalePrice.minQuantity || ''}
+                            onChange={(e) => setNewWholesalePrice({ ...newWholesalePrice, minQuantity: parseInt(e.target.value) || 0 })}
+                            placeholder="Cantidad mín."
+                            min="2"
+                            className="form-input flex-1"
+                          />
+                          <input
+                            type="number"
+                            value={newWholesalePrice.discount || ''}
+                            onChange={(e) => setNewWholesalePrice({ ...newWholesalePrice, discount: parseFloat(e.target.value) || 0 })}
+                            placeholder="% descuento"
+                            min="1"
+                            max="50"
+                            className="form-input flex-1"
+                          />
+                          <button onClick={handleAddWholesalePrice} className="btn-secondary px-3">
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Variantes */}
+                  <button
+                    type="button"
+                    onClick={() => setShowVariants(!showVariants)}
+                    className="w-full flex items-center justify-between py-3 text-left border-t border-gray-100"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${showVariants ? 'rotate-90' : ''}`} />
+                      <span className="text-sm font-medium text-gray-700">Variantes (tallas, sabores, etc.)</span>
+                      {newProduct.variants?.length > 0 && (
+                        <span className="px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">{newProduct.variants.length}</span>
+                      )}
+                    </div>
+                  </button>
+                  {showVariants && (
+                    <div className="pl-6 pb-4 space-y-4">
+                      {/* Lista de variantes existentes */}
+                      {newProduct.variants.length > 0 && (
+                        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEndVariants}>
+                          <SortableContext items={newProduct.variants.map(v => v.id)} strategy={verticalListSortingStrategy}>
+                            <div className="space-y-3">
+                              {newProduct.variants.map((variant) => (
+                                <SortableVariant
+                                  key={variant.id}
+                                  variant={variant}
+                                  onDelete={confirmDeleteVariant}
+                                  onToggleStock={handleToggleVariantStock}
+                                  onToggleRequired={handleToggleVariantRequired}
+                                  onToggleCollapse={toggleVariantCollapse}
+                                  onStartInlineEdit={startInlineVariantEdit}
+                                  onSaveInlineEdit={saveInlineVariantEdit}
+                                  onCancelInlineEdit={cancelInlineVariantEdit}
+                                  isCollapsed={isVariantCollapsed(variant.id)}
+                                  isEditingInline={editingVariantInline?.id === variant.id}
+                                >
+                                  <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(event) => handleDragEndOptions(event, variant.id)}>
+                                    <SortableContext items={variant.options.map(o => o.id)} strategy={verticalListSortingStrategy}>
+                                      <div className="space-y-2 mb-3">
+                                        {variant.options.map((option) => (
+                                          <SortableVariantOption
+                                            key={option.id}
+                                            option={option}
+                                            variantId={variant.id}
+                                            onDelete={confirmDeleteOption}
+                                            onStartInlineEdit={startInlineOptionEdit}
+                                            onSaveInlineEdit={saveInlineOptionEdit}
+                                            onCancelInlineEdit={cancelInlineOptionEdit}
+                                            isEditingInline={editingOptionInline?.id === option.id}
+                                            newVariantOption={newVariantOption}
+                                            setNewVariantOption={setNewVariantOption}
+                                          />
+                                        ))}
+                                      </div>
+                                    </SortableContext>
+                                  </DndContext>
+                                  {/* Agregar opción */}
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="text"
+                                      value={selectedVariantCategoryId === variant.id ? newVariantOption.name : ""}
+                                      onChange={(e) => setNewVariantOption({ ...newVariantOption, name: e.target.value })}
+                                      placeholder="Nueva opción..."
+                                      className="form-input flex-1 text-sm"
+                                      onClick={() => setSelectedVariantCategoryId(variant.id)}
+                                    />
+                                    <input
+                                      type="number"
+                                      value={selectedVariantCategoryId === variant.id && newVariantOption.price > 0 ? newVariantOption.price : ""}
+                                      onChange={(e) => setNewVariantOption({ ...newVariantOption, price: parseFloat(e.target.value) || 0 })}
+                                      placeholder="+$0"
+                                      className="form-input w-20 text-sm"
+                                      onClick={() => setSelectedVariantCategoryId(variant.id)}
+                                    />
+                                    <button
+                                      onClick={() => { setSelectedVariantCategoryId(variant.id); handleAddVariantOption(); }}
+                                      className="btn-secondary px-3"
+                                    >
+                                      <Plus className="w-4 h-4" />
+                                    </button>
+                                  </div>
+                                </SortableVariant>
+                              ))}
+                            </div>
+                          </SortableContext>
+                        </DndContext>
+                      )}
+                      {/* Agregar nueva categoría */}
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={newVariantCategory}
+                          onChange={(e) => setNewVariantCategory(e.target.value)}
+                          placeholder="Nueva categoría (ej: Tallas, Sabores...)"
+                          className="form-input flex-1"
+                        />
+                        <button onClick={handleAddVariantCategory} className="btn-secondary px-3">
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Extras */}
+                  <button
+                    type="button"
+                    onClick={() => setShowExtras(!showExtras)}
+                    className="w-full flex items-center justify-between py-3 text-left border-t border-gray-100"
+                  >
+                    <div className="flex items-center gap-2">
+                      <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${showExtras ? 'rotate-90' : ''}`} />
+                      <span className="text-sm font-medium text-gray-700">Extras (complementos con costo)</span>
+                      {newProduct.extras?.length > 0 && (
+                        <span className="px-2 py-0.5 text-xs bg-purple-100 text-purple-700 rounded-full">{newProduct.extras.length}</span>
+                      )}
+                    </div>
+                  </button>
+                  {showExtras && (
+                    <div className="pl-6 pb-4 space-y-3">
+                      {/* Lista de extras */}
+                      {newProduct.extras.length > 0 && (
+                        <div className="space-y-2">
+                          {newProduct.extras.map((extra) => (
+                            <div key={extra.id} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-lg text-sm">
+                              <span>{extra.name} <strong className="text-green-600">+${extra.price.toFixed(2)}</strong></span>
+                              <button onClick={() => handleDeleteExtra(extra.id)} className="text-gray-400 hover:text-red-500">
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {/* Agregar extra */}
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={newExtra.name}
+                          onChange={(e) => setNewExtra({ ...newExtra, name: e.target.value })}
+                          placeholder="Nombre del extra..."
+                          className="form-input flex-1"
+                        />
+                        <div className="relative">
+                          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 text-sm">$</span>
+                          <input
+                            type="number"
+                            value={newExtra.price || ''}
+                            onChange={(e) => setNewExtra({ ...newExtra, price: parseFloat(e.target.value) || 0 })}
+                            placeholder="0"
+                            className="form-input w-20 pl-5"
+                          />
+                        </div>
+                        <button onClick={handleAddExtra} className="btn-secondary px-3">
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
+            </div>
+
+            {/* Footer simple */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={() => {
+                  setIsAddingProduct(false)
+                  resetNewProduct()
+                  setEditingProduct(null)
+                }}
+                className="btn-ghost"
+              >
+                Cancelar
+              </button>
+              <button onClick={handleAddProduct} className="btn-primary">
+                {editingProduct ? "Guardar cambios" : "Crear producto"}
+              </button>
             </div>
           </div>
         </div>
@@ -2227,79 +1884,63 @@ export default function ProductDashboard() {
 
       {/* Modal de confirmación de eliminación */}
       {showDeleteModal && productToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl border border-gray-200">
-            {/* Header del modal */}
-            <div className="bg-red-50 px-6 py-4 rounded-t-xl border-b border-red-200">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-red-900">Confirmar eliminación</h3>
-                  <p className="text-sm text-red-700">Esta acción no se puede deshacer</p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Contenido del modal */}
-            <div className="px-6 py-6">
-              <div className="mb-4">
-                <p className="text-gray-700 mb-2">
-                  ¿Estás seguro de que quieres eliminar el producto:
-                </p>
-                <div className="bg-gray-50 p-3 rounded-lg border">
-                  <div className="flex items-center">
-                    {productToDelete.imagen && (
-                      <div className="w-12 h-12 mr-3 flex-shrink-0 rounded-md overflow-hidden">
-                        <Image
-                          src={productToDelete.imagen}
-                          alt={productToDelete.nombre}
-                          width={48}
-                          height={48}
-                          objectFit="cover"
-                        />
-                      </div>
-                    )}
-                    <div>
-                      <h4 className="font-semibold text-gray-900">{productToDelete.nombre}</h4>
-                      <p className="text-sm text-gray-600">
-                        ${productToDelete.precioPromocion > 0 ? productToDelete.precioPromocion : productToDelete.precio}
-                      </p>
-                    </div>
+        <div className="modal-backdrop" onClick={cancelDeleteProduct}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-panel max-w-sm">
+              {/* Content */}
+              <div className="p-5">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <X className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Eliminar producto</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">Esta acción no se puede deshacer</p>
                   </div>
                 </div>
-              </div>
-              
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                <div className="flex">
-                  <svg className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  <p className="text-sm text-yellow-800">
-                    <strong>Advertencia:</strong> Esta acción eliminará permanentemente el producto y todos sus datos asociados.
-                  </p>
+
+                {/* Product preview */}
+                <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg mb-4">
+                  <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-200 flex-shrink-0">
+                    {productToDelete.imagen ? (
+                      <Image
+                        src={productToDelete.imagen}
+                        alt={productToDelete.nombre}
+                        width={48}
+                        height={48}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-medium text-gray-900 truncate">{productToDelete.nombre}</p>
+                    <p className="text-sm text-gray-500">
+                      ${productToDelete.precioPromocion > 0 ? productToDelete.precioPromocion : productToDelete.precio}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </div>
-            
-            {/* Footer del modal */}
-            <div className="bg-gray-50 px-6 py-4 rounded-b-xl border-t border-gray-200">
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={cancelDeleteProduct}
-                  className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm font-medium transition-all duration-200"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={() => handleDeleteProduct(productToDelete._id)}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
-                >
-                  Eliminar producto
-                </button>
+
+                {/* Actions */}
+                <div className="flex gap-3">
+                  <button
+                    onClick={cancelDeleteProduct}
+                    className="btn-secondary flex-1"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => handleDeleteProduct(productToDelete._id)}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                  >
+                    Eliminar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -2308,64 +1949,38 @@ export default function ProductDashboard() {
 
       {/* Modal de confirmación de eliminación de variante */}
       {showDeleteVariantModal && variantToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl border border-gray-200">
-            {/* Header del modal */}
-            <div className="bg-red-50 px-6 py-4 rounded-t-xl border-b border-red-200">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
+        <div className="modal-backdrop" onClick={cancelDeleteVariant}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-panel max-w-sm">
+              <div className="p-5">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <X className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Eliminar variante</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">Esta acción no se puede deshacer</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-red-900">Confirmar eliminación</h3>
-                  <p className="text-sm text-red-700">Esta acción no se puede deshacer</p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Contenido del modal */}
-            <div className="px-6 py-6">
-              <div className="mb-4">
-                <p className="text-gray-700 mb-2">
-                  ¿Estás seguro de que quieres eliminar la categoría de variantes:
-                </p>
-                <div className="bg-gray-50 p-3 rounded-lg border">
-                  <h4 className="font-semibold text-gray-900">{variantToDelete.name}</h4>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Se eliminarán también todas las opciones de esta categoría ({variantToDelete.options?.length || 0} opciones)
+
+                <div className="p-3 bg-gray-50 rounded-lg mb-4">
+                  <p className="font-medium text-gray-900">{variantToDelete.name}</p>
+                  <p className="text-sm text-gray-500 mt-0.5">
+                    {variantToDelete.options?.length || 0} opciones serán eliminadas
                   </p>
                 </div>
-              </div>
-              
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                <div className="flex">
-                  <svg className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  <p className="text-sm text-yellow-800">
-                    <strong>Advertencia:</strong> Esta acción eliminará permanentemente la categoría y todas sus opciones.
-                  </p>
+
+                <div className="flex gap-3">
+                  <button onClick={cancelDeleteVariant} className="btn-secondary flex-1">
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleDeleteVariantConfirmed}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                  >
+                    Eliminar
+                  </button>
                 </div>
-              </div>
-            </div>
-            
-            {/* Footer del modal */}
-            <div className="bg-gray-50 px-6 py-4 rounded-b-xl border-t border-gray-200">
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={cancelDeleteVariant}
-                  className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm font-medium transition-all duration-200"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleDeleteVariantConfirmed}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
-                >
-                  Eliminar categoría
-                </button>
               </div>
             </div>
           </div>
@@ -2374,67 +1989,43 @@ export default function ProductDashboard() {
 
       {/* Modal de confirmación de eliminación de opción */}
       {showDeleteOptionModal && optionToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl w-full max-w-md shadow-2xl border border-gray-200">
-            {/* Header del modal */}
-            <div className="bg-red-50 px-6 py-4 rounded-t-xl border-b border-red-200">
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mr-3">
-                  <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
+        <div className="modal-backdrop" onClick={cancelDeleteOption}>
+          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-panel max-w-sm">
+              <div className="p-5">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <X className="w-5 h-5 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Eliminar opción</h3>
+                    <p className="text-sm text-gray-500 mt-0.5">Esta acción no se puede deshacer</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-red-900">Confirmar eliminación</h3>
-                  <p className="text-sm text-red-700">Esta acción no se puede deshacer</p>
+
+                <div className="p-3 bg-gray-50 rounded-lg mb-4">
+                  <p className="font-medium text-gray-900">{optionToDelete.name}</p>
+                  <div className="flex gap-3 mt-1">
+                    {optionToDelete.price > 0 && (
+                      <span className="text-sm text-gray-500">+${optionToDelete.price.toFixed(2)}</span>
+                    )}
+                    {optionToDelete.quantityMultiplier > 1 && (
+                      <span className="text-sm text-gray-500">{optionToDelete.quantityMultiplier} unidades</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
-            
-            {/* Contenido del modal */}
-            <div className="px-6 py-6">
-              <div className="mb-4">
-                <p className="text-gray-700 mb-2">
-                  ¿Estás seguro de que quieres eliminar la opción:
-                </p>
-                <div className="bg-gray-50 p-3 rounded-lg border">
-                  <h4 className="font-semibold text-gray-900">{optionToDelete.name}</h4>
-                  {optionToDelete.price > 0 && (
-                    <p className="text-sm text-green-600 mt-1">Precio extra: +${optionToDelete.price.toFixed(2)}</p>
-                  )}
-                  {optionToDelete.quantityMultiplier > 1 && (
-                    <p className="text-sm text-blue-600 mt-1">Unidades: {optionToDelete.quantityMultiplier}</p>
-                  )}
+
+                <div className="flex gap-3">
+                  <button onClick={cancelDeleteOption} className="btn-secondary flex-1">
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleDeleteOptionConfirmed}
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                  >
+                    Eliminar
+                  </button>
                 </div>
-              </div>
-              
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                <div className="flex">
-                  <svg className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  <p className="text-sm text-yellow-800">
-                    <strong>Advertencia:</strong> Esta acción eliminará permanentemente la opción de la variante.
-                  </p>
-                </div>
-              </div>
-            </div>
-            
-            {/* Footer del modal */}
-            <div className="bg-gray-50 px-6 py-4 rounded-b-xl border-t border-gray-200">
-              <div className="flex gap-3 justify-end">
-                <button
-                  onClick={cancelDeleteOption}
-                  className="px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 text-sm font-medium transition-all duration-200"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={handleDeleteOptionConfirmed}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md"
-                >
-                  Eliminar opción
-                </button>
               </div>
             </div>
           </div>
