@@ -24,6 +24,7 @@
     "@heroicons/react": "^2.1.5",
     "@vercel/og": "^0.6.3",
     "axios": "^1.6.8",
+    "canvas-confetti": "^1.9.4",
     "cloudinary": "^2.5.1",
     "crisp-sdk-web": "^1.0.22",
     "eslint": "8.47.0",

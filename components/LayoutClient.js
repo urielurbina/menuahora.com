@@ -9,6 +9,8 @@ import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "react-hot-toast";
 import { Tooltip } from "react-tooltip";
 import config from "@/config";
+import ReferralCapture from "@/components/ReferralCapture";
+import { Suspense } from "react";
 
 // Crisp customer chat support:
 // This component is separated from ClientLayout because it needs to be wrapped with <SessionProvider> to use useSession() hook
@@ -76,6 +78,11 @@ const ClientLayout = ({ children }) => {
 
         {/* Set Crisp customer chat support */}
         <CrispChat />
+
+        {/* Capture referral code from URL */}
+        <Suspense fallback={null}>
+          <ReferralCapture />
+        </Suspense>
       </SessionProvider>
     </>
   );

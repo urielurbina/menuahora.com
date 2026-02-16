@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import ButtonAccount from "@/components/ButtonAccount";
-import PrivateRoute from '@/components/PrivateRoute';
+import PrivateRoute, { useTrialInfo } from '@/components/PrivateRoute';
 import { useSession } from 'next-auth/react';
 import LoadingScreen from '../../components/LoadingScreen';
 
@@ -12,9 +12,38 @@ const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
   { name: 'Mis productos', href: '/dashboard/productos', icon: 'M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z' },
   { name: 'Información básica', href: '/dashboard/informacionbasica', icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+  { name: 'Entregas', href: '/dashboard/entregas', icon: 'M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25m-2.25 0h-2.25m0 0v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0-6.677h-2.25' },
   { name: 'Botones', href: '/dashboard/buttons', icon: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1' },
   { name: 'Apariencia', href: '/dashboard/apariencia', icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' },
+  { name: 'Mi suscripción', href: '/dashboard/suscripcion', icon: 'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z' },
+  { name: 'Gana Dinero', href: '/dashboard/referidos', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', highlight: true },
 ];
+
+// Componente para el banner de trial
+function TrialBanner() {
+  const trialInfo = useTrialInfo();
+
+  if (!trialInfo) return null;
+
+  const isUrgent = trialInfo.daysLeft <= 2;
+
+  return (
+    <div className={`px-4 py-2 ${isUrgent ? 'bg-red-50 border-b border-red-200' : 'bg-amber-50 border-b border-amber-200'}`}>
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <p className={`text-sm ${isUrgent ? 'text-red-800' : 'text-amber-800'}`}>
+          <span className="font-medium">Prueba gratuita:</span> Te {trialInfo.daysLeft === 1 ? 'queda' : 'quedan'}{' '}
+          <strong>{trialInfo.daysLeft} {trialInfo.daysLeft === 1 ? 'día' : 'días'}</strong>
+        </p>
+        <Link
+          href="/dashboard/suscripcion"
+          className={`text-sm font-medium underline hover:no-underline ${isUrgent ? 'text-red-900 hover:text-red-700' : 'text-amber-900 hover:text-amber-700'}`}
+        >
+          Suscribirme
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 export default function ResponsiveLayout({ children }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -170,6 +199,9 @@ export default function ResponsiveLayout({ children }) {
 
           {/* Main Content */}
           <div className="dashboard-main">
+            {/* Trial Banner */}
+            <TrialBanner />
+
             {/* Mobile Header */}
             <div className="dashboard-header-mobile">
               <button

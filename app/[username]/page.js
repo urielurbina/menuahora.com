@@ -536,13 +536,12 @@ function UserPageContent({ params }) {
   };
 
   if (isLoading) return (
-    <div className="flex justify-center items-center h-screen">
-      <div role="status">
-        <svg aria-hidden="true" className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-400 fill-[#0D654A]" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-          <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-        </svg>
+    <div className="flex flex-col justify-center items-center h-[100dvh] bg-gray-50">
+      <div className="relative">
+        <div className="w-10 h-10 border-[3px] border-gray-200 rounded-full" />
+        <div className="absolute inset-0 w-10 h-10 border-[3px] border-transparent border-t-gray-900 rounded-full animate-spin" />
       </div>
+      <p className="mt-4 text-sm text-gray-400 font-medium">Cargando...</p>
     </div>
   )
   if (error) return <div>Error: {error}</div>
@@ -553,7 +552,8 @@ function UserPageContent({ params }) {
     categories = [],
     products = [],
     buttons = [],
-    appearance = {}
+    appearance = {},
+    deliverySettings = null
   } = businessData || {}
 
   const primaryColor = appearance.primaryColor || '#FF1C20'
@@ -1025,15 +1025,15 @@ function UserPageContent({ params }) {
 
         {/* Columns 2-4: Categories and Products */}
         <div className="lg:w-3/4 lg:ml-[25%]">
-          <div className="bg-gray-100 ">
+          <div className="bg-gray-50">
             {/* Categories */}
-            <div className="py-6 lg:py-2 bg-white border-b border-gray-200 text-center lg:text-left">
-              <h2 className={`text-3xl font-regular px-6 pt-4 ${headingFont}`}>
+            <div className="py-4 sm:py-6 lg:py-2 bg-white border-b border-gray-100 text-center lg:text-left sticky top-0 z-30">
+              <h2 className={`text-2xl sm:text-3xl font-medium px-4 sm:px-6 pt-2 sm:pt-4 text-gray-900 ${headingFont}`}>
                 Categorías
               </h2>
               <div className="flex justify-center lg:justify-start">
-                <CategoryList 
-                  categories={categories} 
+                <CategoryList
+                  categories={categories}
                   activeCategory={activeCategory}
                   setActiveCategory={setActiveCategory}
                   appearance={appearance}
@@ -1054,18 +1054,24 @@ function UserPageContent({ params }) {
               onDecrease={handleDecreaseQuantity}
             />
           </div>
-          {/* Modificar el footer para centrar los elementos */}
-  <footer className="w-full bg-gray-100 py-4 px-4 text-center text-sm text-gray-600 mt-8">
-    <Link href="https://menuahora.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center">
-      <span className="mr-2">Crea tu cátalogo digital en:</span>
-      <Image
-        src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
-        alt="Logo MenúAhora"
-        width={100}
-          height={20}
-        />
-        </Link>
-      </footer>
+          {/* Footer */}
+          <footer className="w-full bg-gray-50 py-6 px-4 text-center mt-8 mb-20 sm:mb-4">
+            <Link
+              href="https://menuahora.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 text-sm text-gray-500 hover:text-gray-700 transition-colors"
+            >
+              <span>Crea tu catálogo digital en</span>
+              <Image
+                src="https://res.cloudinary.com/dkuss2bup/image/upload/v1729739519/ohglabavyxhuflbn7jun.svg"
+                alt="Logo MenúAhora"
+                width={90}
+                height={18}
+                className="opacity-70 hover:opacity-100 transition-opacity"
+              />
+            </Link>
+          </footer>
     </div>
   </div>
 
@@ -1076,16 +1082,18 @@ function UserPageContent({ params }) {
 
   {/* Botón Volver Arriba */}
   <AnimatePresence>
-    {showScrollTop && (
+    {showScrollTop && !cart?.items?.length && (
       <motion.button
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, scale: 0.8, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.8, y: 20 }}
+        transition={{ type: "spring", stiffness: 400, damping: 25 }}
         onClick={scrollToTop}
-        className="fixed bottom-4 right-4 bg-black text-white p-3 rounded-full shadow-lg z-50"
+        className="fixed bottom-6 right-4 bg-white text-gray-700 w-11 h-11 rounded-full shadow-lg z-40 flex items-center justify-center active:scale-95 transition-transform border border-gray-100"
+        aria-label="Volver arriba"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
         </svg>
       </motion.button>
     )}
@@ -1098,31 +1106,37 @@ function UserPageContent({ params }) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-black bg-opacity-50 flex items-end sm:items-center justify-center z-50"
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 bg-black/60 backdrop-blur-[2px] flex items-end sm:items-center justify-center z-50"
         onClick={(e) => {
           e.stopPropagation();
           toggleProductDetails(selectedProduct);
         }}
       >
-        
+
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="bg-white w-full h-[100vh] sm:h-[85vh] sm:max-w-lg sm:rounded-xl relative flex flex-col overflow-hidden"
+          initial={{ y: "100%", opacity: 0.5 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: "100%", opacity: 0 }}
+          transition={{ type: "spring", damping: 30, stiffness: 300 }}
+          className="bg-white w-full h-[100dvh] sm:h-[85vh] sm:max-w-lg sm:rounded-2xl relative flex flex-col overflow-hidden shadow-2xl"
           onClick={(e) => e.stopPropagation()}
         >
 
+          {/* Drag handle indicator for mobile */}
+          <div className="sm:hidden absolute top-2 left-1/2 -translate-x-1/2 w-10 h-1 bg-gray-300 rounded-full z-30" />
+
           {/* Contenedor con scroll */}
-          <div className="flex-1 overflow-y-auto pb-[150px] pt-16">
+          <div className="flex-1 overflow-y-auto overscroll-y-contain pb-[160px] pt-12 sm:pt-6">
             {/* Imagen del producto */}
             <div className="px-4 sm:px-6 pb-4">
-              <div className="w-full aspect-square relative rounded-2xl overflow-hidden">
+              <div className="w-full aspect-square relative rounded-2xl overflow-hidden shadow-sm">
                  <Image
                    src={selectedProduct.imagen}
                    alt={selectedProduct.nombre}
                    fill
-                   style={{ objectFit: 'cover' }}
+                   sizes="(max-width: 640px) 100vw, 512px"
+                   className="object-cover"
                    priority
                  />
               </div>
@@ -1183,20 +1197,19 @@ function UserPageContent({ params }) {
               {selectedProduct.variants && selectedProduct.variants.length > 0 && (
                 <div className="mb-6">
                   {selectedProduct.variants.map((variant, variantIndex) => (
-                    <div key={variant.id} className="mb-6">
-                      {/* Divisor entre variantes */}
+                    <div key={variant.id} className="mb-5">
                       {variantIndex > 0 && (
-                        <div className="border-t-2 border-gray-200 mb-4"></div>
+                        <div className="border-t border-gray-100 mb-4" />
                       )}
-                      
+
                       <h4 className="font-semibold mb-3 text-gray-800 flex items-center justify-between">
                         <span>{variant.name}</span>
                         {variant.isRequired !== false ? (
-                          <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full font-medium">
+                          <span className="text-[11px] bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full font-medium">
                             Requerido
                           </span>
                         ) : (
-                          <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">
+                          <span className="text-[11px] bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full font-medium">
                             Opcional
                           </span>
                         )}
@@ -1206,27 +1219,27 @@ function UserPageContent({ params }) {
                           <div key={option.id} className="relative">
                             {variant.enableStock ? (
                               // Con contador de cantidad
-                              <div className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg">
-                                <div className="flex items-center">
-                                  <div className="text-sm font-medium text-gray-700">
+                              <div className="flex items-center justify-between w-full p-3.5 bg-white border border-gray-200 rounded-xl transition-colors">
+                                <div className="flex-1 min-w-0 pr-3">
+                                  <div className="text-sm font-medium text-gray-800 truncate">
                                     {option.name}
-                                    {option.price > 0 && (
-                                      <span className="text-xs text-green-600 ml-2">+${option.price.toFixed(2)}</span>
-                                    )}
                                   </div>
+                                  {option.price > 0 && (
+                                    <span className="text-xs text-emerald-600 font-medium">+${option.price.toFixed(2)}</span>
+                                  )}
                                 </div>
-                                <div className="flex items-center border rounded-lg">
+                                <div className="flex items-center bg-gray-100 rounded-lg overflow-hidden">
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       const currentQuantity = getVariantQuantity(variant.id, option.id);
                                       handleVariantQuantityChange(variant.id, option.id, Math.max(0, currentQuantity - 1));
                                     }}
-                                    className="w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
+                                    className="w-10 h-10 flex items-center justify-center text-gray-600 text-lg font-medium active:bg-gray-200 transition-colors"
                                   >
-                                    -
+                                    −
                                   </button>
-                                  <div className="w-12 h-8 flex items-center justify-center bg-white text-sm">
+                                  <div className="w-10 h-10 flex items-center justify-center bg-white text-sm font-semibold tabular-nums">
                                     {getVariantQuantity(variant.id, option.id)}
                                   </div>
                                   <button
@@ -1235,7 +1248,7 @@ function UserPageContent({ params }) {
                                       const currentQuantity = getVariantQuantity(variant.id, option.id);
                                       handleVariantQuantityChange(variant.id, option.id, currentQuantity + 1);
                                     }}
-                                    className="w-8 h-8 flex items-center justify-center bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200"
+                                    className="w-10 h-10 flex items-center justify-center text-gray-600 text-lg font-medium active:bg-gray-200 transition-colors"
                                   >
                                     +
                                   </button>
@@ -1262,16 +1275,18 @@ function UserPageContent({ params }) {
                                 />
                                 <label
                                   htmlFor={`variant-${variant.id}-${option.id}`}
-                                  className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-gray-600 peer-checked:bg-gray-50 hover:bg-gray-50 transition-all"
+                                  className="flex items-center justify-between w-full p-3.5 bg-white border border-gray-200 rounded-xl cursor-pointer peer-checked:border-gray-900 peer-checked:bg-gray-50 active:bg-gray-50 transition-all"
                                 >
-                                  <div className="flex-1 text-sm font-medium text-gray-700">
-                                    {option.name}
+                                  <div className="flex-1 min-w-0">
+                                    <span className="text-sm font-medium text-gray-800">{option.name}</span>
                                     {option.price > 0 && (
-                                      <span className="text-xs text-green-600 ml-2">+${option.price.toFixed(2)}</span>
+                                      <span className="text-xs text-emerald-600 font-medium ml-2">+${option.price.toFixed(2)}</span>
                                     )}
                                   </div>
-                                  <div className="w-5 h-5 border-2 border-gray-300 rounded-full flex items-center justify-center ml-3 peer-checked:border-gray-600 flex-shrink-0">
-                                    <div className={`w-2.5 h-2.5 bg-gray-600 rounded-full ${getVariantQuantity(variant.id, option.id) > 0 ? 'block' : 'hidden'}`}></div>
+                                  <div className={`w-5 h-5 border-2 rounded-full flex items-center justify-center ml-3 flex-shrink-0 transition-colors ${getVariantQuantity(variant.id, option.id) > 0 ? 'border-gray-900 bg-gray-900' : 'border-gray-300'}`}>
+                                    {getVariantQuantity(variant.id, option.id) > 0 && (
+                                      <div className="w-2 h-2 bg-white rounded-full" />
+                                    )}
                                   </div>
                                 </label>
                               </div>
@@ -1340,12 +1355,11 @@ function UserPageContent({ params }) {
               {/* Extras */}
               {selectedProduct.extras && selectedProduct.extras.length > 0 && (
                 <div className="mb-6">
-                  {/* Divisor antes de extras */}
-                  <div className="border-t-2 border-gray-200 mb-4"></div>
-                  
+                  <div className="border-t border-gray-100 mb-4" />
+
                   <h4 className="font-semibold mb-3 text-gray-800 flex items-center justify-between">
                     <span>Extras</span>
-                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full font-medium">
+                    <span className="text-[11px] bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full font-medium">
                       Opcional
                     </span>
                   </h4>
@@ -1367,28 +1381,20 @@ function UserPageContent({ params }) {
                         />
                         <label
                           htmlFor={`extra-${index}`}
-                          className="flex items-center justify-between w-full p-3 bg-white border border-gray-200 rounded-lg cursor-pointer peer-checked:border-gray-600 peer-checked:bg-gray-50 hover:bg-gray-50 transition-all"
+                          className="flex items-center justify-between w-full p-3.5 bg-white border border-gray-200 rounded-xl cursor-pointer peer-checked:border-gray-900 peer-checked:bg-gray-50 active:bg-gray-50 transition-all"
                         >
-                          <div className="flex-1 text-sm font-medium text-gray-700">
-                            {extra.name}
-                            <span className="text-xs text-green-600 ml-2">
+                          <div className="flex-1 min-w-0">
+                            <span className="text-sm font-medium text-gray-800">{extra.name}</span>
+                            <span className="text-xs text-emerald-600 font-medium ml-2">
                               +${typeof extra.price === 'number' ? extra.price.toFixed(2) : extra.price}
                             </span>
                           </div>
-                          <div className="w-5 h-5 border-2 border-gray-300 rounded flex items-center justify-center ml-3 peer-checked:border-gray-600 flex-shrink-0">
-                            <svg 
-                              className={`w-3 h-3 text-gray-600 ${selectedExtras.includes(extra.name) ? 'block' : 'hidden'}`}
-                              fill="none" 
-                              stroke="currentColor" 
-                              viewBox="0 0 24 24"
-                            >
-                              <path 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round" 
-                                strokeWidth="2" 
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
+                          <div className={`w-5 h-5 border-2 rounded flex items-center justify-center ml-3 flex-shrink-0 transition-colors ${selectedExtras.includes(extra.name) ? 'border-gray-900 bg-gray-900' : 'border-gray-300'}`}>
+                            {selectedExtras.includes(extra.name) && (
+                              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                              </svg>
+                            )}
                           </div>
                         </label>
                       </div>
@@ -1397,27 +1403,26 @@ function UserPageContent({ params }) {
                 </div>
               )}
 
-              {/* Selector de cantidad - Movido aquí desde el footer */}
+              {/* Selector de cantidad */}
               {!hasVariantsWithQuantity(selectedProduct) && (
                 <div className="mb-6">
-                  {/* Divisor antes de cantidad */}
-                  <div className="border-t-2 border-gray-200 mb-4"></div>
-                  
+                  <div className="border-t border-gray-100 mb-4" />
+
                   <h4 className="font-semibold mb-3 text-gray-800">
                     Cantidad
                   </h4>
                   <div className="flex items-center justify-center w-full">
-                    <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+                    <div className="flex items-center bg-gray-100 rounded-xl overflow-hidden">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleDecreaseQuantity(selectedProduct._id);
                         }}
-                        className="w-12 h-12 flex items-center justify-center bg-gray-100 text-gray-700 text-lg font-medium hover:bg-gray-200"
+                        className="w-14 h-14 flex items-center justify-center text-gray-600 text-xl font-medium active:bg-gray-200 transition-colors"
                       >
-                        -
+                        −
                       </button>
-                      <div className="w-16 h-12 flex items-center justify-center bg-white text-lg font-medium">
+                      <div className="w-16 h-14 flex items-center justify-center bg-white text-lg font-semibold tabular-nums">
                         {productQuantities[selectedProduct._id] || 1}
                       </div>
                       <button
@@ -1425,7 +1430,7 @@ function UserPageContent({ params }) {
                           e.stopPropagation();
                           handleIncreaseQuantity(selectedProduct._id);
                         }}
-                        className="w-12 h-12 flex items-center justify-center bg-gray-100 text-gray-700 text-lg font-medium hover:bg-gray-200"
+                        className="w-14 h-14 flex items-center justify-center text-gray-600 text-xl font-medium active:bg-gray-200 transition-colors"
                       >
                         +
                       </button>
@@ -1438,11 +1443,10 @@ function UserPageContent({ params }) {
 
           {/* Botón de cerrar flotante - siempre visible */}
           <button
-            className="absolute top-12 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:bg-white transition-colors"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 w-9 h-9 flex items-center justify-center rounded-full bg-white/95 backdrop-blur-sm shadow-lg hover:bg-white active:scale-95 transition-all duration-150"
             onClick={(e) => {
               e.stopPropagation();
               if (editingCartItem) {
-                // Si estamos editando, limpiar el estado de edición
                 setEditingCartItem(null);
                 setSelectedProduct(null);
                 setSelectedVariants({});
@@ -1452,17 +1456,19 @@ function UserPageContent({ params }) {
               }
             }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" viewBox="0 0 20 20" fill="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </button>
 
 
-          {/* Fondo blanco adicional en la parte inferior para mobile */}
-          <div className="absolute bottom-0 left-0 right-0 h-20 bg-white -z-10"></div>
-
           {/* Footer fijo con botón de agregar */}
-          <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 p-4 bg-white shadow-lg">
+          <div
+            className="absolute bottom-0 left-0 right-0 border-t border-gray-100 px-4 pt-3 bg-white/95 backdrop-blur-lg shadow-[0_-4px_20px_rgba(0,0,0,0.08)]"
+            style={{
+              paddingBottom: 'max(1rem, calc(env(safe-area-inset-bottom, 0px) + 0.75rem))'
+            }}
+          >
             <div className="max-w-lg mx-auto">
               {/* Banner de descuentos */}
               {(() => {
@@ -1517,63 +1523,71 @@ function UserPageContent({ params }) {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  
-                  // Validar que se hayan seleccionado las variantes requeridas
+
                   if (selectedProduct.variants && selectedProduct.variants.length > 0) {
                     const unselectedRequiredVariants = selectedProduct.variants.filter(variant => {
-                      // Solo verificar variantes que son obligatorias
                       if (variant.isRequired === false) return false;
-                      
-                      const hasSelection = Object.keys(selectedVariants).includes(variant.id) && 
+
+                      const hasSelection = Object.keys(selectedVariants).includes(variant.id) &&
                         Object.values(selectedVariants[variant.id] || {}).some(qty => qty > 0);
-                      return !hasSelection; // Si no hay selección en variante obligatoria
+                      return !hasSelection;
                     });
-                    
+
                     if (unselectedRequiredVariants.length > 0) {
                       const variantNames = unselectedRequiredVariants.map(v => v.name).join(', ');
                       alert(`Por favor selecciona las siguientes variantes obligatorias: ${variantNames}`);
                       return;
                     }
                   }
-                  
-                  // Compatibilidad con estructura antigua
+
                   if (selectedProduct.tipos && !selectedProduct.variants) {
                     const hasLegacySelection = Object.keys(selectedVariants).length > 0;
                     if (!hasLegacySelection) {
-                    alert('Por favor selecciona un tipo');
+                      alert('Por favor selecciona un tipo');
                       return;
                     }
                   }
-                  
-                  // Si tiene variantes con cantidad, usar la cantidad total calculada
-                  const finalQuantity = hasVariantsWithQuantity(selectedProduct) 
+
+                  const finalQuantity = hasVariantsWithQuantity(selectedProduct)
                     ? calculateTotalVariantQuantity(selectedProduct)
                     : (productQuantities[selectedProduct._id] || 1);
-                  
-                  // Validar que hay al menos una unidad seleccionada
+
                   if (finalQuantity === 0) {
                     alert('Debes seleccionar al menos una unidad');
                     return;
                   }
-                  
+
                   if (editingCartItem) {
-                    // Si estamos editando, actualizar el item
                     handleUpdateEditedItem();
                   } else {
-                    // Si no estamos editando, agregar nuevo item
-                  addToCart(
-                    selectedProduct, 
+                    addToCart(
+                      selectedProduct,
                       finalQuantity,
                       selectedVariants,
-                    selectedExtras
-                  );
+                      selectedExtras
+                    );
                   }
                 }}
-                className="w-full h-12 bg-black text-white rounded-lg font-medium hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                className="
+                  w-full h-14 sm:h-12
+                  bg-gray-900 text-white
+                  rounded-xl sm:rounded-lg
+                  font-semibold text-[15px]
+                  hover:bg-gray-800 active:scale-[0.98]
+                  transition-all duration-150
+                  flex items-center justify-center gap-2
+                  shadow-sm
+                "
               >
-                <span className="text-white">
-                  {editingCartItem ? "Actualizar item" : `Agregar ${hasVariantsWithQuantity(selectedProduct) ? calculateTotalVariantQuantity(selectedProduct) : (productQuantities[selectedProduct._id] || 1)} al carrito • $${calculateDynamicPrice(selectedProduct).toFixed(2)}`}
-                </span>
+                {editingCartItem ? (
+                  <span>Actualizar</span>
+                ) : (
+                  <>
+                    <span>Agregar</span>
+                    <span className="mx-1 text-white/40">•</span>
+                    <span className="tabular-nums">${calculateDynamicPrice(selectedProduct).toFixed(2)}</span>
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -1591,6 +1605,7 @@ function UserPageContent({ params }) {
     onEditItem={handleEditCartItem}
     appearance={businessData}
     total={cart.total}
+    deliverySettings={deliverySettings}
   />
 </div>
 

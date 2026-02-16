@@ -5,14 +5,117 @@ import connectMongo from "@/libs/mongoose";
 import configFile from "@/config";
 import User from "@/models/User";
 import { findCheckoutSession } from "@/libs/stripe";
+import { connectToDatabase } from "@/libs/mongodb";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+const REFERRAL_REWARD = 3500; // $35.00 en centavos
+
+// Función para procesar el pago de referido
+async function processReferralPayout(user, paymentAmount) {
+  try {
+    if (!user.referredBy) {
+      console.log("User has no referrer");
+      return;
+    }
+
+    const { db } = await connectToDatabase();
+
+    // Buscar el negocio del referidor por username
+    const referrerBusiness = await db.collection('businesses').findOne({
+      username: user.referredBy.toLowerCase()
+    });
+
+    if (!referrerBusiness) {
+      console.log("Referrer business not found:", user.referredBy);
+      return;
+    }
+
+    // Buscar el usuario referidor
+    const referrer = await db.collection('users').findOne({
+      _id: referrerBusiness.userId
+    }) || await db.collection('users').findOne({
+      email: referrerBusiness.userId
+    });
+
+    if (!referrer) {
+      console.log("Referrer user not found");
+      return;
+    }
+
+    // Verificar que el referidor tenga suscripción activa
+    if (referrer.hasAccess !== true) {
+      console.log("Referrer does not have active subscription, skipping payout");
+      return;
+    }
+
+    // Verificar si el referidor tiene Stripe Connect configurado y onboarded
+    if (!referrer.stripeConnectId || !referrer.stripeConnectOnboarded) {
+      console.log("Referrer not connected to Stripe, accumulating earnings");
+      // Acumular ganancias aunque no tenga Stripe Connect
+      await db.collection('users').updateOne(
+        { _id: referrer._id },
+        { $inc: { referralEarnings: REFERRAL_REWARD / 100 } }
+      );
+      return;
+    }
+
+    // Crear transfer a la cuenta Connect del referidor
+    try {
+      const transfer = await stripe.transfers.create({
+        amount: REFERRAL_REWARD,
+        currency: 'mxn',
+        destination: referrer.stripeConnectId,
+        description: `Referral reward for ${user.email}`,
+        metadata: {
+          referredUserId: user._id?.toString(),
+          referredEmail: user.email,
+          referrerId: referrer._id?.toString(),
+        },
+      });
+
+      console.log("Transfer created:", transfer.id);
+
+      // Actualizar ganancias del referidor
+      await db.collection('users').updateOne(
+        { _id: referrer._id },
+        {
+          $inc: {
+            referralEarnings: REFERRAL_REWARD / 100,
+            referralPaidOut: REFERRAL_REWARD / 100,
+          }
+        }
+      );
+
+      // Registrar el payout en una colección separada para historial
+      await db.collection('referralPayouts').insertOne({
+        referrerId: referrer._id,
+        referrerEmail: referrer.email,
+        referredUserId: user._id,
+        referredEmail: user.email,
+        amount: REFERRAL_REWARD / 100,
+        stripeTransferId: transfer.id,
+        createdAt: new Date(),
+      });
+
+      console.log("Referral payout processed successfully");
+
+    } catch (transferError) {
+      console.error("Error creating transfer:", transferError.message);
+      // Aún así acumular ganancias para pago manual
+      await db.collection('users').updateOne(
+        { _id: referrer._id },
+        { $inc: { referralEarnings: REFERRAL_REWARD / 100 } }
+      );
+    }
+
+  } catch (error) {
+    console.error("Error processing referral payout:", error);
+  }
+}
+
 // This is where we receive Stripe webhook events
-// It used to update the user data, send emails, etc...
-// By default, it'll store the user in the database
-// See more: https://shipfa.st/docs/features/payments
 export async function POST(req) {
   await connectMongo();
 
@@ -35,19 +138,19 @@ export async function POST(req) {
     switch (type) {
       case "checkout.session.completed": {
         console.log("Checkout session completed:", data.object.id);
-        
+
         const session = await findCheckoutSession(data.object.id);
         console.log("Session details:", session);
 
         const customerId = session?.customer;
         const priceId = session?.line_items?.data[0]?.price.id;
         const userId = data.object.client_reference_id;
-        
+
         console.log("Customer ID:", customerId);
         console.log("Price ID:", priceId);
         console.log("User ID:", userId);
 
-        const plan = configFile.stripe.plans.find(p => 
+        const plan = configFile.stripe.plans.find(p =>
           p.priceId.monthly === priceId || p.priceId.yearly === priceId
         );
 
@@ -92,74 +195,88 @@ export async function POST(req) {
         user.hasAccess = true;
         user.plan = plan.name;
 
+        // Desactivar trial cuando el usuario paga
+        if (user.isOnTrial) {
+          user.isOnTrial = false;
+          console.log("Trial deactivated for user:", user.email);
+        }
+
         await user.save();
         console.log("User saved successfully:", user);
+
+        // Procesar pago de referido (primer pago)
+        await processReferralPayout(user, session.amount_total);
 
         break;
       }
 
       case "checkout.session.expired": {
         // User didn't complete the transaction
-        // You don't need to do anything here, by you can send an email to the user to remind him to complete the transaction, for instance
         break;
       }
 
       case "customer.subscription.updated": {
-        // The customer might have changed the plan (higher or lower plan, cancel soon etc...)
-        // You don't need to do anything here, because Stripe will let us know when the subscription is canceled for good (at the end of the billing cycle) in the "customer.subscription.deleted" event
-        // You can update the user data to show a "Cancel soon" badge for instance
+        // The customer might have changed the plan
         break;
       }
 
       case "customer.subscription.deleted": {
         // The customer subscription stopped
-        // ❌ Revoke access to the product
-        // The customer might have changed the plan (higher or lower plan, cancel soon etc...)
         const subscription = await stripe.subscriptions.retrieve(
           data.object.id
         );
         const user = await User.findOne({ customerId: subscription.customer });
 
-        // Revoke access to your product
-        user.hasAccess = false;
-        await user.save();
+        if (user) {
+          user.hasAccess = false;
+          await user.save();
+        }
 
         break;
       }
 
       case "invoice.paid": {
         console.log("Invoice paid:", data.object.id);
-        // Customer just paid an invoice (for instance, a recurring payment for a subscription)
-        // ✅ Grant access to the product
-        const priceId = data.object.lines.data[0].price.id;
-        const customerId = data.object.customer;
+        const invoice = data.object;
 
-        const user = await User.findOne({ customerId });
+        // Solo procesar si no es el primer invoice (billing_reason !== 'subscription_create')
+        // porque el primer pago ya se procesa en checkout.session.completed
+        if (invoice.billing_reason === 'subscription_cycle') {
+          const customerId = invoice.customer;
+          const user = await User.findOne({ customerId });
 
-        if (!user) {
-          console.error("No user found for customerId:", customerId);
-          // You might want to create a new user here or handle this case differently
-          break;
+          if (user) {
+            // Grant access
+            user.hasAccess = true;
+            await user.save();
+
+            // Procesar pago de referido para pagos recurrentes
+            await processReferralPayout(user, invoice.amount_paid);
+            console.log("Recurring payment processed for:", user.email);
+          }
         }
-
-        // Make sure the invoice is for the same plan (priceId) the user subscribed to
-        if (user.priceId !== priceId) break;
-
-        // Grant user access to your product. It's a boolean in the database, but could be a number of credits, etc...
-        user.hasAccess = true;
-        await user.save();
 
         break;
       }
 
       case "invoice.payment_failed":
-        // A payment failed (for instance the customer does not have a valid payment method)
-        // ❌ Revoke access to the product
-        // ⏳ OR wait for the customer to pay (more friendly):
-        //      - Stripe will automatically email the customer (Smart Retries)
-        //      - We will receive a "customer.subscription.deleted" when all retries were made and the subscription has expired
-
+        // A payment failed
         break;
+
+      case "account.updated": {
+        // Stripe Connect account was updated
+        const account = data.object;
+
+        if (account.details_submitted && account.payouts_enabled) {
+          const { db } = await connectToDatabase();
+          await db.collection('users').updateOne(
+            { stripeConnectId: account.id },
+            { $set: { stripeConnectOnboarded: true } }
+          );
+          console.log("Stripe Connect onboarding completed for:", account.id);
+        }
+        break;
+      }
 
       default:
       // Unhandled event type

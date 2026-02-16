@@ -36,6 +36,54 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // Trial fields
+    trialStartDate: {
+      type: Date,
+      default: null,
+    },
+    trialEndDate: {
+      type: Date,
+      default: null,
+    },
+    isOnTrial: {
+      type: Boolean,
+      default: false,
+    },
+    // Onboarding fields
+    onboardingCompleted: {
+      type: Boolean,
+      default: false,
+    },
+    personalWhatsapp: {
+      type: String,
+      trim: true,
+    },
+    country: {
+      type: String,
+      trim: true,
+    },
+    // Referral fields
+    referredBy: {
+      type: String, // username del referidor
+      trim: true,
+      default: null,
+    },
+    stripeConnectId: {
+      type: String, // ID de Stripe Connect para recibir pagos
+      default: null,
+    },
+    stripeConnectOnboarded: {
+      type: Boolean,
+      default: false,
+    },
+    referralEarnings: {
+      type: Number, // Total ganado históricamente
+      default: 0,
+    },
+    referralPaidOut: {
+      type: Number, // Total ya pagado
+      default: 0,
+    },
   },
   {
     timestamps: true,
