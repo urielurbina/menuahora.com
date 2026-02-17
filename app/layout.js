@@ -31,7 +31,7 @@ export default function RootLayout({ children }) {
           <PlausibleProvider domain={config.domainName} />
           <Script
             strategy="afterInteractive"
-            src="https://www.googletagmanager.com/gtag/js?id=G-5LN0ZLM77J"
+            src="https://www.googletagmanager.com/gtag/js?id=G-NLE176KSH8"
           />
           <Script
             id="google-analytics"
@@ -42,6 +42,7 @@ export default function RootLayout({ children }) {
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
 
+              gtag('config', 'G-NLE176KSH8');
               gtag('config', 'G-5LN0ZLM77J');
             `}
           </Script>
