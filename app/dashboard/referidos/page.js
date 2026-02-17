@@ -77,13 +77,23 @@ export default function ReferidosPage() {
     setConnectLoading(true);
     try {
       const res = await fetch('/api/referrals/connect', { method: 'POST' });
-      const data = await res.json();
+      const result = await res.json();
 
-      if (data.url) {
-        window.location.href = data.url;
+      console.log('Stripe Connect response:', result);
+
+      if (result.error) {
+        alert(`Error: ${result.error}`);
+        return;
+      }
+
+      if (result.url) {
+        window.location.href = result.url;
+      } else {
+        alert('No se recibió URL de Stripe. Revisa la configuración.');
       }
     } catch (error) {
       console.error('Error connecting Stripe:', error);
+      alert(`Error: ${error.message}`);
     } finally {
       setConnectLoading(false);
     }

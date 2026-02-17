@@ -60,6 +60,14 @@ export async function POST(req) {
 
   } catch (error) {
     console.error('Error creating Stripe Connect:', error);
+
+    // More specific error messages
+    if (error.type === 'StripeInvalidRequestError') {
+      return NextResponse.json({
+        error: `Stripe Connect error: ${error.message}. Verifica que Stripe Connect esté habilitado en tu cuenta.`
+      }, { status: 500 });
+    }
+
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
