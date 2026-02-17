@@ -997,27 +997,28 @@ function UserPageContent({ params }) {
         {/* Column 1: Logo and Info */}
         <div style={{backgroundColor: primaryColor}} className="lg:w-1/4 lg:fixed lg:top-0 lg:left-0 lg:bottom-0 lg:overflow-y-auto">
           {/* Header with background image and logo */}
-          <div className="relative">
+          <header className="relative">
             <Image
               src={mergedBasicInfo.coverPhotoUrl}
-              alt="Fondo de negocio"
+              alt={`Portada de ${mergedBasicInfo.businessName}`}
               width={500}
               height={300}
               layout="responsive"
               objectFit="cover"
+              priority
             />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="bg-white rounded-full w-32 h-32 flex items-center justify-center overflow-hidden">
                 <Image
                   src={mergedBasicInfo.logoUrl}
-                  alt="Logotipo"
+                  alt={`Logo de ${mergedBasicInfo.businessName}`}
                   width={128}
                   height={128}
                   objectFit="cover"
                 />
               </div>
             </div>
-          </div>
+          </header>
 
           <BusinessInfo basicInfo={basicInfo} appearance={appearance} />
           <ActionButtons buttons={buttons} appearance={appearance} />
@@ -1130,16 +1131,16 @@ function UserPageContent({ params }) {
           <div className="flex-1 overflow-y-auto overscroll-y-contain pb-[160px] pt-12 sm:pt-6">
             {/* Imagen del producto */}
             <div className="px-4 sm:px-6 pb-4">
-              <div className="w-full aspect-square relative rounded-2xl overflow-hidden shadow-sm">
+              <figure className="w-full aspect-square relative rounded-2xl overflow-hidden shadow-sm">
                  <Image
                    src={selectedProduct.imagen}
-                   alt={selectedProduct.nombre}
+                   alt={`${selectedProduct.nombre}${selectedProduct.descripcion ? ` - ${selectedProduct.descripcion.slice(0, 50)}` : ''}`}
                    fill
                    sizes="(max-width: 640px) 100vw, 512px"
                    className="object-cover"
                    priority
                  />
-              </div>
+              </figure>
             </div>
 
             {/* Contenido del producto */}

@@ -4,9 +4,12 @@ import { authOptions } from "@/libs/next-auth";
 import { connectToDatabase } from "@/libs/mongodb";
 import { isAdmin } from "@/libs/admin";
 import { ObjectId } from 'mongodb';
+import Stripe from 'stripe';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Actualizar usuario (extender trial, dar acceso, etc)
-export async function PUT(req, { params }) {
+export async function PUT(req, context) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -14,7 +17,7 @@ export async function PUT(req, { params }) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await context.params;
     const body = await req.json();
     const { db } = await connectToDatabase();
 
@@ -39,6 +42,29 @@ export async function PUT(req, { params }) {
       updateFields.hasAccess = body.hasAccess;
       if (body.hasAccess) {
         updateFields.isOnTrial = false;
+      } else {
+        // Quitar acceso: cancelar suscripción de Stripe si existe
+        const user = await db.collection('users').findOne({ _id: new ObjectId(id) });
+        if (user?.customerId) {
+          try {
+            // Buscar suscripciones activas del cliente
+            const subscriptions = await stripe.subscriptions.list({
+              customer: user.customerId,
+              status: 'active',
+            });
+
+            // Cancelar todas las suscripciones activas
+            for (const subscription of subscriptions.data) {
+              await stripe.subscriptions.cancel(subscription.id);
+            }
+
+            if (subscriptions.data.length > 0) {
+              updateFields.subscriptionCancelledByAdmin = new Date();
+            }
+          } catch (stripeError) {
+            console.error('Error cancelling Stripe subscription:', stripeError.message);
+          }
+        }
       }
     }
 

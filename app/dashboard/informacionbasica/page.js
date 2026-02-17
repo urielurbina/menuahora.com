@@ -22,6 +22,7 @@ export default function InformacionBasica() {
     slogan: '',
     logoUrl: '',
     coverPhotoUrl: '',
+    seoKeywords: '',
     contact: {
       phoneNumber: '',
       whatsappNumber: '',
@@ -66,9 +67,15 @@ export default function InformacionBasica() {
         // Verificar que los datos existan antes de usarlos
         const basicInfo = data['basic-info'] || {};
 
+        // Convert seoKeywords array to comma-separated string for input
+        const seoKeywordsString = Array.isArray(data.seoKeywords)
+          ? data.seoKeywords.join(', ')
+          : '';
+
         setFormData(prevData => ({
           ...prevData,
           ...basicInfo,
+          seoKeywords: seoKeywordsString,
           contact: { ...prevData.contact, ...(basicInfo.contact || {}) },
           schedule: { ...prevData.schedule, ...(basicInfo.schedule || {}) }
         }));
@@ -207,9 +214,15 @@ export default function InformacionBasica() {
     // Obtener el userId de la sesión
     const userId = session.user.id;
 
+    // Parse SEO keywords from comma-separated string to array
+    const seoKeywordsArray = formData.seoKeywords
+      ? formData.seoKeywords.split(',').map(k => k.trim()).filter(k => k.length > 0)
+      : [];
+
     // Preparar los datos para enviar
     const dataToSend = {
       userId, // Incluir el userId del usuario autenticado
+      seoKeywords: seoKeywordsArray,
       'basic-info': {
         businessName: formData.businessName,
         description: formData.description,
@@ -402,6 +415,24 @@ export default function InformacionBasica() {
                   placeholder="Breve descripción de tu negocio"
                 />
                 <p className="form-hint">Máximo 200 caracteres.</p>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="seoKeywords" className="form-label">
+                  Palabras clave para buscadores <span className="form-label-optional">(opcional)</span>
+                </label>
+                <input
+                  type="text"
+                  id="seoKeywords"
+                  name="seoKeywords"
+                  value={formData.seoKeywords}
+                  onChange={handleChange}
+                  className="form-input"
+                  placeholder="tacos, comida mexicana, delivery, centro histórico"
+                />
+                <p className="form-hint">
+                  Separa las palabras clave con comas. Estas ayudan a que te encuentren en Google.
+                </p>
               </div>
             </div>
           </div>

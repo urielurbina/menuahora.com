@@ -33,10 +33,13 @@ export async function GET(req) {
 
     if (business && business['basic-info']) {
       console.log('Información básica encontrada:', business['basic-info']);
-      return NextResponse.json({ 'basic-info': business['basic-info'] });
+      return NextResponse.json({
+        'basic-info': business['basic-info'],
+        seoKeywords: business.seoKeywords || []
+      });
     } else {
       console.log('No se encontró información básica, devolviendo objeto vacío');
-      return NextResponse.json({ 'basic-info': {} });
+      return NextResponse.json({ 'basic-info': {}, seoKeywords: [] });
     }
   } catch (error) {
     console.error('Error detallado en get-basic-info:', error);

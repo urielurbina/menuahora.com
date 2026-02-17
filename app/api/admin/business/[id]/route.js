@@ -5,7 +5,7 @@ import { connectToDatabase } from "@/libs/mongodb";
 import { isAdmin } from "@/libs/admin";
 import { ObjectId } from 'mongodb';
 
-export async function GET(req, { params }) {
+export async function GET(req, context) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -13,7 +13,7 @@ export async function GET(req, { params }) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await context.params;
     const { db } = await connectToDatabase();
 
     // Buscar el negocio
@@ -30,8 +30,23 @@ export async function GET(req, { params }) {
     }
 
     // Buscar el usuario asociado
-    const user = await db.collection('users').findOne({ _id: business.userId }) ||
-                 await db.collection('users').findOne({ email: business.userId });
+    let user = null;
+
+    if (business.userId) {
+      try {
+        user = await db.collection('users').findOne({ _id: new ObjectId(business.userId) });
+      } catch (e) {
+        // Not a valid ObjectId
+      }
+
+      if (!user) {
+        user = await db.collection('users').findOne({ _id: business.userId });
+      }
+
+      if (!user) {
+        user = await db.collection('users').findOne({ email: business.userId });
+      }
+    }
 
     // Calcular estado
     const now = new Date();
@@ -99,7 +114,7 @@ export async function GET(req, { params }) {
 }
 
 // Actualizar datos del negocio (como admin)
-export async function PUT(req, { params }) {
+export async function PUT(req, context) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -107,7 +122,7 @@ export async function PUT(req, { params }) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await context.params;
     const body = await req.json();
     const { db } = await connectToDatabase();
 
@@ -147,7 +162,7 @@ export async function PUT(req, { params }) {
 }
 
 // Eliminar un producto específico
-export async function DELETE(req, { params }) {
+export async function DELETE(req, context) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -155,7 +170,7 @@ export async function DELETE(req, { params }) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const { id } = params;
+    const { id } = await context.params;
     const { searchParams } = new URL(req.url);
     const productId = searchParams.get('productId');
 

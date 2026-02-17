@@ -52,7 +52,7 @@ export default function ComercioDetailPage() {
 
       if (res.ok) {
         setMessage({ type: 'success', text: result.message });
-        fetchData(); // Recargar datos
+        fetchData();
       } else {
         setMessage({ type: 'error', text: result.error });
       }

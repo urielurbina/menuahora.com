@@ -268,9 +268,9 @@ export default function Hero() {
 
                   {/* Headline */}
                   <h1 className="text-[2.5rem] sm:text-5xl lg:text-[3.5rem] xl:text-[4rem] leading-[0.95] tracking-tight text-neutral-900 font-medium">
-                    Tu catalogo digital.
+                    Crea tu catalogo digital.
                     <br />
-                    <span className="text-[#0D654A]">Pedidos por WhatsApp.</span>
+                    <span className="text-[#0D654A]">Recibe pedidos por WhatsApp.</span>
                   </h1>
 
                   {/* Subhead */}

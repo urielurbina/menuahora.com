@@ -1,7 +1,49 @@
+const { MongoClient } = require('mongodb');
+
 module.exports = {
-  // REQUIRED: add your own domain name here (e.g. https://shipfa.st),
-  siteUrl: process.env.SITE_URL || "https://shipfa.st",
+  siteUrl: process.env.SITE_URL || "https://repisa.co",
   generateRobotsTxt: true,
-  // use this to exclude routes from the sitemap (i.e. a user dashboard). By default, NextJS app router metadata files are excluded (https://nextjs.org/docs/app/api-reference/file-conventions/metadata)
-  exclude: ["/twitter-image.*", "/opengraph-image.*", "/icon.*"],
+  exclude: [
+    "/twitter-image.*",
+    "/opengraph-image.*",
+    "/icon.*",
+    "/admin",
+    "/admin/*",
+    "/dashboard",
+    "/dashboard/*",
+    "/onboarding",
+    "/onboarding/*",
+    "/auth/*",
+    "/trial-expirado",
+    "/bienvenida",
+    "/pantallaplanes",
+  ],
+  additionalPaths: async (config) => {
+    const paths = [];
+
+    // Fetch all business usernames from database
+    try {
+      const client = await MongoClient.connect(process.env.MONGODB_URI);
+      const db = client.db();
+      const businesses = await db.collection('businesses').find(
+        { username: { $exists: true, $ne: null } },
+        { projection: { username: 1, updatedAt: 1 } }
+      ).toArray();
+
+      for (const business of businesses) {
+        paths.push({
+          loc: `/${business.username}`,
+          lastmod: business.updatedAt ? new Date(business.updatedAt).toISOString() : new Date().toISOString(),
+          changefreq: 'weekly',
+          priority: 0.8,
+        });
+      }
+
+      await client.close();
+    } catch (error) {
+      console.error('Error fetching businesses for sitemap:', error);
+    }
+
+    return paths;
+  },
 };

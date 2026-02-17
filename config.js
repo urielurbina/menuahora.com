@@ -5,7 +5,7 @@ const config = {
   appName: "Repisa",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
   appDescription:
-    "Recibe tu menú digital en minutos no semanas.",
+    "Crea tu catálogo digital y recibe pedidos por WhatsApp. Productos ilimitados, variantes, extras y precios por mayoreo. Prueba gratis 7 días.",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
   domainName: "repisa.co",
   crisp: {
