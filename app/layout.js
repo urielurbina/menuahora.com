@@ -1,4 +1,4 @@
-import { Inter } from "next/font/google";
+import { Manrope } from "next/font/google";
 import PlausibleProvider from "next-plausible";
 import { getSEOTags } from "@/libs/seo";
 import ClientLayout from "@/components/LayoutClient";
@@ -6,7 +6,10 @@ import config from "@/config";
 import "./globals.css";
 import Script from 'next/script'
 
-const font = Inter({ subsets: ["latin"] });
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: '--font-manrope',
+});
 
 export const viewport = {
   // Will use the primary color of your theme to show a nice theme color in the URL bar of supported browsers
@@ -21,7 +24,7 @@ export const metadata = getSEOTags();
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" data-theme={config.colors.theme} className={font.className}>
+    <html lang="en" data-theme={config.colors.theme} className={`${manrope.variable} font-sans`}>
       {config.domainName && (
         <head>
           <PlausibleProvider domain={config.domainName} />
