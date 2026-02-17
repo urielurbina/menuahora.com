@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 
 module.exports = {
-  siteUrl: process.env.SITE_URL || "https://repisa.co",
+  siteUrl: process.env.SITE_URL || "https://www.repisa.co",
   generateRobotsTxt: true,
   exclude: [
     "/twitter-image.*",

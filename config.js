@@ -7,7 +7,7 @@ const config = {
   appDescription:
     "Crea tu catálogo digital y recibe pedidos por WhatsApp. Productos ilimitados, variantes, extras y precios por mayoreo. Prueba gratis 7 días.",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
-  domainName: "repisa.co",
+  domainName: "www.repisa.co",
   crisp: {
     // Crisp website ID. IF YOU DON'T USE CRISP: just remove this => Then add a support email in this config file (mailgun.supportEmail) otherwise customer support won't work.
     id: "",
