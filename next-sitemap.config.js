@@ -7,6 +7,7 @@ module.exports = {
     "/twitter-image.*",
     "/opengraph-image.*",
     "/icon.*",
+    "/apple-icon.*",
     "/admin",
     "/admin/*",
     "/dashboard",
