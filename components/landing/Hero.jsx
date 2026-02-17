@@ -284,7 +284,7 @@ export default function Hero() {
                       href="/#precios"
                       className="inline-flex items-center justify-center px-8 py-4 text-base text-white bg-[#0D654A] hover:bg-[#0a5640] transition-colors"
                     >
-                      Crear mi catalogo
+                      Crear mi catalogo gratis
                     </Link>
                     <a
                       href="https://repisa.co/tacosuriel"

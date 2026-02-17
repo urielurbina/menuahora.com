@@ -34,7 +34,7 @@ export default function CTA() {
               href="/auth/signin"
               className="inline-flex items-center justify-center w-full px-8 py-4 text-base text-[#0D654A] bg-white hover:bg-neutral-100 transition-colors"
             >
-              Crear mi catalogo
+              Crear mi catalogo gratis
             </Link>
             <a
               href="https://repisa.co/tacosuriel"
