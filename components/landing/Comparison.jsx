@@ -37,50 +37,46 @@ export default function Comparison() {
           </div>
         </div>
 
-        {/* Mobile: Card-based comparison */}
-        <motion.div
-          ref={ref}
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.6 }}
-          className="md:hidden space-y-3"
-        >
-          {rows.map((row, i) => (
-            <motion.div
-              key={row.feature}
-              initial={{ opacity: 0, y: 10 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ delay: i * 0.05 }}
-              className="bg-white p-4 rounded-lg"
-            >
-              <div className="text-sm font-medium text-neutral-900 mb-3">
-                {row.feature}
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                <div className="text-center">
-                  <div className="text-[10px] text-neutral-400 uppercase tracking-wide mb-1">PDF</div>
-                  <div className="text-sm text-neutral-500">{row.pdf}</div>
+        {/* Comparison content */}
+        <div ref={ref}>
+          {/* Mobile: Card-based comparison */}
+          <div className="md:hidden space-y-3">
+            {rows.map((row, i) => (
+              <motion.div
+                key={row.feature}
+                initial={{ opacity: 0, y: 10 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: i * 0.05 }}
+                className="bg-white p-4 rounded-lg"
+              >
+                <div className="text-sm font-medium text-neutral-900 mb-3">
+                  {row.feature}
                 </div>
-                <div className="text-center bg-[#0D654A]/10 rounded-lg py-2 -my-1">
-                  <div className="text-[10px] text-[#0D654A] uppercase tracking-wide mb-1 font-medium">Repisa</div>
-                  <div className="text-sm text-[#0D654A] font-medium">{row.repisa}</div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-center">
+                    <div className="text-[10px] text-neutral-400 uppercase tracking-wide mb-1">PDF</div>
+                    <div className="text-sm text-neutral-500">{row.pdf}</div>
+                  </div>
+                  <div className="text-center bg-[#0D654A]/10 rounded-lg py-2 -my-1">
+                    <div className="text-[10px] text-[#0D654A] uppercase tracking-wide mb-1 font-medium">Repisa</div>
+                    <div className="text-sm text-[#0D654A] font-medium">{row.repisa}</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-[10px] text-neutral-400 uppercase tracking-wide mb-1">Ecommerce</div>
+                    <div className="text-sm text-neutral-500">{row.ecommerce}</div>
+                  </div>
                 </div>
-                <div className="text-center">
-                  <div className="text-[10px] text-neutral-400 uppercase tracking-wide mb-1">Ecommerce</div>
-                  <div className="text-sm text-neutral-500">{row.ecommerce}</div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+              </motion.div>
+            ))}
+          </div>
 
-        {/* Desktop: Table */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.6 }}
-          className="hidden md:block bg-white overflow-x-auto"
-        >
+          {/* Desktop: Table */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={isInView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.6 }}
+            className="hidden md:block bg-white overflow-x-auto"
+          >
           <table className="w-full">
             <thead>
               <tr>
@@ -108,6 +104,7 @@ export default function Comparison() {
             </tbody>
           </table>
         </motion.div>
+        </div>
       </div>
     </section>
   )
