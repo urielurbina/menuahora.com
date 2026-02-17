@@ -45,6 +45,12 @@ export default function RootLayout({ children }) {
               gtag('config', 'G-5LN0ZLM77J');
             `}
           </Script>
+          <Script
+            defer
+            src="https://cloud.umami.is/script.js"
+            data-website-id="0c78c6a2-9b88-4d62-8337-d7e6f4bfb386"
+            strategy="afterInteractive"
+          />
         </head>
       )}
       <body>
