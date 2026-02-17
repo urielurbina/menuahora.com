@@ -6,6 +6,7 @@ import apiClient from "@/libs/api";
 import config from "@/config";
 import { useRouter } from 'next/navigation';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
+import { trackHybridEvent } from "@/components/FacebookPixel";
 
 const ButtonCheckout = ({ priceId, mode = "subscription", children, className = "" }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +36,22 @@ const ButtonCheckout = ({ priceId, mode = "subscription", children, className = 
     }
 
     try {
+      // Get plan info for tracking
+      const plan = config.stripe.plans.find(p =>
+        p.priceId.monthly === selectedPriceId || p.priceId.yearly === selectedPriceId
+      );
+      const isYearly = plan?.priceId.yearly === selectedPriceId;
+      const price = isYearly ? plan?.price.yearly : plan?.price.monthly;
+
+      // Track InitiateCheckout event (browser + server)
+      await trackHybridEvent('InitiateCheckout', {
+        content_name: plan?.name || 'Subscription',
+        content_category: 'subscription',
+        value: price,
+        currency: 'MXN',
+        num_items: 1,
+      });
+
       const res = await apiClient.post("/stripe/create-checkout", {
         priceId: selectedPriceId,
         mode: selectedMode,

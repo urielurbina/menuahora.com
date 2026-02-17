@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import config from '@/config';
 import { getReferralCode, clearReferralCode } from '@/components/ReferralCapture';
+import { trackHybridEvent } from '@/components/FacebookPixel';
 
 // Lista de rubros/categorías
 const CATEGORIES = [
@@ -319,6 +320,15 @@ export default function OnboardingPage() {
       });
 
       if (res.ok) {
+        // Track StartTrial event (browser + server)
+        await trackHybridEvent('StartTrial', {
+          content_name: 'Plan Esencial',
+          content_category: 'subscription',
+          value: 0,
+          currency: 'MXN',
+          predicted_ltv: monthlyPrice,
+        });
+
         // Limpiar el código de referido después de usarlo
         clearReferralCode();
         router.push('/dashboard');

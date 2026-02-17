@@ -3,6 +3,7 @@ import EmailProvider from "next-auth/providers/email";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import config from "@/config";
 import connectMongo from "./mongo";
+import { sendServerEvent, generateEventId, FB_EVENTS } from "./facebook-pixel";
 
 export const authOptions = {
   // Set any random key in .env.local
@@ -51,6 +52,31 @@ export const authOptions = {
         token.uid = user.id;
       }
       return token;
+    },
+  },
+  events: {
+    // Track CompleteRegistration when a new user signs up
+    createUser: async ({ user }) => {
+      try {
+        await sendServerEvent({
+          eventName: FB_EVENTS.COMPLETE_REGISTRATION,
+          eventId: generateEventId(),
+          eventSourceUrl: `https://${config.domainName}/auth/signin`,
+          userData: {
+            email: user.email,
+            firstName: user.name?.split(' ')[0],
+            lastName: user.name?.split(' ').slice(1).join(' '),
+            externalId: user.id,
+          },
+          customData: {
+            content_name: 'Google Sign Up',
+            status: 'completed',
+          },
+        });
+        console.log("FB CompleteRegistration event sent for:", user.email);
+      } catch (error) {
+        console.error("FB CompleteRegistration event failed:", error);
+      }
     },
   },
   session: {

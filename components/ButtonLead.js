@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { toast } from "react-hot-toast";
 import apiClient from "@/libs/api";
+import { trackHybridEvent } from "@/components/FacebookPixel";
 
 // This component is used to collect the emails from the landing page
 // You'd use this if your product isn't ready yet or you want to collect leads
@@ -20,6 +21,12 @@ const ButtonLead = ({ extraStyle }) => {
     setIsLoading(true);
     try {
       await apiClient.post("/lead", { email });
+
+      // Track Lead event (browser + server)
+      await trackHybridEvent('Lead', {
+        content_name: 'Waitlist',
+        content_category: 'lead_capture',
+      }, { userData: { email } });
 
       toast.success("Thanks for joining the waitlist!");
 

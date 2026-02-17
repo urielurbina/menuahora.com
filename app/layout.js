@@ -4,7 +4,8 @@ import { getSEOTags } from "@/libs/seo";
 import ClientLayout from "@/components/LayoutClient";
 import config from "@/config";
 import "./globals.css";
-import Script from 'next/script'
+import Script from 'next/script';
+import FacebookPixel from "@/components/FacebookPixel";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -47,6 +48,7 @@ export default function RootLayout({ children }) {
         </head>
       )}
       <body>
+        <FacebookPixel />
         {/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
         <ClientLayout>{children}</ClientLayout>
       </body>

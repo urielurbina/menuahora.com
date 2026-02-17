@@ -6,6 +6,7 @@ import configFile from "@/config";
 import User from "@/models/User";
 import { findCheckoutSession } from "@/libs/stripe";
 import { connectToDatabase } from "@/libs/mongodb";
+import { sendServerEvent, generateEventId, FB_EVENTS } from "@/libs/facebook-pixel";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -203,6 +204,34 @@ export async function POST(req) {
 
         await user.save();
         console.log("User saved successfully:", user);
+
+        // Track Purchase event with Facebook Conversions API
+        try {
+          const purchaseAmount = session.amount_total / 100; // Convert from cents
+          await sendServerEvent({
+            eventName: FB_EVENTS.PURCHASE,
+            eventId: generateEventId(),
+            eventSourceUrl: 'https://www.repisa.co/onboarding',
+            userData: {
+              email: user.email,
+              firstName: user.name?.split(' ')[0],
+              lastName: user.name?.split(' ').slice(1).join(' '),
+              externalId: user._id?.toString(),
+              subscriptionId: customerId,
+            },
+            customData: {
+              value: purchaseAmount,
+              currency: 'MXN',
+              content_name: plan.name,
+              content_type: 'subscription',
+              content_ids: [priceId],
+              num_items: 1,
+            },
+          });
+          console.log("FB Purchase event sent for:", user.email);
+        } catch (fbError) {
+          console.error("FB Purchase event failed:", fbError);
+        }
 
         // Procesar pago de referido (primer pago)
         await processReferralPayout(user, session.amount_total);
