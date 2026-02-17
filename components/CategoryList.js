@@ -17,18 +17,13 @@ export default function CategoryList({ categories = [], activeCategory, setActiv
 
   return (
     <div className="relative w-full">
-      {/* Fade edges for scroll indication */}
-      <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-white to-transparent z-10" />
-      <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-white to-transparent z-10" />
-
       <div
         className="
           flex items-center gap-2
           overflow-x-auto overscroll-x-contain
-          px-6 py-4
+          px-4 sm:px-6 py-4
           scrollbar-hide
           scroll-smooth
-          snap-x snap-mandatory
         "
         style={{
           WebkitOverflowScrolling: 'touch',
@@ -37,7 +32,7 @@ export default function CategoryList({ categories = [], activeCategory, setActiv
         }}
       >
         <button
-          className={`${buttonClasses(activeCategory === 'Todo')} snap-start`}
+          className={buttonClasses(activeCategory === 'Todo')}
           onClick={() => setActiveCategory('Todo')}
           style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}
         >
@@ -46,7 +41,7 @@ export default function CategoryList({ categories = [], activeCategory, setActiv
         {categories.map((category) => (
           <button
             key={category._id}
-            className={`${buttonClasses(activeCategory === category.name)} snap-start`}
+            className={buttonClasses(activeCategory === category.name)}
             onClick={() => setActiveCategory(category.name)}
             style={{ fontFamily: appearance.bodyFont || 'sans-serif' }}
           >
