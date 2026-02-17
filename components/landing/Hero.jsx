@@ -6,6 +6,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import { useSession } from 'next-auth/react'
 
 const navigation = [
   { name: 'Producto', href: '#producto' },
@@ -150,6 +151,8 @@ function PhoneMockup() {
 
 export default function Hero() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const { data: session, status } = useSession()
+  const isAuthenticated = status === 'authenticated'
 
   return (
     <div className="bg-white min-h-screen">
@@ -187,16 +190,44 @@ export default function Hero() {
                 {item.name}
               </a>
             ))}
-            <div className="flex items-center gap-6 ml-6 pl-6 border-l border-neutral-200">
-              <Link href="/auth/signin" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors">
-                Entrar
-              </Link>
-              <Link
-                href="/#precios"
-                className="text-sm text-white bg-neutral-900 px-5 py-2.5 hover:bg-neutral-800 transition-colors"
-              >
-                Comenzar
-              </Link>
+            <div className="flex items-center gap-4 ml-6 pl-6 border-l border-neutral-200">
+              {isAuthenticated ? (
+                <>
+                  <div className="flex items-center gap-2">
+                    {session?.user?.image ? (
+                      <img
+                        src={session.user.image}
+                        alt={session.user.name || 'Usuario'}
+                        className="w-8 h-8 rounded-full"
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <span className="w-8 h-8 bg-neutral-200 flex items-center justify-center rounded-full text-sm font-medium text-neutral-600">
+                        {session?.user?.name?.charAt(0) || session?.user?.email?.charAt(0)}
+                      </span>
+                    )}
+                    <span className="text-sm text-neutral-700">{session?.user?.name}</span>
+                  </div>
+                  <Link
+                    href="/dashboard"
+                    className="text-sm text-white bg-neutral-900 px-5 py-2.5 hover:bg-neutral-800 transition-colors"
+                  >
+                    Ir al Dashboard
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth/signin" className="text-sm text-neutral-500 hover:text-neutral-900 transition-colors">
+                    Entrar
+                  </Link>
+                  <Link
+                    href="/#precios"
+                    className="text-sm text-white bg-neutral-900 px-5 py-2.5 hover:bg-neutral-800 transition-colors"
+                  >
+                    Comenzar
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </nav>
@@ -236,12 +267,41 @@ export default function Hero() {
                 </a>
               ))}
               <div className="pt-6 border-t border-neutral-200 space-y-4">
-                <Link href="/auth/signin" className="block text-lg text-neutral-500">
-                  Entrar
-                </Link>
-                <Link href="/#precios" className="block text-lg text-[#0D654A] font-medium">
-                  Comenzar gratis →
-                </Link>
+                {isAuthenticated ? (
+                  <>
+                    <div className="flex items-center gap-3 pb-4">
+                      {session?.user?.image ? (
+                        <img
+                          src={session.user.image}
+                          alt={session.user.name || 'Usuario'}
+                          className="w-10 h-10 rounded-full"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <span className="w-10 h-10 bg-neutral-200 flex items-center justify-center rounded-full text-lg font-medium text-neutral-600">
+                          {session?.user?.name?.charAt(0) || session?.user?.email?.charAt(0)}
+                        </span>
+                      )}
+                      <span className="text-lg text-neutral-900">{session?.user?.name}</span>
+                    </div>
+                    <Link
+                      href="/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block text-lg text-[#0D654A] font-medium"
+                    >
+                      Ir al Dashboard →
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/auth/signin" className="block text-lg text-neutral-500">
+                      Entrar
+                    </Link>
+                    <Link href="/#precios" className="block text-lg text-[#0D654A] font-medium">
+                      Comenzar gratis →
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
           </DialogPanel>
