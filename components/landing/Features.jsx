@@ -236,7 +236,7 @@ const features = [
   {
     number: '02',
     title: 'Variantes y extras',
-    description: 'Tamanos, sabores, ingredientes adicionales. Tus clientes personalizan su pedido exactamente como lo quieren.',
+    description: 'Tamanos, colores, extras opcionales. Tus clientes personalizan su pedido exactamente como lo quieren.',
     mockup: VariantsMockup,
   },
   {

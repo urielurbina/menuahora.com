@@ -72,7 +72,7 @@ export default function Pricing() {
                   ${annual ? '1,499' : '199'}
                 </span>
                 <span className="text-neutral-500">
-                  MXN / {annual ? 'ano' : 'mes'}
+                  MXN / {annual ? 'año' : 'mes'}
                 </span>
               </div>
               {annual && (
